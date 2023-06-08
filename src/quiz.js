@@ -39,6 +39,32 @@ function adminQuizRemove(authUserId, quizId) {
 }
 
 /**
+ * This function returns all the relevant information 
+ * about the given quiz.
+ * 
+ * @param {integer} authUserId
+ * @param {integer} quizId
+ * 
+ * @returns {
+ *  quizId: integer,
+ *  name: string,
+ *  timeCreated: integer,
+ *  timeLastEdited: integer,
+ *  description: string,
+ * }
+*/
+function adminQuizInfo(authUserId, quizId) {
+   //add code
+   return {
+       quizId: 1,
+       name: 'My Quiz',
+       timeCreated: 1683125870,
+       timeLastEdited: 1683125871,
+       description: 'This is my quiz',
+     }
+}
+
+/**
  * This function updates the description of the relevant quiz.
  * 
  * @param {integer} authUserId 
