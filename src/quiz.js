@@ -12,7 +12,7 @@
  *      }
  *  ]
  * }
- */
+*/
 function adminQuizList(authUserId) {
     return {
         quizzes: [
@@ -24,7 +24,16 @@ function adminQuizList(authUserId) {
     }
 }
 
-
+/**
+ * This function updates the description of the relevant quiz.
+ * 
+ * @param {integer} authUserId 
+ * @param {integer} quizId
+ * @param {string} description
+ * 
+ * @returns {}
+ * 
+*/
 function adminQuizDescriptionUpdate(authUserId, quizId, description) {
     return {}
 }
