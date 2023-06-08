@@ -8,7 +8,7 @@
  * @param {string} nameFirst
  * @param {string} nameLast
  * 
- * @returns {{authUserId: integer}}
+ * @returns {authUserId: integer}
  */
 function adminAuthRegister(email, password, nameFirst, nameLast) {
     return {
@@ -24,7 +24,7 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
  * @param {string} email 
  * @param {string} password 
  * 
- * @returns {{authUserId: integer}}
+ * @returns {authUserId: integer}
  */
 function adminAuthLogin(email, password) {
     return {
@@ -38,14 +38,14 @@ function adminAuthLogin(email, password) {
  * 
  * @param {integer} authUserId 
  * 
- * @returns {{ user:
+ * @returns { user:
  *  { 
  *      userId: integer,
  *      email: string,
  *      numSuccessfulLogins: integer,
  *      numFailedPasswordsSinceLastLogin: integer
  *  }
- * }}
+ * }
  */
 function adminUserDetails(authUserId) {
     return {
