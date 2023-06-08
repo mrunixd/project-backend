@@ -13,3 +13,21 @@ function adminAuthLogin(email, password) {
         authUserId: 1
     }
 }
+
+/**
+ * This function registers a new user into Toohak: requires an email password
+ * and first & last name to create a valid user, will then generate and return
+ * a new userId.
+ * 
+ * @param {string} email 
+ * @param {string} password 
+ * @param {string} nameFirst
+ * @param {string} nameLast
+ * 
+ * @returns {{authUserId: number}}
+ */
+function adminAuthRegister(email, password, nameFirst, nameLast) {
+    return {
+        authUserId: 1
+    }
+}
