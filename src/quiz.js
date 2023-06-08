@@ -25,6 +25,20 @@ function adminQuizList(authUserId) {
 }
 
 /**
+ * This function is given a particular quiz and then permanently removes
+ * and deletes the quiz.
+ * 
+ * @param {integer} authUserId
+ * @param {integer} quizId
+ * 
+ * @returns {} 
+ */
+function adminQuizRemove(authUserId, quizId) {
+    //code to remove quiz
+    return {}
+}
+
+/**
  * This function updates the description of the relevant quiz.
  * 
  * @param {integer} authUserId 
