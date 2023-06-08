@@ -1,3 +1,3 @@
-function adminQuizDescriptionUpdate (authUserId, quizId, description) {
+function adminQuizDescriptionUpdate(authUserId, quizId, description) {
     return {}
 }
