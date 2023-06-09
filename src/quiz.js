@@ -25,6 +25,23 @@ function adminQuizList(authUserId) {
 }
 
 /**
+ * This function creates a quiz given a basic description for the logged in
+ * user, thus creating a new quix for an individual.
+ * 
+ * @param {number} authUserId 
+ * @param {string} name
+ * @param {string} description 
+ * 
+ * @returns {{quizId: number}}
+ */
+
+function adminQuizCreate(authUserId, name, description) {
+    return {
+        quizId: 2
+    }
+}
+
+/**
  * This function is given a particular quiz and then permanently removes
  * and deletes the quiz.
  * 
