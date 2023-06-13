@@ -12,6 +12,7 @@
         "@babel/preset-env": "^7.22.5",
         "jest": "^28.1.0"
     },
+    "type": "module",
     "nyc": {
         "exclude": [
             "echo.*"
