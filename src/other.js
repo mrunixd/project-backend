@@ -6,7 +6,15 @@
  * @returns {}
  * 
 */
+import { setData } from "./dataStore.js";
+
 function clear() {
+    const clear_data = {
+        users: [],
+
+        quizzes: []
+    }
+    setData(clear_data);
     return {}
 }
 
