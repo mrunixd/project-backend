@@ -59,3 +59,5 @@ function adminUserDetails(authUserId) {
         }
     }
 }
+
+export { adminAuthRegister, adminAuthLogin, adminUserDetails };
