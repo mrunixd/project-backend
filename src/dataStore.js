@@ -1,5 +1,9 @@
 // YOU SHOULD MODIFY THIS OBJECT BELOW
-const data = {};
+let data = {
+  users: [],
+
+  quizzes: []
+};
 
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
 
