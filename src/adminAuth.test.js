@@ -47,7 +47,7 @@ describe('Testing adminAuthRegister errors', () => {
     });
     
     test('CASE: Password does not contain at least one number and at least one letter', () => {
-        let result = adminAuthRegister("vincentxian@gmail.com", "password", "vincent", "x");
+        let result = adminAuthRegister("vincentxian@gmail.com", "password", "vincent", "xian");
         expect(result).toMatchObject({ error: 'Password does not contain at least one number and at least one letter' });
     });
 });

@@ -1,7 +1,8 @@
 // YOU SHOULD MODIFY THIS OBJECT BELOW
-const data = {
-  'users': [  ],
-  'quizzes': [  ]
+let data = {
+  users: [],
+
+  quizzes: []
 };
 
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
@@ -31,3 +32,4 @@ function setData(newData) {
 }
 
 export { getData, setData };
+
