@@ -80,6 +80,7 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
  */
 function adminAuthLogin(email, password) {
     const data = getData();
+
     if (!data.users.some(users => users.email === email.toLowerCase())) {
         return {
             error: 'Email address does not exist.'
@@ -87,14 +88,20 @@ function adminAuthLogin(email, password) {
     };
 
     if (!data.users.some(users => users.email === email.toLowerCase() && users.password === password )) {
+        // increment numFailedPasswordsSinceLastLogin
+        const user_email = data.users.find(users => users.email === email.toLowerCase());
+        user_email.numFailedPasswordsSinceLastLogin++;
         return {
             error: 'Password is incorrect.'
         };
     }; 
-    
+
     // Find index of user to return their respective authUserId
     const user = data.users.find(users => users.email === email.toLowerCase() && users.password === password);
 
+    // increment numSuccesfulLogins && reset numFailedPasswordsSinceLastLogin
+    user.numSuccessfulLogins++;
+    user.numFailedPasswordsSinceLastLogin = 0;
     return {
         authUserId: user.authUserId
     }
