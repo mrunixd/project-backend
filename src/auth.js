@@ -79,8 +79,24 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
  * @returns {authUserId: integer}
  */
 function adminAuthLogin(email, password) {
+    const data = getData();
+    if (!data.users.some(users => users.email === email.toLowerCase())) {
+        return {
+            error: 'Email address does not exist.'
+        };
+    };
+
+    if (!data.users.some(users => users.email === email.toLowerCase() && users.password === password )) {
+        return {
+            error: 'Password is incorrect.'
+        };
+    }; 
+    
+    // Find index of user to return their respective authUserId
+    const user = data.users.find(users => users.email === email.toLowerCase() && users.password === password);
+
     return {
-        authUserId: 1
+        authUserId: user.authUserId
     }
 }
 
