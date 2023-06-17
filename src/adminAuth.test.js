@@ -114,4 +114,24 @@ describe('email addresses case sensitivity', () => {
     });
 });
 
+describe('increment numSuccesfulLogins & numFailedPasswords', () => {
+    test('CASE: 2 successful logins in a row', () => {
+        clear();
+
+        adminAuthRegister("manan.j2450@gmail.com", "abcd1234", "Manan", "Jaiswal");
+        adminAuthLogin("manan.j2450@gmail.com", "abcd1234");
+        adminAuthLogin("manan.j2450@gmail.com", "abcd1234");
+        expect(adminAuthLogin("manan.j2450@gmail.com", "abcd1234")).toStrictEqual({ authUserId: expect.any(Number)});
+    });
+
+    test('CASE: 2 incorrect passwords in a row', () => {
+        clear();
+
+        adminAuthRegister("manan.j2450@gmail.com", "abcd1234", "Manan", "Jaiswal");
+        adminAuthLogin("manan.j2450@gmail.com", "abcd1234");
+        adminAuthLogin("manan.j2450@gmail.com", "incorrectpw1");
+        adminAuthLogin("manan.j2450@gmail.com", "incorrectpw2");
+        expect(adminAuthLogin("manan.j2450@gmail.com", "abcd1234")).toStrictEqual({ authUserId: expect.any(Number)});
+    });
+});
 //TESTING adminUserDetails
