@@ -19,3 +19,6 @@ different users.
 
 * Assume that you cannot change the name of the quiz to the current name
 
+* Assume user email is case insensitive such that you can log in with 
+lowercase or uppercase regardless of registration.
+
