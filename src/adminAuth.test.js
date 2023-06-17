@@ -70,6 +70,7 @@ describe('Testing adminAuthRegister errors', () => {
 describe('check return', () => {
     test('CASE: test returns authUserId {number}', () => {
         clear();
+
         adminAuthRegister("manan.j2450@gmail.com", "abcd1234", "Manan", "Jaiswal");
         expect(adminAuthLogin("manan.j2450@gmail.com", "abcd1234")).toStrictEqual({ authUserId: expect.any(Number)}); 
     });
@@ -78,31 +79,36 @@ describe('check return', () => {
 describe('checking errors', () => {
     test('CASE: Email address does not exist', () => {
         clear();
-        expect(adminAuthLogin("manan.j2450@gmail.com", "abcd1234")).toStrictEqual({ error: 'Email address does not exist.'}); 
+
+        expect(adminAuthLogin("manan.j2450@gmail.com", "hello1")).toStrictEqual({ error: 'Email address does not exist.'}); 
     });
 
     test('CASE: Password is incorrect - differing case', () => {
         clear();
-        adminAuthRegister("manan.j2450@gmail.com", "ABCD1234", "Manan", "Jaiswal");
-        expect(adminAuthLogin("manan.j2450@gmail.com", "abcd1234")).toStrictEqual({ error: 'Password is incorrect.'}); 
+
+        adminAuthRegister("manan1111@gmail.com", "ABCD1234", "Manan", "Jaiswal");
+        expect(adminAuthLogin("manan1111@gmail.com", "hello2")).toStrictEqual({ error: 'Password is incorrect.'}); 
     });
     
     test('CASE: Password is incorrect - differing password', () => {
         clear();
-        adminAuthRegister("manan.j2450@gmail.com", "incorrectpw", "Manan", "Jaiswal");
-        expect(adminAuthLogin("manan.j2450@gmail.com", "abcd1234")).toStrictEqual({ error: 'Password is incorrect.'}); 
+
+        adminAuthRegister("manan2222@gmail.com", "incorrectpw1", "Manan", "Jaiswal");
+        expect(adminAuthLogin("manan2222@gmail.com", "hello3")).toStrictEqual({ error: 'Password is incorrect.'}); 
     });
 });
 
 describe('email addresses case sensitivity', () => {
     test('CASE: test case sensitivity of email address letters', () => {
         clear();
+
         adminAuthRegister("manan.j2450@gmail.com", "abcd1234", "Manan", "Jaiswal");
         expect(adminAuthLogin("Manan.j2450@gmail.com", "abcd1234")).toStrictEqual({ authUserId: expect.any(Number)}); 
     });
 
     test('CASE: test case sensitivity of email address letters', () => {
         clear();
+
         adminAuthRegister("manan.j2450@gmail.com", "abcd1234", "Manan", "Jaiswal");
         expect(adminAuthLogin("manan.j2450@gMail.com", "abcd1234")).toStrictEqual({ authUserId: expect.any(Number)}); 
     });
