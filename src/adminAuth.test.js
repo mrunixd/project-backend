@@ -2,63 +2,61 @@ import { adminAuthRegister, adminAuthLogin, adminUserDetails } from "./auth.js";
 // import { getData, setData } from "./dataStore.js";
 import { clear } from "./other.js";
 
-//TESTING adminAuthRegister
-describe('Testing adminAuthRegister success', () => {
+beforeEach(() => {
+    clear();
+  });
 
+///////////////////////TESTING adminAuthRegister///////////////////////
+describe('Testing adminAuthRegister success', () => {
     test('CASE: Successful register', () => {
-        clear();
         let result = adminAuthRegister("vincentxian@gmail.com", "vincentpassword1", "vincent", "xian");
         expect(result).toMatchObject({ authUserId: expect.any(Number) });
     });
 });
 
 describe('Testing adminAuthRegister errors', () => {
-    test('CASE: Email address is already in use', () => {
-        clear();
+    test('CASE: Email address is already in use - same email in caps', () => {
+        let result = adminAuthRegister("vincentxian@gmail.com", "vincentpassword1", "vincent", "xian");
+        let result2 = adminAuthRegister("Vincentxian@gmail.com", "vincentpassword1", "vincent", "xian");
+        expect(result2).toStrictEqual({ error: 'Email address is already in use' });
+    });
+    test('CASE: Email address is already in use - same email exactly', () => {
         let result = adminAuthRegister("vincentxian@gmail.com", "vincentpassword1", "vincent", "xian");
         let result2 = adminAuthRegister("vincentxian@gmail.com", "vincentpassword1", "vincent", "xian");
         expect(result2).toStrictEqual({ error: 'Email address is already in use' });
     });
 
     test('CASE: Email address is invalid', () => {
-        clear();
         let result = adminAuthRegister("vincent123", "vincentpassword1", "vincent", "xian");
         expect(result).toStrictEqual({ error: 'Email address is not valid' });
     });
 
     test('CASE: First name is invalid', () => {
-        clear();
         let result = adminAuthRegister("vincentxian@gmail.com", "vincentpassword1", "!!!", "xian");
         expect(result).toStrictEqual({ error: 'First name is invalid' });
     });
     
     test('CASE: First name is less than 2 characters or more than 20 characters', () => {
-        clear();
         let result = adminAuthRegister("vincentxian@gmail.com", "vincentpassword1", "v", "xian");
         expect(result).toStrictEqual({ error: 'First name is less than 2 characters or more than 20 characters' });
     });
     
     test('CASE: Last name is invalid', () => {
-        clear();
         let result = adminAuthRegister("vincentxian@gmail.com", "vincentpassword1", "vincent", "!!!");
         expect(result).toStrictEqual({ error: 'Last name is invalid' });
     });
        
     test('CASE: Last name is less than 2 characters or more than 20 characters', () => {
-        clear(); 
         let result = adminAuthRegister("vincentxian@gmail.com", "vincentpassword1", "vincent", "x");
         expect(result).toStrictEqual({ error: 'Last name is less than 2 characters or more than 20 characters' });
     });
     
     test('CASE: Password is less than 8 characters', () => {
-        clear();
         let result = adminAuthRegister("vincentxian@gmail.com", "pass", "vincent", "xian");
         expect(result).toStrictEqual({ error: 'Password is less than 8 characters' });
     });
 
     test('CASE: Password does not contain at least one number and at least one letter', () => {
-        clear();
-
         let result = adminAuthRegister("vincentxian@gmail.com", "password", "vincent", "xian");
         expect(result).toStrictEqual({ error: 'Password does not contain at least one number and at least one letter' });
     });
@@ -66,57 +64,56 @@ describe('Testing adminAuthRegister errors', () => {
 
 
 
-//TESTING adminAuthLogin
-describe('check return', () => {
-    test('CASE: test returns authUserId {number}', () => {
-        clear();
+///////////////////////TESTING adminAuthLogin///////////////////////
+describe('Testing adminAuthLogin success', () => {
+    test('CASE: Email and password are exact same', () => {
 
         adminAuthRegister("manan.j2450@gmail.com", "abcd1234", "Manan", "Jaiswal");
         expect(adminAuthLogin("manan.j2450@gmail.com", "abcd1234")).toStrictEqual({ authUserId: expect.any(Number)}); 
     });
 });
 
-describe('checking errors', () => {
+describe('Testing adminAuthLogin errors', () => {
     test('CASE: Email address does not exist', () => {
-        clear();
 
-        expect(adminAuthLogin("manan.j2450@gmail.com", "hello1")).toStrictEqual({ error: 'Email address does not exist.'}); 
+        expect(adminAuthLogin("manan.j2450@gmail.com", "hello1")).toStrictEqual({ error: 'Email address does not exist'}); 
     });
 
     test('CASE: Password is incorrect - differing case', () => {
-        clear();
 
         adminAuthRegister("manan1111@gmail.com", "ABCD1234", "Manan", "Jaiswal");
-        expect(adminAuthLogin("manan1111@gmail.com", "hello2")).toStrictEqual({ error: 'Password is incorrect.'}); 
+        expect(adminAuthLogin("manan1111@gmail.com", "hello2")).toStrictEqual({ error: 'Password is incorrect'}); 
     });
     
     test('CASE: Password is incorrect - differing password', () => {
-        clear();
 
         adminAuthRegister("manan2222@gmail.com", "incorrectpw1", "Manan", "Jaiswal");
-        expect(adminAuthLogin("manan2222@gmail.com", "hello3")).toStrictEqual({ error: 'Password is incorrect.'}); 
+        expect(adminAuthLogin("manan2222@gmail.com", "hello3")).toStrictEqual({ error: 'Password is incorrect'}); 
     });
 });
 
 describe('email addresses case sensitivity', () => {
     test('CASE: test case sensitivity of email address letters', () => {
-        clear();
 
         adminAuthRegister("manan.j2450@gmail.com", "abcd1234", "Manan", "Jaiswal");
         expect(adminAuthLogin("Manan.j2450@gmail.com", "abcd1234")).toStrictEqual({ authUserId: expect.any(Number)}); 
     });
 
     test('CASE: test case sensitivity of email address letters', () => {
-        clear();
 
         adminAuthRegister("manan.j2450@gmail.com", "abcd1234", "Manan", "Jaiswal");
+        expect(adminAuthLogin("manan.j2450@gMail.com", "abcd1234")).toStrictEqual({ authUserId: expect.any(Number)}); 
+    });
+
+    test('CASE: test case sensitivity of email address letters - registered with capital letters', () => {
+
+        adminAuthRegister("MANAN.j2450@gmail.com", "abcd1234", "Manan", "Jaiswal");
         expect(adminAuthLogin("manan.j2450@gMail.com", "abcd1234")).toStrictEqual({ authUserId: expect.any(Number)}); 
     });
 });
 
 describe('increment numSuccesfulLogins & numFailedPasswords', () => {
     test('CASE: 2 successful logins in a row', () => {
-        clear();
 
         adminAuthRegister("manan.j2450@gmail.com", "abcd1234", "Manan", "Jaiswal");
         adminAuthLogin("manan.j2450@gmail.com", "abcd1234");
@@ -125,7 +122,6 @@ describe('increment numSuccesfulLogins & numFailedPasswords', () => {
     });
 
     test('CASE: 2 incorrect passwords in a row', () => {
-        clear();
 
         adminAuthRegister("manan.j2450@gmail.com", "abcd1234", "Manan", "Jaiswal");
         adminAuthLogin("manan.j2450@gmail.com", "abcd1234");
@@ -134,4 +130,46 @@ describe('increment numSuccesfulLogins & numFailedPasswords', () => {
         expect(adminAuthLogin("manan.j2450@gmail.com", "abcd1234")).toStrictEqual({ authUserId: expect.any(Number)});
     });
 });
-//TESTING adminUserDetails
+
+///////////////////////TESTING adminUserDetails///////////////////////
+describe('Testing adminUserDetails success', () => {
+    test('CASE: Successful self check', () => {
+        let person = adminAuthRegister("vincentxian@gmail.com", "vincentpassword1", "vincent", "xian");
+        let result = adminUserDetails(person.authUserId);
+        expect(result).toStrictEqual({
+            user:
+            {
+                userId: 0,
+                name: 'vincent xian',
+                email: 'vincentxian@gmail.com',
+                numSuccessfulLogins: 1,
+                numFailedPasswordsSinceLastLogin: 0,
+            }
+        })
+    });
+
+    test('CASE: Successful check on 2nd person', () => {
+        let person = adminAuthRegister("vincentxian@gmail.com", "vincentpassword1", "vincent", "xian");
+        let person2 = adminAuthRegister("manan.j2450@gmail.com", "abcd1234", "Manan", "Jaiswal");
+
+        let result = adminUserDetails(person2.authUserId);
+        expect(result).toStrictEqual({
+            user:
+            {
+                userId: 1,
+                name: 'Manan Jaiswal',
+                email: 'manan.j2450@gmail.com',
+                numSuccessfulLogins: 1,
+                numFailedPasswordsSinceLastLogin: 0,
+            }
+        })
+    });
+});
+
+describe('Testing adminUserDetails errors', () => {
+    test('CASE: authUserId doesnt exist', () => {
+        let person = adminAuthRegister("vincentxian@gmail.com", "vincentpassword1", "vincent", "xian");
+        let result = adminUserDetails(person.authUserId + 1);
+        expect(result).toStrictEqual({ error: 'AuthUserId does not exist' });
+    });
+});
