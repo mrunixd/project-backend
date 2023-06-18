@@ -22,7 +22,7 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
 
     //Error checking block
     for (const user of data.users) {
-        if (user.email === email) {
+        if (user.email.toLowerCase() === email.toLowerCase()) {
             return { error: 'Email address is already in use' };
         }
     }
@@ -81,23 +81,23 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
 function adminAuthLogin(email, password) {
     const data = getData();
 
-    if (!data.users.some(users => users.email === email.toLowerCase())) {
-        return {
-            error: 'Email address does not exist.'
+    if (!data.users.some(users => users.email.toLowerCase() === email.toLowerCase())) {
+        return {    
+            error: 'Email address does not exist'
         };
     };
 
-    if (!data.users.some(users => users.email === email.toLowerCase() && users.password === password )) {
+    if (!data.users.some(users => users.email.toLowerCase() === email.toLowerCase() && users.password === password )) {
         // increment numFailedPasswordsSinceLastLogin
         const user_email = data.users.find(users => users.email === email.toLowerCase());
         user_email.numFailedPasswordsSinceLastLogin++;
         return {
-            error: 'Password is incorrect.'
+            error: 'Password is incorrect'
         };
     }; 
 
     // Find index of user to return their respective authUserId
-    const user = data.users.find(users => users.email === email.toLowerCase() && users.password === password);
+    const user = data.users.find(users => users.email.toLowerCase() === email.toLowerCase() && users.password === password);
 
     // increment numSuccesfulLogins && reset numFailedPasswordsSinceLastLogin
     user.numSuccessfulLogins++;
@@ -124,14 +124,22 @@ function adminAuthLogin(email, password) {
  * }
  */
 function adminUserDetails(authUserId) {
+    const data = getData();
+
+    if (!data.users.some(users => users.authUserId === authUserId)) {
+        return { error: 'AuthUserId does not exist' };
+    };
+
+    const user = data.users.find(users => users.authUserId === authUserId);
+
     return {
         user:
         {
-          userId: 1,
-          name: 'Hayden Smith',
-          email: 'hayden.smith@unsw.edu.au',
-          numSuccessfulLogins: 3,
-          numFailedPasswordsSinceLastLogin: 1,
+          userId: user.authUserId,
+          name: user.name,
+          email: user.email,
+          numSuccessfulLogins: user.numSuccessfulLogins,
+          numFailedPasswordsSinceLastLogin: user.numFailedPasswordsSinceLastLogin,
         }
     }
 }
