@@ -1,10 +1,9 @@
 Assumptions
 
-* Assume the user Id be listed in ascending order of registered users
+* Assume user email login is case insensitive such that you can log in with 
+lowercase or uppercase regardless of capitalisation during registration.
 
-* Assume the password should include certain restrictions which increase the 
-security of each user. For example: special characters, no first name or last 
-name.
+* Assume the user Id be listed in ascending order of registered users
 
 * Assume that a valid user Id has all other components of data attached to their
 profile.
@@ -19,6 +18,4 @@ different users.
 
 * Assume that you cannot change the name of the quiz to the current name
 
-* Assume user email is case insensitive such that you can log in with 
-lowercase or uppercase regardless of registration.
 
