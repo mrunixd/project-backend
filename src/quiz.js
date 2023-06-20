@@ -15,15 +15,23 @@ import { getData, setData } from "./dataStore.js";
  * }
 */
 function adminQuizList(authUserId) {
-    return {
-        quizzes: [
-            {
-                quizId: 1,
-                name: 'My Quiz',
-            }
-        ]
+    let data = getData();
+    const user = data.users.find(user => user.authUserId === authUserId);
+
+    if (!user) {
+        return { error: 'User is invalid' };
     }
+
+    if (user.QuizIds) {
+        return { quizzes: user.QuizIds.map(quiz => quiz) }
+    }
+
+    else {
+    return {
+        quizzes: []
+    }}
 }
+
 
 /**
  * This function creates a quiz given a basic description for the logged in
@@ -53,7 +61,7 @@ function adminQuizCreate(authUserId, name, description) {
         return { error: 'Name is less than 3 or more than 30 characters' };
     
     //checks if the quizIds array exists as an array and that it has the 'name' of the quiz present
-    } else if(user.QuizIds && Array.isArray(user.QuizIds) && user.QuizIds.some(quiz => quiz.quizName === name)) {
+    } else if(user.QuizIds && Array.isArray(user.QuizIds) && user.QuizIds.some(quiz => quiz.name === name)) {
         return { error: 'Name is already used for another quiz' };
 
     } else if ( 100 < description.length ) {
@@ -66,7 +74,7 @@ function adminQuizCreate(authUserId, name, description) {
     //adds this quiz to the quizIds array in this user's object
     user.QuizIds.push({
         quizId: quizId,
-        quizName: name,
+        name: name,
     });
     
     data.quizzes.push({
