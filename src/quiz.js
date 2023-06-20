@@ -1,3 +1,4 @@
+import { getData, setData } from "./dataStore.js";
 /**
  * This function provides a list of all the quizzes owned by the currently
  * logged in user.
@@ -36,8 +37,50 @@ function adminQuizList(authUserId) {
  */
 
 function adminQuizCreate(authUserId, name, description) {
+    let data = getData();
+
+    const user = data.users.find(user => user.authUserId === authUserId);
+    const acceptedCharacters = /^[a-zA-Z0-9 ]+$/;
+    
+    //checks if all inputs are valid
+    if (!user) {
+        return { error: 'User is invalid' };
+
+    } else if (!acceptedCharacters.test(name)) {
+        return { error: 'Name contains invalid characters' };
+
+    } else if (name.length > 30 || name.length < 3) {
+        return { error: 'Name is less than 3 or more than 30 characters' };
+    
+    //checks if the quizIds array exists as an array and that it has the 'name' of the quiz present
+    } else if(user.QuizIds && Array.isArray(user.QuizIds) && user.QuizIds.some(quiz => quiz.quizName === name)) {
+        return { error: 'Name is already used for another quiz' };
+
+    } else if ( 100 < description.length ) {
+        return { error: 'Description is more than 100 characters' };
+    }
+
+    const quizId = data.quizzes.length;
+    const currentTime = new Date();
+
+    //adds this quiz to the quizIds array in this user's object
+    user.QuizIds.push({
+        quizId: quizId,
+        quizName: name,
+    });
+    
+    data.quizzes.push({
+        quizId: quizId,
+        name: name,
+        timeCreated: currentTime,
+        timeLastEdited: currentTime,
+        description: description,
+    });
+
+    setData(data);
+    
     return {
-        quizId: 2
+        quizId: quizId
     }
 }
 
@@ -108,3 +151,6 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
 function adminQuizDescriptionUpdate(authUserId, quizId, description) {
     return {}
 }
+
+export { adminQuizCreate, adminQuizList, adminQuizInfo, 
+    adminQuizDescriptionUpdate, adminQuizNameUpdate, adminQuizRemove };
