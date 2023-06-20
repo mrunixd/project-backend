@@ -60,3 +60,69 @@ describe('Testing adminQuizErrors', () => {
     });
 });
     
+//TESTING adminQuizList
+describe('Testing adminQuizList error', () => {
+
+    beforeEach(() => {
+        result = adminAuthRegister("aarnavsample@gmail.com", "abcd1234", "Aarnav", "Sheth");
+        adminAuthLogin("aarnavsample@gmail.com", "abcd1234");
+      });
+
+    test('CASE: Not a valid user', () => {
+
+        let result1 = adminQuizList("invalid", "aarnavsquiz", "a very hard interesting quiz");
+        expect(result1).toStrictEqual({ error: 'User is invalid' });
+    });
+});
+
+describe('Testing adminQuizList outcomes', () => {
+
+    beforeEach(() => {
+        result = adminAuthRegister("aarnavsample@gmail.com", "abcd1234", "Aarnav", "Sheth");
+        adminAuthLogin("aarnavsample@gmail.com", "abcd1234");
+      });
+
+    test('CASE: Successful Quiz Display', () => {
+
+        adminQuizCreate(result.authUserId, "aarnavsquiz", "a very hard interesting quiz");
+        let result1 = adminQuizList(result.authUserId, "aarnavsquiz", "a very hard interesting quiz");
+        expect(result1).toStrictEqual({
+            quizzes: [
+            {
+                quizId: 0,
+                name: 'aarnavsquiz',
+            }
+            ]
+        });
+    });
+
+    test('CASE: Successful Multiple Quiz Display', () => {
+
+        adminQuizCreate(result.authUserId, "aarnavsquiz", "a very hard interesting quiz");
+        adminQuizCreate(result.authUserId, "secondquiz", "a very hard interesting quiz");
+        adminQuizCreate(result.authUserId, "thirdquiz", "a very hard interesting quiz");
+        let result1 = adminQuizList(result.authUserId);
+        expect(result1).toStrictEqual({
+            quizzes: [
+            {
+                quizId: 0,
+                name: 'aarnavsquiz',
+            },
+            {
+                quizId: 1,
+                name: 'secondquiz',
+            },
+            {
+                quizId: 2,
+                name: 'thirdquiz',
+            }
+            ]   
+        });
+    });
+
+    test('CASE: Successful Empty Display', () => {
+
+        let result1 = adminQuizList(result.authUserId, "aarnavsquiz", "a very hard interesting quiz");
+        expect(result1).toStrictEqual({ quizzes: [] });
+    });
+});
