@@ -122,14 +122,28 @@ function adminQuizRemove(authUserId, quizId) {
  * }
 */
 function adminQuizInfo(authUserId, quizId) {
-   //add code
-   return {
-       quizId: 1,
-       name: 'My Quiz',
-       timeCreated: 1683125870,
-       timeLastEdited: 1683125871,
-       description: 'This is my quiz',
-     }
+    let data = getData();
+    const user = data.users.find(user => user.authUserId === authUserId);
+
+    if (!user) {
+        return { error: 'User is invalid' };
+
+    } else if (!(data.quizzes.find(quiz => quiz.quizId === quizId))) {
+        return { error: 'Quiz Id does not refer to a valid quiz' };
+
+    } else if (!(user.QuizIds.find(quiz => quiz.quizId === quizId))) {
+        return { error: 'Quiz Id does not refer to a quiz that this user owns' };
+    }
+
+    const selected = data.quizzes.find(quiz => quiz.quizId === quizId);
+
+    return {
+        quizId: selected.quizId,
+        name: selected.name,
+        timeCreated: selected.timeCreated,
+        timeLastEdited: selected.timeLastEdited,
+        description: selected.description,
+    }
 }
 
 /**
