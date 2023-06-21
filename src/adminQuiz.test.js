@@ -9,7 +9,7 @@ beforeEach(() => {
     clear();
 });
     
-//TESTING adminQuizCreate
+///////////////////////////// TESTING adminQuizCreate /////////////////////////////
 describe('Testing adminQuizCreate success', () => {
     
     test('CASE: Successfully created quiz', () => {
@@ -17,7 +17,7 @@ describe('Testing adminQuizCreate success', () => {
         let result = adminAuthRegister("aarnavsample@gmail.com", "abcd1234", "Aarnav", "Sheth");
         adminAuthLogin("aarnavsample@gmail.com", "abcd1234");
         let result1 = adminQuizCreate(result.authUserId, "aarnavsquiz", "a very hard interesting quiz");
-        expect(result1).toMatchObject({ quizId: expect.any(Number) });
+        expect(result1).toStrictEqual({ quizId: expect.any(Number) });
     });
 });
     
@@ -60,13 +60,13 @@ describe('Testing adminQuizErrors', () => {
     });
 });
     
-//TESTING adminQuizList
+////////////////////////////// TESTING adminQuizList //////////////////////////////
 describe('Testing adminQuizList error', () => {
 
     beforeEach(() => {
         result = adminAuthRegister("aarnavsample@gmail.com", "abcd1234", "Aarnav", "Sheth");
         adminAuthLogin("aarnavsample@gmail.com", "abcd1234");
-      });
+    });
 
     test('CASE: Not a valid user', () => {
 
@@ -80,7 +80,7 @@ describe('Testing adminQuizList outcomes', () => {
     beforeEach(() => {
         result = adminAuthRegister("aarnavsample@gmail.com", "abcd1234", "Aarnav", "Sheth");
         adminAuthLogin("aarnavsample@gmail.com", "abcd1234");
-      });
+    });
 
     test('CASE: Successful Quiz Display', () => {
 
@@ -125,4 +125,73 @@ describe('Testing adminQuizList outcomes', () => {
         let result1 = adminQuizList(result.authUserId, "aarnavsquiz", "a very hard interesting quiz");
         expect(result1).toStrictEqual({ quizzes: [] });
     });
+});
+ 
+/////////////////////////// TESTING adminQuizNameUpdate ///////////////////////////
+describe('Testing adminQuizNameUpdate outcomes', () => {
+    beforeEach(() => {
+        let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
+        adminAuthLogin('zhizhao@gmail.com', 'MeowMeow123');
+        let quizId = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
+    });
+
+    // adminQuizNameUpdate successfully run
+    test('CASE: Successful quiz name update', () => {
+        let result = adminQuizNameUpdate(user.authUserId, quizId, 'catQuiz');
+        expect(result).toStrictEqual({});
+    });
+
+    // adminQuizNameUpdate error(s) occurred.
+    test('CASE: Invalid authUserId', () => {
+        let result = adminQuizNameUpdate(0, quizId, 'CatQuiz');
+        expect(result).toStrictEqual({ error: 'ERROR: Invalid authUserId' });
+    });
+
+    test('CASE: Quiz ID does not refer to a valid quiz', () => {
+        let result = adminQuizNameUpdate(user.authUserId, 0, 'catQuiz');
+        expect(result).toStrictEqual({ error: 'ERROR: Quiz ID does not refer to a valid quiz' });
+    });
+
+    test('CASE: Quiz ID does not refer to a quiz that this user owns', () => {
+        let user1 = adminAuthRegister('pasta@gmail.com', 'VincentXian14', 'Vincent', 'Xian');
+        adminAuthLogin('pasta@gmail.com', 'VincentXian14');
+
+        let result = adminQuizNameUpdate(user.authUserId, quizId, 'catQuiz'); 
+        expect(result).toStrictEqual({ error: 'ERROR: Quiz ID does not refer to a quiz that this user owns' });
+    });
+
+    test('CASE: Name contains any characters that are not alphanumeric or are spaces', () => {
+        let result = adminQuizNameUpdate(user.authUserId, quizId, '!@#$%^&');
+        expect(result).toStrictEqual({ error: 'ERROR: Name contains any characters that are not alphanumeric or are spaces' });
+    });
+
+    test('CASE: Name is either less than 3 characters long or more than 30 characters long', () => {
+        let result = adminQuizNameUpdate(user.authUserId, quizId, 'qu');
+        expect(result).toStrictEqual({ error: 'ERROR: Name is either less than 3 characters long or more than 30 characters long' });
+    });
+
+    test('CASE: Name is either less than 3 characters long or more than 30 characters long', () => {
+        let result = adminQuizNameUpdate(user.authUserId, quizId, 'There is a dog holding me hostage.');
+        expect(result).toStrictEqual({ error: 'ERROR: Name is either less than 3 characters long or more than 30 characters long' });
+    });
+
+    test('CASE: Name is already used by the current logged in user for another quiz', () => {
+        adminQuizCreate(user.authUserId, 'CatQuiz', 'A quiz about cats :)')
+
+        let result = adminQuizNameUpdate(user.authUserId, quizId, 'CatQuiz');
+        expect(result).toStrictEqual({ error: 'ERROR: Name is already used by the current logged in user for another quiz' });
+    });
+
+});
+
+/////////////////////// TESTING adminQuizDescriptionUpdate ///////////////////////
+describe('Testing adminQuizNameUpdate outcomes', () => {
+
+    // beforeEach(() => {
+    //     user =
+
+    // })
+
+    test({})
+
 });
