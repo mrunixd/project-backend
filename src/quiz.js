@@ -102,8 +102,25 @@ function adminQuizCreate(authUserId, name, description) {
  * @returns {} 
  */
 function adminQuizRemove(authUserId, quizId) {
-    //code to remove quiz
-    return {}
+    let data = getData();
+    const user = data.users.find(user => user.authUserId === authUserId);
+
+    if (!data.users.some(user => user.authUserId === authUserId)) {
+        return { error: 'AuthUserId is not a valid user.' };
+    }
+    else if (!data.quizzes.some(quizzes => quizzes.quizId === quizId)){
+        return { error: 'Quiz ID does not refer to a valid quiz.'};
+    }
+    else if (!user.QuizIds.some((id) => id.quizId === quizId)) {
+        return { error: 'Quiz ID does not refer to a valid quiz that this user owns.'};
+    } else {
+        const index = user.QuizIds.find((id) => id.quizId === quizId);
+        user.QuizIds.splice(index, 1);
+        
+        const index_quiz = data.quizzes.find((id) => id.quizId === quizId);
+        data.quizzes.splice(index_quiz,1);
+        return {};
+    }
 }
 
 /**
