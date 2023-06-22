@@ -216,8 +216,29 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
  * 
 */
 function adminQuizDescriptionUpdate(authUserId, quizId, description) {
+    let data = getData();
+    const user = data.users.find(user => user.authUserId === authUserId);
+    if (!user) {
+        return {error: 'User is invalid'};
+
+    } else if (!(data.quizzes.find(quiz => quiz.quizId === quizId))) {
+        return { error: 'Quiz Id does not refer to a valid quiz' };
+
+    } else if (!(user.QuizIds.find(quiz => quiz.quizId === quizId))) {
+        return { error: 'Quiz Id does not refer to a quiz that this user owns' };
+
+    } else if (description.length > 100) {
+        return { error: 'Description is more than 100 characters in length' };
+    }
+
+    const selected = data.quizzes.find(quiz => quiz.quizId === quizId);
+    selected.description = description;
+
+    setData(data);
+
     return {};
 }
+
 
 export { adminQuizCreate, adminQuizList, adminQuizInfo, 
     adminQuizDescriptionUpdate, adminQuizNameUpdate, adminQuizRemove };
