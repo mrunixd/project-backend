@@ -17,9 +17,8 @@ import { getData, setData } from "./dataStore.js";
 function adminQuizList(authUserId) {
     let data = getData();
     const user = data.users.find(user => user.authUserId === authUserId);
-
     if (!user) {
-        return { error: 'User is invalid' };
+        return { error: 'AuthUserId is not a valid user' };
     }
 
     if (user.quizIds) {
@@ -52,7 +51,7 @@ function adminQuizCreate(authUserId, name, description) {
     
     //checks if all inputs are valid
     if (!user) {
-        return { error: 'User is invalid' };
+        return { error: 'AuthUserId is not a valid user' };
 
     } else if (!acceptedCharacters.test(name)) {
         return { error: 'Name contains invalid characters' };
@@ -106,13 +105,13 @@ function adminQuizRemove(authUserId, quizId) {
     const user = data.users.find(user => user.authUserId === authUserId);
 
     if (!data.users.some(user => user.authUserId === authUserId)) {
-        return { error: 'AuthUserId is not a valid user.' };
+        return { error: 'AuthUserId is not a valid user' };
     }
     else if (!data.quizzes.some(quizzes => quizzes.quizId === quizId)){
-        return { error: 'Quiz ID does not refer to a valid quiz.'};
+        return { error: 'Quiz ID does not refer to a valid quiz'};
     }
     else if (!user.quizIds.some((id) => id.quizId === quizId)) {
-        return { error: 'Quiz ID does not refer to a valid quiz that this user owns.'};
+        return { error: 'Quiz ID does not refer to a valid quiz that this user owns'};
     } else {
         const index = user.quizIds.find((id) => id.quizId === quizId);
         user.quizIds.splice(index, 1);
@@ -143,7 +142,7 @@ function adminQuizInfo(authUserId, quizId) {
     const user = data.users.find(user => user.authUserId === authUserId);
 
     if (!user) {
-        return { error: 'User is invalid' };
+        return { error: 'AuthUserId is not a valid user' };
 
     } else if (!(data.quizzes.find(quiz => quiz.quizId === quizId))) {
         return { error: 'Quiz Id does not refer to a valid quiz' };

@@ -127,7 +127,7 @@ function adminUserDetails(authUserId) {
     const data = getData();
 
     if (!data.users.some(users => users.authUserId === authUserId)) {
-        return { error: 'AuthUserId does not exist' };
+        return { error: 'AuthUserId is not a valid user' };
     };
 
     const user = data.users.find(users => users.authUserId === authUserId);
