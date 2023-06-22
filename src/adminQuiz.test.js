@@ -1,4 +1,4 @@
-import { adminQuizCreate, adminQuizList, adminQuizInfo } from "./quiz.js";
+import { adminQuizCreate, adminQuizList, adminQuizInfo, adminQuizRemove } from "./quiz.js";
 import { adminAuthRegister, adminAuthLogin, adminUserDetails } from "./auth.js";
 // import { getData, setData } from "./dataStore.js";
 import { clear } from "./other.js";
@@ -130,7 +130,44 @@ describe('Testing adminQuiz errors', () => {
 });
 
 //TESTING adminQuizRemove
+describe('Testing adminQuizRemove outcomes', () => {
+    let user;
+    let result;
+    let result1;
+    let user1;
+    beforeEach(() => {
+        user = adminAuthRegister("manan.j2450@gmail.com", "Abcd1234", "Manan", "Jaiswal");
+        adminAuthLogin("manan.j2450@gmail.com", "Abcd1234");
+        user1 = adminAuthRegister("test@gmail.com", "Abcd1234", "Manan", "Jaiswal");
+        adminAuthLogin("test@gmail.com", "Abcd1234");
+        result = adminQuizCreate(user.authUserId, "COMP1511", "Programming Fundamentals");
+        result1 = adminQuizCreate(user1.authUserId, "COMP1531", "Software Engineering");
+    });
 
+    test('CASE: return if no error {}', () => {
+        expect(adminQuizRemove(user.authUserId, result.quizId)).toStrictEqual({});
+    }); 
+
+    test('CASE: authUserId is not valid', () => {
+        expect(adminQuizRemove(user.authUserId + 2, result.quizId)).toStrictEqual({ error: "AuthUserId is not a valid user."});
+    });
+
+    test('CASE: quizId does not refer to a valid quiz.', () => {
+        expect(adminQuizRemove(user.authUserId, result.quizId + 2)).toStrictEqual({ error: "Quiz ID does not refer to a valid quiz."});
+    });
+
+    test('CASE: quizId does not refer to a valid quiz.', () => {
+        expect(adminQuizRemove(user.authUserId, result.quizId + 10)).toStrictEqual({ error: "Quiz ID does not refer to a valid quiz."});
+    });
+
+    test('CASE: quizId does not refer to a valid quiz.', () => {
+        expect(adminQuizRemove(user.authUserId, result.quizId + 1000)).toStrictEqual({ error: "Quiz ID does not refer to a valid quiz."});
+    });
+
+    test('CASE: quizId does not refer to a valid quiz that the user owns.', () => {
+        expect(adminQuizRemove(user.authUserId, result1.quizId)).toStrictEqual({ error: "Quiz ID does not refer to a valid quiz that this user owns."});
+    });
+});
 //TESTING adminQuizInfo
 describe('Testing adminQuizInfo success', () => {
     
