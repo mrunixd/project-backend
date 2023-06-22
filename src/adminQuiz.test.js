@@ -178,8 +178,8 @@ describe('Testing adminQuizInfo success', () => {
         expect(result1).toStrictEqual({
             quizId: quiz.quizId,
             name: 'vincentQuiz',
-            timeCreated: expect.any(Date),
-            timeLastEdited: expect.any(Date),
+            timeCreated: expect.any(Number),
+            timeLastEdited: expect.any(Number),
             description: 'a very hard interesting quiz', 
         });
     });
@@ -193,8 +193,8 @@ describe('Testing adminQuizInfo success', () => {
         expect(result1).toStrictEqual({
             quizId: quiz.quizId,
             name: 'vincentQuiz',
-            timeCreated: expect.any(Date),
-            timeLastEdited: expect.any(Date),
+            timeCreated: expect.any(Number),
+            timeLastEdited: expect.any(Number),
             description: 'a very hard interesting quiz', 
         });
     });
@@ -209,8 +209,8 @@ describe('Testing adminQuizInfo success', () => {
         expect(result1).toStrictEqual({
             quizId: quiz2.quizId,
             name: 'vincentSecondQuiz',
-            timeCreated: expect.any(Date),
-            timeLastEdited: expect.any(Date),
+            timeCreated: expect.any(Number),
+            timeLastEdited: expect.any(Number),
             description: 'second quiz', 
         });
     });
