@@ -7,7 +7,6 @@ import {
   adminQuizDescriptionUpdate,
 } from "./quiz.js";
 import { adminAuthRegister, adminAuthLogin, adminUserDetails } from "./auth.js";
-// import { getData, setData } from "./dataStore.js";
 import { clear } from "./other.js";
 
 let result1;
@@ -23,7 +22,7 @@ beforeEach(() => {
   person2 = undefined;
 });
 
-//TESTING adminQuizList
+/////////////////////// TESTING adminQuizList ///////////////////////
 describe("Testing adminQuizList errors", () => {
   test("CASE: AuthUserId is not a valid user", () => {
     person1 = adminAuthRegister(
@@ -114,7 +113,7 @@ describe("Testing adminQuizList success", () => {
   });
 });
 
-//TESTING adminQuizCreate
+/////////////////////// TESTING adminQuizCreate ///////////////////////
 describe("Testing adminQuizCreate success", () => {
   test("CASE: Successfully created quiz", () => {
     person1 = adminAuthRegister(
@@ -185,7 +184,7 @@ describe("Testing adminQuizCreate errors", () => {
   });
 });
 
-//TESTING adminQuizRemove
+/////////////////////// TESTING adminQuizRemove ///////////////////////
 describe("Testing all adminQuizRemove success and errors", () => {
   beforeEach(() => {
     person1 = adminAuthRegister(
@@ -251,7 +250,7 @@ describe("Testing all adminQuizRemove success and errors", () => {
   });
 });
 
-//TESTING adminQuizInfo
+/////////////////////// TESTING adminQuizInfo ///////////////////////
 describe("Testing adminQuizInfo success", () => {
   test("CASE: Successfully returned info for 1 user and 1 quiz", () => {
     person1 = adminAuthRegister(
@@ -379,7 +378,7 @@ describe("Testing adminQuizInfo errors", () => {
   });
 });
 
-/////////////////////////// TESTING adminQuizNameUpdate ///////////////////////////
+/////////////////////// TESTING adminQuizNameUpdate ///////////////////////
 describe("Testing adminQuizNameUpdate outcomes", () => {
   // adminQuizNameUpdate pre-quiz-creation errors
   test("CASE: Create a user first!", () => {

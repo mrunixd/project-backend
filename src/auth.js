@@ -15,12 +15,12 @@ import { getData, setData } from "./dataStore.js";
  */
 function adminAuthRegister(email, password, nameFirst, nameLast) {
   let data = getData();
-  //These regexes are needed to check for valid characters in names & password
+  // These regexes are needed to check for valid characters in names & password
   const acceptedCharacters = /^[a-zA-Z0-9' -]+$/;
   const numbers = /\d/;
   const letters = /[a-zA-Z]/;
 
-  //Error checking block
+  // Error checking block
   for (const user of data.users) {
     if (user.email.toLowerCase() === email.toLowerCase()) {
       return { error: "Email address is already in use" };
@@ -28,20 +28,26 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
   }
   if (validator.isEmail(email) === false) {
     return { error: "Email address is not valid" };
+
   } else if (acceptedCharacters.test(nameFirst) === false) {
     return { error: "First name is invalid" };
+
   } else if (nameFirst.length < 2 || nameFirst.length > 20) {
     return {
       error: "First name is less than 2 characters or more than 20 characters",
     };
+
   } else if (acceptedCharacters.test(nameLast) === false) {
     return { error: "Last name is invalid" };
+
   } else if (nameLast.length < 2 || nameLast.length > 20) {
     return {
       error: "Last name is less than 2 characters or more than 20 characters",
     };
+
   } else if (password.length < 8) {
     return { error: "Password is less than 8 characters" };
+
   } else if (
     numbers.test(password) === false ||
     letters.test(password) === false
@@ -52,7 +58,7 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
     };
   }
 
-  //All inputs are valid, thus add user info into dataStore.js
+  // All inputs are valid, thus add user info into dataStore.js
   const authUserId = data.users.length;
   const name = nameFirst.concat(" ", nameLast);
 
@@ -85,6 +91,7 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
 function adminAuthLogin(email, password) {
   const data = getData();
 
+  // Error in finding user with matching email; returns error if email not found
   if (
     !data.users.some(
       (users) => users.email.toLowerCase() === email.toLowerCase()
@@ -102,7 +109,7 @@ function adminAuthLogin(email, password) {
         users.password === password
     )
   ) {
-    // increment numFailedPasswordsSinceLastLogin
+    // Increment numFailedPasswordsSinceLastLogin if password & email incorrect
     const user_email = data.users.find(
       (users) => users.email === email.toLowerCase()
     );
@@ -112,6 +119,7 @@ function adminAuthLogin(email, password) {
     };
   }
 
+  // By this point, inputs must be valid
   // Find index of user to return their respective authUserId
   const user = data.users.find(
     (users) =>
@@ -119,7 +127,7 @@ function adminAuthLogin(email, password) {
       users.password === password
   );
 
-  // increment numSuccesfulLogins && reset numFailedPasswordsSinceLastLogin
+  // Increment numSuccesfulLogins && reset numFailedPasswordsSinceLastLogin
   user.numSuccessfulLogins++;
   user.numFailedPasswordsSinceLastLogin = 0;
   return {
@@ -146,10 +154,12 @@ function adminAuthLogin(email, password) {
 function adminUserDetails(authUserId) {
   const data = getData();
 
+  // Find user with matching UserId; returns error if userId not found
   if (!data.users.some((users) => users.authUserId === authUserId)) {
     return { error: "AuthUserId is not a valid user" };
   }
 
+  // Save required user and return relevant information
   const user = data.users.find((users) => users.authUserId === authUserId);
 
   return {
