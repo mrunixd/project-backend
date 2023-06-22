@@ -1,4 +1,4 @@
-import { adminQuizCreate, adminQuizList, adminQuizInfo, adminQuizRemove } from "./quiz.js";
+import { adminQuizCreate, adminQuizList, adminQuizInfo, adminQuizRemove, adminQuizNameUpdate } from "./quiz.js";
 import { adminAuthRegister, adminAuthLogin, adminUserDetails } from "./auth.js";
 // import { getData, setData } from "./dataStore.js";
 import { clear } from "./other.js";
@@ -244,7 +244,91 @@ describe('Testing adminQuizInfo errors', () => {
     });
 });
 
-//TESTING adminQuizNameUpdate
+/////////////////////////// TESTING adminQuizNameUpdate ///////////////////////////
+describe('Testing adminQuizNameUpdate outcomes', () => {
+
+    // adminQuizNameUpdate pre-quiz-creation errors
+    test('CASE: Create a user first!', () => {
+        let result = adminQuizNameUpdate(0, 0, 'catQuiz');
+        expect(result).toStrictEqual({ error: 'User is invalid' });
+    });
+
+    test('CASE: Create a quiz first!', () => {
+        let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
+        let result = adminQuizNameUpdate(0, 0, 'catQuiz');
+        expect(result).toStrictEqual({ error: 'Quiz Id does not refer to a valid quiz' });
+    });
+
+    // adminQuizNameUpdate successfully run
+    test('CASE: Successful quiz name update', () => {
+        let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
+        let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
+        let result = adminQuizNameUpdate(user.authUserId, quiz.quizId, 'catQuiz');
+        expect(result).toStrictEqual({});
+    });
+
+    // adminQuizNameUpdate error(s) occurred.
+    test('CASE: AuthUserId is not a valid user', () => {
+        let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
+        let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
+        let result = adminQuizNameUpdate(user.authUserId + 1, quiz.quizId, 'CatQuiz');
+        expect(result).toStrictEqual({ error: 'User is invalid' });
+    });
+
+    test('CASE: Quiz ID does not refer to a valid quiz', () => {
+        let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
+        let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
+        let result = adminQuizNameUpdate(user.authUserId, quiz.quizId + 1, 'catQuiz');
+        expect(result).toStrictEqual({ error: 'Quiz Id does not refer to a valid quiz' });
+        
+    });
+
+    test('CASE: Quiz ID does not refer to a quiz that this user owns', () => {
+        let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
+        let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
+        let user1 = adminAuthRegister('pasta@gmail.com', 'VincentXian14', 'Vincent', 'Xian');
+
+        let result = adminQuizNameUpdate(user1.authUserId, quiz.quizId, 'catQuiz'); 
+        expect(result).toStrictEqual({ error: 'Quiz Id does not refer to a quiz that this user owns' });
+
+    });
+
+    test('CASE: Name contains any characters that are not alphanumeric or are spaces', () => {
+        let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
+        let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
+        let result = adminQuizNameUpdate(user.authUserId, quiz.quizId, '!@#$%^&');
+        expect(result).toStrictEqual({ error: 'Name contains any characters that are not alphanumeric or are spaces' });
+
+    });
+
+    test('CASE: Name is either less than 3 characters long or more than 30 characters long', () => {
+        let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
+        let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
+        let result = adminQuizNameUpdate(user.authUserId, quiz.quizId, 'qu');
+        expect(result).toStrictEqual({ error: 'Name is either less than 3 characters long or more than 30 characters long' });
+
+    });
+
+    test('CASE: Name is either less than 3 characters long or more than 30 characters long', () => {
+        let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
+        let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
+        let result = adminQuizNameUpdate(user.authUserId, quiz.quizId, 'There is a dog holding me hostage');
+        expect(result).toStrictEqual({ error: 'Name is either less than 3 characters long or more than 30 characters long' });
+
+    });
+
+    test('CASE: Name is already used by the current logged in user for another quiz', () => {
+        let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
+        let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
+        adminQuizCreate(user.authUserId, 'CatQuiz', 'A quiz about cats :)');
+
+        let result = adminQuizNameUpdate(user.authUserId, quiz.quizId, 'CatQuiz');
+        expect(result).toStrictEqual({ error: 'Name is already used by the current logged in user for another quiz' });
+
+    });
+
+});
+
 
 //TESTING adminQuizDescriptionUpdate
 
