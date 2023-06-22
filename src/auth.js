@@ -59,7 +59,7 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
         authUserId: authUserId,
         numSuccessfulLogins: 1,
         numFailedPasswordsSinceLastLogin: 0,
-        QuizIds: [],
+        quizIds: [],
     });
     setData(data);
 
