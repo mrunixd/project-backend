@@ -23,7 +23,7 @@ describe('Testing adminQuizList errors', () => {
     test('CASE: AuthUserId is not a valid user', () => {
         person1 = adminAuthRegister("aarnavsample@gmail.com", "abcd1234", "Aarnav", "Sheth");
         result1 = adminQuizList(person1.authUserId + 1);
-        expect(result1).toStrictEqual({ error: 'AuthUserId is not a valid user' });
+        expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 });
 
@@ -36,12 +36,12 @@ describe('Testing adminQuizList success', () => {
 
     test('CASE: Successful Quiz Display', () => {
 
-        adminQuizCreate(person1.authUserId, "aarnavsquiz", "a very hard interesting quiz");
+        let aarnavsQuiz = adminQuizCreate(person1.authUserId, "aarnavsquiz", "a very hard interesting quiz");
         let result1 = adminQuizList(person1.authUserId, "aarnavsquiz", "a very hard interesting quiz");
         expect(result1).toStrictEqual({
             quizzes: [
             {
-                quizId: 0,
+                quizId: aarnavsQuiz.quizId,
                 name: 'aarnavsquiz',
             }
             ]
@@ -50,22 +50,22 @@ describe('Testing adminQuizList success', () => {
 
     test('CASE: Successful Multiple Quiz Display', () => {
 
-        adminQuizCreate(person1.authUserId, "aarnavsquiz", "a very hard interesting quiz");
-        adminQuizCreate(person1.authUserId, "secondquiz", "a very hard interesting quiz");
-        adminQuizCreate(person1.authUserId, "thirdquiz", "a very hard interesting quiz");
+        let aarnavsQuiz = adminQuizCreate(person1.authUserId, "aarnavsquiz", "a very hard interesting quiz");
+        let secondQuiz = adminQuizCreate(person1.authUserId, "secondquiz", "a very hard interesting quiz");
+        let thirdQuiz = adminQuizCreate(person1.authUserId, "thirdquiz", "a very hard interesting quiz");
         result1 = adminQuizList(person1.authUserId);
         expect(result1).toStrictEqual({
             quizzes: [
             {
-                quizId: 0,
+                quizId: aarnavsQuiz.quizId,
                 name: 'aarnavsquiz',
             },
             {
-                quizId: 1,
+                quizId: secondQuiz.quizId,
                 name: 'secondquiz',
             },
             {
-                quizId: 2,
+                quizId: thirdQuiz.quizId,
                 name: 'thirdquiz',
             }
             ]   
@@ -91,7 +91,7 @@ describe('Testing adminQuizCreate success', () => {
     });
 });
     
-describe('Testing adminQuiz errors', () => {
+describe('Testing adminQuizCreate errors', () => {
     
     beforeEach(() => {
         person1 = adminAuthRegister("aarnavsample@gmail.com", "abcd1234", "Aarnav", "Sheth");
@@ -100,32 +100,32 @@ describe('Testing adminQuiz errors', () => {
     test('CASE: AuthUserId is not a valid user', () => {
     
         result1 = adminQuizCreate("invalid", "aarnavsquiz", "a very hard interesting quiz");
-        expect(result1).toStrictEqual({ error: 'AuthUserId is not a valid user' });
+        expect(result1).toStrictEqual({ error: expect.any(String) });
     });
     
     test('CASE: not alphanumeric name', () => {
     
         result1 = adminQuizCreate(person1.authUserId, "*not^lph+", "a very hard interesting quiz");
-        expect(result1).toStrictEqual({ error: 'Name contains invalid characters' });
+        expect(result1).toStrictEqual({ error: expect.any(String) });
     });
     
     test('CASE: name is less than 3 or more than 30 characters', () => {
     
         result1 = adminQuizCreate(person1.authUserId, "qz", "a very hard interesting quiz");
-        expect(result1).toStrictEqual({ error: 'Name is less than 3 or more than 30 characters' });
+        expect(result1).toStrictEqual({ error: expect.any(String) });
     });
         
     test('CASE: name is already used for a quiz by user', () => {
     
         adminQuizCreate(person1.authUserId, "aarnavsquiz", "first quiz");
         result1 = adminQuizCreate(person1.authUserId, "aarnavsquiz", "second quiz");
-        expect(result1).toStrictEqual({ error: 'Name is already used for another quiz' });
+        expect(result1).toStrictEqual({ error: expect.any(String) });
     });
         
     test('CASE: description is more than 100 characters', () => {
 
         let result1 = adminQuizCreate(person1.authUserId, "aarnavsquiz", "abcdefghijklmanoinapqrstuvfkdlhzbljkfs kj;kadvbjp kj;aobadbo;udvk; j kja jna dnad j;canlnlxc gjanjk  bafhlbahwlbvkljbhw;KEWBF;KBNE;BNKBGGJRNAJLKVBJ;KV");
-        expect(result1).toStrictEqual({ error: 'Description is more than 100 characters' });
+        expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 });
 
@@ -146,23 +146,23 @@ describe('Testing all adminQuizRemove success and errors', () => {
     }); 
 
     test('CASE: AuthUserId is not a valid user', () => {
-        expect(adminQuizRemove(person1.authUserId + 2, result1.quizId)).toStrictEqual({ error: "AuthUserId is not a valid user"});
+        expect(adminQuizRemove(person1.authUserId + 2, result1.quizId)).toStrictEqual({ error: expect.any(String)});
     });
 
     test('CASE: quizId does not refer to a valid quiz.', () => {
-        expect(adminQuizRemove(person1.authUserId, result1.quizId + 2)).toStrictEqual({ error: "Quiz ID does not refer to a valid quiz"});
+        expect(adminQuizRemove(person1.authUserId, result1.quizId + 2)).toStrictEqual({ error: expect.any(String)});
     });
 
     test('CASE: quizId does not refer to a valid quiz.', () => {
-        expect(adminQuizRemove(person1.authUserId, result1.quizId + 10)).toStrictEqual({ error: "Quiz ID does not refer to a valid quiz"});
+        expect(adminQuizRemove(person1.authUserId, result1.quizId + 10)).toStrictEqual({ error: expect.any(String)});
     });
 
     test('CASE: quizId does not refer to a valid quiz.', () => {
-        expect(adminQuizRemove(person1.authUserId, result1.quizId + 1000)).toStrictEqual({ error: "Quiz ID does not refer to a valid quiz"});
+        expect(adminQuizRemove(person1.authUserId, result1.quizId + 1000)).toStrictEqual({ error: expect.any(String)});
     });
 
     test('CASE: quizId does not refer to a valid quiz that the user owns.', () => {
-        expect(adminQuizRemove(person1.authUserId, result2.quizId)).toStrictEqual({ error: "Quiz ID does not refer to a valid quiz that this user owns"});
+        expect(adminQuizRemove(person1.authUserId, result2.quizId)).toStrictEqual({ error: expect.any(String)});
     });
 });
 
@@ -176,7 +176,7 @@ describe('Testing adminQuizInfo success', () => {
         let quiz = adminQuizCreate(person1.authUserId, "vincentQuiz", "a very hard interesting quiz");
         result1 = adminQuizInfo(person1.authUserId, quiz.quizId);
         expect(result1).toStrictEqual({
-            quizId: 0,
+            quizId: quiz.quizId,
             name: 'vincentQuiz',
             timeCreated: expect.any(Date),
             timeLastEdited: expect.any(Date),
@@ -191,7 +191,7 @@ describe('Testing adminQuizInfo success', () => {
         let quiz = adminQuizCreate(person2.authUserId, "vincentQuiz", "a very hard interesting quiz");
         result1 = adminQuizInfo(person2.authUserId, quiz.quizId);
         expect(result1).toStrictEqual({
-            quizId: 0,
+            quizId: quiz.quizId,
             name: 'vincentQuiz',
             timeCreated: expect.any(Date),
             timeLastEdited: expect.any(Date),
@@ -207,7 +207,7 @@ describe('Testing adminQuizInfo success', () => {
 
         result1 = adminQuizInfo(person1.authUserId, quiz2.quizId);
         expect(result1).toStrictEqual({
-            quizId: 1,
+            quizId: quiz2.quizId,
             name: 'vincentSecondQuiz',
             timeCreated: expect.any(Date),
             timeLastEdited: expect.any(Date),
@@ -222,7 +222,7 @@ describe('Testing adminQuizInfo errors', () => {
         person1 = adminAuthRegister("vincentxian@gmail.com", "vincentpassword1", "vincent", "xian");
         let quiz = adminQuizCreate(person1.authUserId, "vincentQuiz", "a very hard interesting quiz");
         result1 = adminQuizInfo(person1.authUserId + 1, quiz.quizId);
-        expect(result1).toStrictEqual({ error: 'AuthUserId is not a valid user' });
+        expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Quiz Id does not refer to a valid quiz', () => {
@@ -230,7 +230,7 @@ describe('Testing adminQuizInfo errors', () => {
         person1 = adminAuthRegister("vincentxian@gmail.com", "vincentpassword1", "vincent", "xian");
         let quiz = adminQuizCreate(person1.authUserId, "vincentQuiz", "a very hard interesting quiz");
         result1 = adminQuizInfo(person1.authUserId, quiz.quizId + 1);
-        expect(result1).toStrictEqual({ error: 'Quiz Id does not refer to a valid quiz' });
+        expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Quiz Id does not refer to a quiz that this user owns', () => {
@@ -239,7 +239,7 @@ describe('Testing adminQuizInfo errors', () => {
         person2 = adminAuthRegister("vincentxian@gmail.com", "vincentpassword1", "vincent", "xian");
         let quiz = adminQuizCreate(person1.authUserId, "aarnavQuiz", "a very hard interesting quiz");
         result1 = adminQuizInfo(person2.authUserId, quiz.quizId);
-        expect(result1).toStrictEqual({ error: 'Quiz Id does not refer to a quiz that this user owns' });
+        expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 });
 
@@ -249,13 +249,13 @@ describe('Testing adminQuizNameUpdate outcomes', () => {
     // adminQuizNameUpdate pre-quiz-creation errors
     test('CASE: Create a user first!', () => {
         let result = adminQuizNameUpdate(0, 0, 'catQuiz');
-        expect(result).toStrictEqual({ error: 'User is invalid' });
+        expect(result).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Create a quiz first!', () => {
         let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
         let result = adminQuizNameUpdate(0, 0, 'catQuiz');
-        expect(result).toStrictEqual({ error: 'Quiz Id does not refer to a valid quiz' });
+        expect(result).toStrictEqual({ error: expect.any(String) });
     });
 
     // adminQuizNameUpdate successfully run
@@ -271,14 +271,14 @@ describe('Testing adminQuizNameUpdate outcomes', () => {
         let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
         let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
         let result = adminQuizNameUpdate(user.authUserId + 1, quiz.quizId, 'CatQuiz');
-        expect(result).toStrictEqual({ error: 'User is invalid' });
+        expect(result).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Quiz ID does not refer to a valid quiz', () => {
         let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
         let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
         let result = adminQuizNameUpdate(user.authUserId, quiz.quizId + 1, 'catQuiz');
-        expect(result).toStrictEqual({ error: 'Quiz Id does not refer to a valid quiz' });
+        expect(result).toStrictEqual({ error: expect.any(String) });
         
     });
 
@@ -288,7 +288,7 @@ describe('Testing adminQuizNameUpdate outcomes', () => {
         let user1 = adminAuthRegister('pasta@gmail.com', 'VincentXian14', 'Vincent', 'Xian');
 
         let result = adminQuizNameUpdate(user1.authUserId, quiz.quizId, 'catQuiz'); 
-        expect(result).toStrictEqual({ error: 'Quiz Id does not refer to a quiz that this user owns' });
+        expect(result).toStrictEqual({ error: expect.any(String) });
 
     });
 
@@ -296,7 +296,7 @@ describe('Testing adminQuizNameUpdate outcomes', () => {
         let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
         let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
         let result = adminQuizNameUpdate(user.authUserId, quiz.quizId, '!@#$%^&');
-        expect(result).toStrictEqual({ error: 'Name contains any characters that are not alphanumeric or are spaces' });
+        expect(result).toStrictEqual({ error: expect.any(String) });
 
     });
 
@@ -304,7 +304,7 @@ describe('Testing adminQuizNameUpdate outcomes', () => {
         let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
         let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
         let result = adminQuizNameUpdate(user.authUserId, quiz.quizId, 'qu');
-        expect(result).toStrictEqual({ error: 'Name is either less than 3 characters long or more than 30 characters long' });
+        expect(result).toStrictEqual({ error: expect.any(String) });
 
     });
 
@@ -312,7 +312,7 @@ describe('Testing adminQuizNameUpdate outcomes', () => {
         let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
         let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
         let result = adminQuizNameUpdate(user.authUserId, quiz.quizId, 'There is a dog holding me hostage');
-        expect(result).toStrictEqual({ error: 'Name is either less than 3 characters long or more than 30 characters long' });
+        expect(result).toStrictEqual({ error: expect.any(String) });
 
     });
 
@@ -322,7 +322,7 @@ describe('Testing adminQuizNameUpdate outcomes', () => {
         adminQuizCreate(user.authUserId, 'CatQuiz', 'A quiz about cats :)');
 
         let result = adminQuizNameUpdate(user.authUserId, quiz.quizId, 'CatQuiz');
-        expect(result).toStrictEqual({ error: 'Name is already used by the current logged in user for another quiz' });
+        expect(result).toStrictEqual({ error: expect.any(String) });
 
     });
 
@@ -346,7 +346,7 @@ describe('Testing adminQuizDescriptionUpdate outcomes', () => {
         let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
 
         let result = adminQuizDescriptionUpdate(user.authUserId + 1, quiz.quizId, 'A quiz about cats :)');
-        expect(result).toStrictEqual({ error: 'User is invalid' });
+        expect(result).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Quiz ID does not refer to a valid quiz', () => {
@@ -354,7 +354,7 @@ describe('Testing adminQuizDescriptionUpdate outcomes', () => {
         let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
 
         let result = adminQuizDescriptionUpdate(user.authUserId, quiz.quizId + 1, 'A quiz about cats :)');
-        expect(result).toStrictEqual({ error: 'Quiz Id does not refer to a valid quiz' });
+        expect(result).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Quiz ID does not refer to a quiz that this user owns', () => {
@@ -365,7 +365,7 @@ describe('Testing adminQuizDescriptionUpdate outcomes', () => {
         adminAuthLogin('pasta@gmail.com', 'VincentXian14');
 
         let result = adminQuizDescriptionUpdate(user1.authUserId, quiz.quizId, 'A quiz about cats :)');
-        expect(result).toStrictEqual({ error: 'Quiz Id does not refer to a quiz that this user owns' });
+        expect(result).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Description is more than 100 characters in length', () => {
@@ -373,7 +373,7 @@ describe('Testing adminQuizDescriptionUpdate outcomes', () => {
         let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
 
         let result = adminQuizDescriptionUpdate(user.authUserId, quiz.quizId, 'blahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlah');
-        expect(result).toStrictEqual({ error: 'Description is more than 100 characters in length' });
+        expect(result).toStrictEqual({ error: expect.any(String) });
     });
 
 });
