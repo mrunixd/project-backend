@@ -68,7 +68,7 @@ function adminQuizCreate(authUserId, name, description) {
     }
 
     const quizId = data.quizzes.length;
-    const currentTime = new Date();
+    const currentTime = Math.floor(Date.now() / 1000);
 
     //adds this quiz to the quizIds array in this user's object
     user.quizIds.push({
@@ -198,6 +198,7 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
 
     const selected = data.quizzes.find(quiz => quiz.quizId === quizId);
     selected.name = name;
+    selected.timeLastEdited = Math.floor(Date.now() / 1000);
 
     setData(data);
 
@@ -232,6 +233,7 @@ function adminQuizDescriptionUpdate(authUserId, quizId, description) {
 
     const selected = data.quizzes.find(quiz => quiz.quizId === quizId);
     selected.description = description;
+    selected.timeLastEdited = Math.floor(Date.now() / 1000);
 
     setData(data);
 
