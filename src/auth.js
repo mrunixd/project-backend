@@ -97,7 +97,10 @@ function adminAuthLogin(email, password) {
     }; 
 
     // Find index of user to return their respective authUserId
-    const user = data.users.find(users => users.email.toLowerCase() === email.toLowerCase() && users.password === password);
+    const user = data.users.find(
+        users => users.email.toLowerCase() === email.toLowerCase() &&
+        users.password === password
+    );
 
     // increment numSuccesfulLogins && reset numFailedPasswordsSinceLastLogin
     user.numSuccessfulLogins++;
