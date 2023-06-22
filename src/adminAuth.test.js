@@ -5,7 +5,7 @@ beforeEach(() => {
   clear();
 });
 
-///////////////////////TESTING adminAuthRegister///////////////////////
+/////////////////////// TESTING adminAuthRegister ///////////////////////
 describe("Testing adminAuthRegister success", () => {
   test("CASE: Successful register", () => {
     let result = adminAuthRegister(
@@ -34,6 +34,7 @@ describe("Testing adminAuthRegister errors", () => {
     );
     expect(result2).toStrictEqual({ error: expect.any(String) });
   });
+  
   test("CASE: Email address is already in use - same email exactly", () => {
     let result = adminAuthRegister(
       "vincentxian@gmail.com",
@@ -121,7 +122,7 @@ describe("Testing adminAuthRegister errors", () => {
   });
 });
 
-///////////////////////TESTING adminAuthLogin///////////////////////
+/////////////////////// TESTING adminAuthLogin ///////////////////////
 describe("Testing adminAuthLogin success", () => {
   test("CASE: Email and password are exact same", () => {
     adminAuthRegister("manan.j2450@gmail.com", "abcd1234", "Manan", "Jaiswal");
@@ -202,7 +203,7 @@ describe("increment numSuccesfulLogins & numFailedPasswords", () => {
   });
 });
 
-///////////////////////TESTING adminUserDetails///////////////////////
+/////////////////////// TESTING adminUserDetails ///////////////////////
 describe("Testing adminUserDetails success", () => {
   test("CASE: Successful self check", () => {
     let person = adminAuthRegister(
