@@ -1,4 +1,4 @@
-import { adminQuizCreate, adminQuizList, adminQuizInfo, adminQuizRemove } from "./quiz.js";
+import { adminQuizCreate, adminQuizList, adminQuizInfo, adminQuizRemove, adminQuizNameUpdate } from "./quiz.js";
 import { adminAuthRegister, adminAuthLogin, adminUserDetails } from "./auth.js";
 // import { getData, setData } from "./dataStore.js";
 import { clear } from "./other.js";
@@ -250,7 +250,7 @@ describe('Testing adminQuizNameUpdate outcomes', () => {
     // adminQuizNameUpdate pre-quiz-creation errors
     test('CASE: Create a user first!', () => {
         let result = adminQuizNameUpdate(0, 0, 'catQuiz');
-        expect(result).toStrictEqual({ error: 'AuthUserId is not a valid user' });
+        expect(result).toStrictEqual({ error: 'User is invalid' });
     });
 
     test('CASE: Create a quiz first!', () => {
@@ -272,7 +272,7 @@ describe('Testing adminQuizNameUpdate outcomes', () => {
         let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
         let quiz = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
         let result = adminQuizNameUpdate(user.authUserId + 1, quiz.quizId, 'CatQuiz');
-        expect(result).toStrictEqual({ error: 'AuthUserId is not a valid user' });
+        expect(result).toStrictEqual({ error: 'User is invalid' });
     });
 
     test('CASE: Quiz ID does not refer to a valid quiz', () => {
