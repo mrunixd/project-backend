@@ -222,6 +222,8 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
   // Inputs are valid thus change name and timeLastEdited
   const selected = data.quizzes.find((quiz) => quiz.quizId === quizId);
   selected.name = name;
+  const userQuiz = user.quizIds.find((quiz) => quiz.quizId === quizId);
+  userQuiz.name = name;
   selected.timeLastEdited = Math.floor(Date.now() / 1000);
 
   setData(data);
