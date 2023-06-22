@@ -329,6 +329,52 @@ describe('Testing adminQuizNameUpdate outcomes', () => {
 
 });
 
+/////////////////////// TESTING adminQuizDescriptionUpdate ///////////////////////
+describe('Testing adminQuizDescriptionUpdate outcomes', () => {
 
-//TESTING adminQuizDescriptionUpdate
+    // adminQuizDescriptionUpdate ran successfully
+    test('CASE: Successful quiz name update', () => {
+        let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
+        let quizId = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
 
+        let result = adminQuizNameUpdate(user.authUserId, quizId, 'catQuiz');
+        expect(result).toStrictEqual({});
+    });
+    
+    // adminQuizDescriptionUpdate error(s) occurred
+    test('CASE: AuthUserId is not a valid user', () => {
+        let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
+        let quizId = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
+
+        let result = adminQuizDescriptionUpdate(-1, quizId, 'A quiz about cats :)');
+        expect(result).toStrictEqual({ error: 'AuthUserId is not a valid user' });
+    });
+
+    test('CASE: Quiz ID does not refer to a valid quiz', () => {
+        let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
+        let quizId = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
+
+        let result = adminQuizDescriptionUpdate(user.authUserId, -1, 'A quiz about cats :)');
+        expect(result).toStrictEqual({ error: 'Quiz ID does not refer to a valid quiz' });
+    });
+
+    test('CASE: Quiz ID does not refer to a quiz that this user owns', () => {
+        let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
+        let quizId = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
+
+        let user1 = adminAuthRegister('pasta@gmail.com', 'VincentXian14', 'Vincent', 'Xian');
+        adminAuthLogin('pasta@gmail.com', 'VincentXian14');
+
+        let result = adminQuizDescriptionUpdate(user.authUserId, quizId, 'A quiz about cats :)');
+        expect(result).toStrictEqual({ error: 'ERROR: Quiz ID does not refer to a quiz that this user owns' });
+    });
+
+    test('CASE: Description is more than 100 characters in length', () => {
+        let user = adminAuthRegister('zhizhao@gmail.com', 'MeowMeow123', 'Zhi', 'Zhao');
+        let quizId = adminQuizCreate(user.authUserId, 'newQuiz', 'A quiz about cats :)');
+
+        let result = adminQuizDescriptionUpdate(user.authUserId, quizId, 'blahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlah');
+        expect(result).toStrictEqual({ error: 'ERROR: Description is more than 100 characters in length' });
+    });
+
+});
