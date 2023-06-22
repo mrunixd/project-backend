@@ -170,8 +170,8 @@ function adminQuizInfo(authUserId, quizId) {
  */
 function adminQuizNameUpdate(authUserId, quizId, name) {
   let data = getData();
-  const user = data.users.find((user) => user.authUserId === authUserId);
 
+  const user = data.users.find((user) => user.authUserId === authUserId);
   const acceptedCharacters = /^[a-zA-Z0-9 ]+$/;
 
   if (!user) {
@@ -186,11 +186,11 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
       error:
         "Name is either less than 3 characters long or more than 30 characters long",
     };
-  } else if (!data.quizzes.find((quiz) => quiz.quizId === quizId)) {
+  } else if (!data.quizzes.some((quiz) => quiz.quizId === quizId)) {
     return { error: "Quiz Id does not refer to a valid quiz" };
-  } else if (!user.quizIds.find((quiz) => quiz.quizId === quizId)) {
+  } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
     return { error: "Quiz Id does not refer to a quiz that this user owns" };
-  } else if (user.quizIds.find((quiz) => quiz.name === name)) {
+  } else if (user.quizIds.some((quiz) => quiz.name === name)) {
     return {
       error:
         "Name is already used by the current logged in user for another quiz",
@@ -199,6 +199,8 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
 
   const selected = data.quizzes.find((quiz) => quiz.quizId === quizId);
   selected.name = name;
+  const userQuiz = user.quizIds.find((quiz) => quiz.quizId === quizId);
+  userQuiz.name = name;
   selected.timeLastEdited = Math.floor(Date.now() / 1000);
 
   setData(data);
