@@ -167,9 +167,9 @@ describe('Testing adminUserDetails success', () => {
 });
 
 describe('Testing adminUserDetails errors', () => {
-    test('CASE: authUserId doesnt exist', () => {
+    test('CASE: AuthUserId is not a valid user', () => {
         let person = adminAuthRegister("vincentxian@gmail.com", "vincentpassword1", "vincent", "xian");
         let result = adminUserDetails(person.authUserId + 1);
-        expect(result).toStrictEqual({ error: 'AuthUserId does not exist' });
+        expect(result).toStrictEqual({ error: 'AuthUserId is not a valid user' });
     });
 });
