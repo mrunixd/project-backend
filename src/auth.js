@@ -59,7 +59,7 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
         authUserId: authUserId,
         numSuccessfulLogins: 1,
         numFailedPasswordsSinceLastLogin: 0,
-        QuizIds: [],
+        quizIds: [],
     });
     setData(data);
 
@@ -97,7 +97,10 @@ function adminAuthLogin(email, password) {
     }; 
 
     // Find index of user to return their respective authUserId
-    const user = data.users.find(users => users.email.toLowerCase() === email.toLowerCase() && users.password === password);
+    const user = data.users.find(
+        users => users.email.toLowerCase() === email.toLowerCase() &&
+        users.password === password
+    );
 
     // increment numSuccesfulLogins && reset numFailedPasswordsSinceLastLogin
     user.numSuccessfulLogins++;
@@ -127,7 +130,7 @@ function adminUserDetails(authUserId) {
     const data = getData();
 
     if (!data.users.some(users => users.authUserId === authUserId)) {
-        return { error: 'AuthUserId does not exist' };
+        return { error: 'AuthUserId is not a valid user' };
     };
 
     const user = data.users.find(users => users.authUserId === authUserId);
