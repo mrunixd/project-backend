@@ -1,5 +1,5 @@
 import validator from 'validator';
-import { getData, setData } from './dataStore.js';
+import { getData, setData } from './dataStore.ts';
 
 /**
  * This function registers a new user into Toohak: requires an email password
