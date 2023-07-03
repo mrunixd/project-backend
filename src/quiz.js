@@ -1,4 +1,4 @@
-import { getData, setData } from './dataStore.js';
+import { getData, setData } from './dataStore.ts';
 /**
  * This function provides a list of all the quizzes owned by the currently
  * logged in user.
