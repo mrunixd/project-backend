@@ -21,7 +21,7 @@ export interface Quiz {
   description: string;
 }
 
-interface DataStore {
+export interface DataStore {
   users: User[];
   quizzes: Quiz[];
 }

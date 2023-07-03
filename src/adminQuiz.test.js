@@ -7,7 +7,7 @@ import {
   adminQuizDescriptionUpdate,
 } from './quiz.js';
 import { adminAuthRegister, adminAuthLogin } from './auth.js';
-import { clear } from './other.js';
+import { clear } from './other.ts';
 
 let result1;
 let result2;
