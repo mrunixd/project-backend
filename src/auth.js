@@ -1,5 +1,5 @@
-import validator from "validator";
-import { getData, setData } from "./dataStore.js";
+import validator from 'validator';
+import { getData, setData } from './dataStore.js';
 
 /**
  * This function registers a new user into Toohak: requires an email password
@@ -14,7 +14,7 @@ import { getData, setData } from "./dataStore.js";
  * @returns {authUserId: integer}
  */
 function adminAuthRegister(email, password, nameFirst, nameLast) {
-  let data = getData();
+  const data = getData();
   // These regexes are needed to check for valid characters in names & password
   const acceptedCharacters = /^[a-zA-Z0-9' -]+$/;
   const numbers = /\d/;
@@ -23,44 +23,38 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
   // Error checking block
   for (const user of data.users) {
     if (user.email.toLowerCase() === email.toLowerCase()) {
-      return { error: "Email address is already in use" };
+      return { error: 'Email address is already in use' };
     }
   }
   if (validator.isEmail(email) === false) {
-    return { error: "Email address is not valid" };
-
+    return { error: 'Email address is not valid' };
   } else if (acceptedCharacters.test(nameFirst) === false) {
-    return { error: "First name is invalid" };
-
+    return { error: 'First name is invalid' };
   } else if (nameFirst.length < 2 || nameFirst.length > 20) {
     return {
-      error: "First name is less than 2 characters or more than 20 characters",
+      error: 'First name is less than 2 characters or more than 20 characters',
     };
-
   } else if (acceptedCharacters.test(nameLast) === false) {
-    return { error: "Last name is invalid" };
-
+    return { error: 'Last name is invalid' };
   } else if (nameLast.length < 2 || nameLast.length > 20) {
     return {
-      error: "Last name is less than 2 characters or more than 20 characters",
+      error: 'Last name is less than 2 characters or more than 20 characters',
     };
-
   } else if (password.length < 8) {
-    return { error: "Password is less than 8 characters" };
-
+    return { error: 'Password is less than 8 characters' };
   } else if (
     numbers.test(password) === false ||
     letters.test(password) === false
   ) {
     return {
       error:
-        "Password does not contain at least one number and at least one letter",
+        'Password does not contain at least one number and at least one letter',
     };
   }
 
   // All inputs are valid, thus add user info into dataStore.js
   const authUserId = data.users.length;
-  const name = nameFirst.concat(" ", nameLast);
+  const name = nameFirst.concat(' ', nameLast);
 
   data.users.push({
     email: email,
@@ -98,7 +92,7 @@ function adminAuthLogin(email, password) {
     )
   ) {
     return {
-      error: "Email address does not exist",
+      error: 'Email address does not exist',
     };
   }
 
@@ -110,12 +104,12 @@ function adminAuthLogin(email, password) {
     )
   ) {
     // Increment numFailedPasswordsSinceLastLogin if password & email incorrect
-    const user_email = data.users.find(
+    const userEmail = data.users.find(
       (users) => users.email === email.toLowerCase()
     );
-    user_email.numFailedPasswordsSinceLastLogin++;
+    userEmail.numFailedPasswordsSinceLastLogin++;
     return {
-      error: "Password is incorrect",
+      error: 'Password is incorrect',
     };
   }
 
@@ -156,7 +150,7 @@ function adminUserDetails(authUserId) {
 
   // Find user with matching UserId; returns error if userId not found
   if (!data.users.some((users) => users.authUserId === authUserId)) {
-    return { error: "AuthUserId is not a valid user" };
+    return { error: 'AuthUserId is not a valid user' };
   }
 
   // Save required user and return relevant information

@@ -1,21 +1,21 @@
 /**
  * This function resets the state of the application back to the start
- * 
+ *
  * @param {}
- * 
+ *
  * @returns {}
- * 
+ *
 */
-import { setData } from "./dataStore.js";
+import { setData } from './dataStore.js';
 
 function clear() {
-    const clear_data = {
-        users: [],
+  const clearData = {
+    users: [],
 
-        quizzes: []
-    }
-    setData(clear_data);
-    return {}
+    quizzes: []
+  };
+  setData(clearData);
+  return {};
 }
 
 export { clear };

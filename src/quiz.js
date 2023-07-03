@@ -1,4 +1,4 @@
-import { getData, setData } from "./dataStore.js";
+import { getData, setData } from './dataStore.js';
 /**
  * This function provides a list of all the quizzes owned by the currently
  * logged in user.
@@ -15,11 +15,11 @@ import { getData, setData } from "./dataStore.js";
  * }
  */
 function adminQuizList(authUserId) {
-  let data = getData();
+  const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
   if (!user) {
-    return { error: "AuthUserId is not a valid user" };
+    return { error: 'AuthUserId is not a valid user' };
   }
 
   if (user.quizIds) {
@@ -43,38 +43,35 @@ function adminQuizList(authUserId) {
  */
 
 function adminQuizCreate(authUserId, name, description) {
-  let data = getData();
+  const data = getData();
 
-  // Save the selected user to be used for error checking & return values  
+  // Save the selected user to be used for error checking & return values
   const user = data.users.find((user) => user.authUserId === authUserId);
   const acceptedCharacters = /^[a-zA-Z0-9 ]+$/;
 
   // Error checking block
   if (!data.users.some((user) => user.authUserId === authUserId)) {
-    return { error: "AuthUserId is not a valid user" };
-
+    return { error: 'AuthUserId is not a valid user' };
   } else if (!acceptedCharacters.test(name)) {
-    return { error: "Name contains invalid characters" };
-
+    return { error: 'Name contains invalid characters' };
   } else if (name.length > 30 || name.length < 3) {
-    return { error: "Name is less than 3 or more than 30 characters" };
+    return { error: 'Name is less than 3 or more than 30 characters' };
 
-  //checks if 'quizIds' exists as an array & that it has the correct quiz 'name
+  // checks if 'quizIds' exists as an array & that it has the correct quiz 'name
   } else if (
     user.quizIds &&
     Array.isArray(user.quizIds) &&
     user.quizIds.some((quiz) => quiz.name === name)
   ) {
-    return { error: "Name is already used for another quiz" };
-    
-  } else if (100 < description.length) {
-    return { error: "Description is more than 100 characters" };
+    return { error: 'Name is already used for another quiz' };
+  } else if (description.length > 100) {
+    return { error: 'Description is more than 100 characters' };
   }
 
   const quizId = data.quizzes.length;
   const currentTime = Math.floor(Date.now() / 1000);
 
-  //adds this quiz to the quizIds array in this user's object
+  // adds this quiz to the quizIds array in this user's object
   user.quizIds.push({
     quizId: quizId,
     name: name,
@@ -105,28 +102,25 @@ function adminQuizCreate(authUserId, name, description) {
  * @returns {}
  */
 function adminQuizRemove(authUserId, quizId) {
-  let data = getData();
+  const data = getData();
   const user = data.users.find((user) => user.authUserId === authUserId);
 
   // Error checking block
   if (!data.users.some((user) => user.authUserId === authUserId)) {
-    return { error: "AuthUserId is not a valid user" };
-
+    return { error: 'AuthUserId is not a valid user' };
   } else if (!data.quizzes.some((quizzes) => quizzes.quizId === quizId)) {
-    return { error: "Quiz ID does not refer to a valid quiz" };
-    
+    return { error: 'Quiz ID does not refer to a valid quiz' };
   } else if (!user.quizIds.some((id) => id.quizId === quizId)) {
     return {
-      error: "Quiz ID does not refer to a valid quiz that this user owns",
+      error: 'Quiz ID does not refer to a valid quiz that this user owns',
     };
-
   } else {
     // If no errors; remove the quiz and update 'quizzes' in dataStore.js
     const index = user.quizIds.find((id) => id.quizId === quizId);
     user.quizIds.splice(index, 1);
 
-    const index_quiz = data.quizzes.find((id) => id.quizId === quizId);
-    data.quizzes.splice(index_quiz, 1);
+    const indexQuiz = data.quizzes.find((id) => id.quizId === quizId);
+    data.quizzes.splice(indexQuiz, 1);
     return {};
   }
 }
@@ -147,20 +141,18 @@ function adminQuizRemove(authUserId, quizId) {
  * }
  */
 function adminQuizInfo(authUserId, quizId) {
-  let data = getData();
+  const data = getData();
 
-  // Save the selected user to be used for error checking & return values  
+  // Save the selected user to be used for error checking & return values
   const user = data.users.find((user) => user.authUserId === authUserId);
 
-  //Error checking block
+  // Error checking block
   if (!data.users.some((user) => user.authUserId === authUserId)) {
-    return { error: "AuthUserId is not a valid user" };
-
+    return { error: 'AuthUserId is not a valid user' };
   } else if (!data.quizzes.some((quiz) => quiz.quizId === quizId)) {
-    return { error: "Quiz Id does not refer to a valid quiz" };
-    
+    return { error: 'Quiz Id does not refer to a valid quiz' };
   } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
-    return { error: "Quiz Id does not refer to a quiz that this user owns" };
+    return { error: 'Quiz Id does not refer to a quiz that this user owns' };
   }
 
   const selected = data.quizzes.find((quiz) => quiz.quizId === quizId);
@@ -184,38 +176,33 @@ function adminQuizInfo(authUserId, quizId) {
  * @returns {}
  */
 function adminQuizNameUpdate(authUserId, quizId, name) {
-  let data = getData();
+  const data = getData();
   const acceptedCharacters = /^[a-zA-Z0-9 ]+$/;
 
-  // Save the selected user to be used for error checking & return values  
+  // Save the selected user to be used for error checking & return values
   const user = data.users.find((user) => user.authUserId === authUserId);
 
   // Error checking block
   if (!data.users.some((user) => user.authUserId === authUserId)) {
-    return { error: "AuthUserId is not a valid user" };
-
+    return { error: 'AuthUserId is not a valid user' };
   } else if (!acceptedCharacters.test(name)) {
     return {
       error:
-        "Name contains any characters that are not alphanumeric or are spaces",
+        'Name contains any characters that are not alphanumeric or are spaces',
     };
-
   } else if (name.length < 3 || name.length > 30) {
     return {
       error:
-        "Name is either less than 3 characters long or more than 30 characters long",
+        'Name is either less than 3 characters long or more than 30 characters long',
     };
-
   } else if (!data.quizzes.some((quiz) => quiz.quizId === quizId)) {
-    return { error: "Quiz Id does not refer to a valid quiz" };
-
+    return { error: 'Quiz Id does not refer to a valid quiz' };
   } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
-    return { error: "Quiz Id does not refer to a quiz that this user owns" };
-
+    return { error: 'Quiz Id does not refer to a quiz that this user owns' };
   } else if (user.quizIds.some((quiz) => quiz.name === name)) {
     return {
       error:
-        "Name is already used by the current logged in user for another quiz",
+        'Name is already used by the current logged in user for another quiz',
     };
   }
 
@@ -241,22 +228,19 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
  *
  */
 function adminQuizDescriptionUpdate(authUserId, quizId, description) {
-  let data = getData();
+  const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
 
   // Error checking block
   if (!data.users.some((user) => user.authUserId === authUserId)) {
-    return { error: "AuthUserId is not a valid user" };
-
+    return { error: 'AuthUserId is not a valid user' };
   } else if (!data.quizzes.some((quiz) => quiz.quizId === quizId)) {
-    return { error: "Quiz Id does not refer to a valid quiz" };
-
+    return { error: 'Quiz Id does not refer to a valid quiz' };
   } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
-    return { error: "Quiz Id does not refer to a quiz that this user owns" };
-
+    return { error: 'Quiz Id does not refer to a quiz that this user owns' };
   } else if (description.length > 100) {
-    return { error: "Description is more than 100 characters in length" };
+    return { error: 'Description is more than 100 characters in length' };
   }
 
   // Inputs are valid thus change description and timeLastEdited
