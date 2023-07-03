@@ -24,11 +24,10 @@ function adminQuizList(authUserId) {
 
   if (user.quizIds) {
     return { quizzes: user.quizIds.map((quiz) => quiz) };
-  } else {
-    return {
-      quizzes: [],
-    };
   }
+  return {
+    quizzes: [],
+  };
 }
 
 /**
