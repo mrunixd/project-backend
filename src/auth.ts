@@ -1,6 +1,24 @@
 import validator from 'validator';
 import { getData, setData } from './dataStore';
 
+interface AuthUserId {
+  authUserId: number;
+};
+
+interface ErrorObject {
+  error: string;
+};
+
+interface User {
+  user: {
+    userId: number;
+    name: string;
+    email: string;
+    numSuccessfulLogins: number;
+    numFailedPasswordsSinceLastLogin: number;
+  },
+};
+
 /**
  * This function registers a new user into Toohak: requires an email password
  * and first & last name to create a valid user, will then generate and return
@@ -13,7 +31,7 @@ import { getData, setData } from './dataStore';
  *
  * @returns {authUserId: integer}
  */
-function adminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string) {
+function adminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string): AuthUserId | ErrorObject {
   const data = getData();
   // These regexes are needed to check for valid characters in names & password
   const acceptedCharacters = /^[a-zA-Z0-9' -]+$/;
@@ -82,7 +100,7 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
  *
  * @returns {authUserId: integer}
  */
-function adminAuthLogin(email: string, password: string) {
+function adminAuthLogin(email: string, password: string): AuthUserId | ErrorObject {
   const data = getData();
   
   // Error in finding user with matching email; returns error if email not found
@@ -145,7 +163,7 @@ function adminAuthLogin(email: string, password: string) {
  *  }
  * }
  */
-function adminUserDetails(authUserId: number) {
+function adminUserDetails(authUserId: number): User | ErrorObject {
   const data = getData();
 
   // Find user with matching UserId; returns error if userId not found

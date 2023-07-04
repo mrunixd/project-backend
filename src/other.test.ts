@@ -7,8 +7,8 @@ describe('////////TESTING CLEAR////////', () => {
     expect(clear()).toStrictEqual({});
   });
 
-  let person1;
-  let quizIds;
+  let person1: any;
+  let quizIds: any;
   test('test clear() using adminQuizInfo', () => {
     person1 = adminAuthRegister('manan.j2450@gmail.com', 'Abcd1234', 'Manan', 'Jaiswal');
     quizIds = adminQuizCreate(person1.authUserId, 'COMP1531', 'Software Engineering');
