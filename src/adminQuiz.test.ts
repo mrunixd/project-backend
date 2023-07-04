@@ -13,7 +13,8 @@ let result1: any;
 let result2: any;
 let person1: any;
 let person2: any;
-//put your define here for quiz1 quiz2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+let quiz1: any;
+let quiz2: any;
 
 beforeEach(() => {
   clear();
@@ -21,6 +22,8 @@ beforeEach(() => {
   result2 = undefined;
   person1 = undefined;
   person2 = undefined;
+  quiz1 = undefined;
+  quiz2 = undefined;
 });
 
 describe('////////TESTING ADMINQUIZLIST////////', () => {
@@ -32,6 +35,7 @@ describe('////////TESTING ADMINQUIZLIST////////', () => {
         'Aarnav',
         'Sheth'
       );
+
       result1 = adminQuizList(person1.authUserId + 1);
       expect(result1).toStrictEqual({ error: expect.any(String) });
     });
@@ -49,18 +53,18 @@ describe('////////TESTING ADMINQUIZLIST////////', () => {
     });
 
     test('CASE: Successful Quiz Display', () => {
-      const aarnavsQuiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'aarnavsquiz',
         'a very hard interesting quiz'
       );
-      const result1 = adminQuizList(
+      result1 = adminQuizList(
         person1.authUserId
       );
       expect(result1).toStrictEqual({
         quizzes: [
           {
-            quizId: aarnavsQuiz.quizId,
+            quizId: quiz1.quizId,
             name: 'aarnavsquiz',
           },
         ],
@@ -68,17 +72,17 @@ describe('////////TESTING ADMINQUIZLIST////////', () => {
     });
 
     test('CASE: Successful Multiple Quiz Display', () => {
-      const aarnavsQuiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
-        'aarnavsquiz',
+        'firstquiz',
         'a very hard interesting quiz'
       );
-      const secondQuiz = adminQuizCreate(
+      quiz2 = adminQuizCreate(
         person1.authUserId,
         'secondquiz',
         'a very hard interesting quiz'
       );
-      const thirdQuiz = adminQuizCreate(
+      const quiz3 = adminQuizCreate(
         person1.authUserId,
         'thirdquiz',
         'a very hard interesting quiz'
@@ -87,15 +91,15 @@ describe('////////TESTING ADMINQUIZLIST////////', () => {
       expect(result1).toStrictEqual({
         quizzes: [
           {
-            quizId: aarnavsQuiz.quizId,
+            quizId: quiz1.quizId,
             name: 'aarnavsquiz',
           },
           {
-            quizId: secondQuiz.quizId,
+            quizId: quiz2.quizId,
             name: 'secondquiz',
           },
           {
-            quizId: thirdQuiz.quizId,
+            quizId: quiz3.quizId,
             name: 'thirdquiz',
           },
         ],
@@ -173,7 +177,7 @@ describe('////////TESTING ADMINQUIZCREATE////////', () => {
     });
 
     test('CASE: description is more than 100 characters', () => {
-      const result1 = adminQuizCreate(
+      result1 = adminQuizCreate(
         person1.authUserId,
         'aarnavsquiz',
         'abcdefghijklmanoinapqrstuvfkdlhzbljkfs kj;kadvbjp kj;aobadbo;udvk; j kja jna dnad j;canlnlxc gjanjk  bafhlbahwlbvkljbhw;KEWBF;KBNE;BNKBGGJRNAJLKVBJ;KV'
@@ -220,13 +224,13 @@ describe('/////////TESTING ADMINQUIZREMOVE////////', () => {
 
     test('CASE: AuthUserId is not a valid user', () => {
       expect(
-        adminQuizRemove(person1.authUserId + 2, result1.quizId)
+        adminQuizRemove(person1.authUserId + 1, result1.quizId)
       ).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: quizId does not refer to a valid quiz.', () => {
       expect(
-        adminQuizRemove(person1.authUserId, result1.quizId + 2)
+        adminQuizRemove(person1.authUserId, result1.quizId + 1)
       ).toStrictEqual({ error: expect.any(String) });
     });
 
@@ -238,7 +242,7 @@ describe('/////////TESTING ADMINQUIZREMOVE////////', () => {
 
     test('CASE: quizId does not refer to a valid quiz.', () => {
       expect(
-        adminQuizRemove(person1.authUserId, result1.quizId + 1000)
+        adminQuizRemove(person1.authUserId, result1.quizId + 100)
       ).toStrictEqual({ error: expect.any(String) });
     });
 
@@ -259,17 +263,17 @@ describe('////////TESTING ADMINQUIZINFO////////', () => {
         'vincent',
         'xian'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'vincentQuiz',
         'a very hard interesting quiz'
       );
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      result1 = adminQuizInfo(person1.authUserId, quiz.quizId);
+      result1 = adminQuizInfo(person1.authUserId, quiz1.quizId);
       expect(result1).toStrictEqual({
-        quizId: quiz.quizId,
+        quizId: quiz1.quizId,
         name: 'vincentQuiz',
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),
@@ -285,18 +289,18 @@ describe('////////TESTING ADMINQUIZINFO////////', () => {
         'vincent',
         'xian'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person2.authUserId,
         'vincentQuiz',
         'a very hard interesting quiz'
       );
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
 
-      result1 = adminQuizInfo(person2.authUserId, quiz.quizId);
+      result1 = adminQuizInfo(person2.authUserId, quiz1.quizId);
       expect(result1).toStrictEqual({
-        quizId: quiz.quizId,
+        quizId: quiz1.quizId,
         name: 'vincentQuiz',
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),
@@ -312,7 +316,7 @@ describe('////////TESTING ADMINQUIZINFO////////', () => {
         'xian'
       );
       adminQuizCreate(person1.authUserId, 'vincentFirstQuiz', 'first quiz');
-      const quiz2 = adminQuizCreate(
+      quiz2 = adminQuizCreate(
         person1.authUserId,
         'vincentSecondQuiz',
         'second quiz'
@@ -339,16 +343,16 @@ describe('////////TESTING ADMINQUIZINFO////////', () => {
         'vincent',
         'xian'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'vincentQuiz',
         'a very hard interesting quiz'
       );
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
 
-      result1 = adminQuizInfo(person1.authUserId + 1, quiz.quizId);
+      result1 = adminQuizInfo(person1.authUserId + 1, quiz1.quizId);
       expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
@@ -359,15 +363,15 @@ describe('////////TESTING ADMINQUIZINFO////////', () => {
         'vincent',
         'xian'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'vincentQuiz',
         'a very hard interesting quiz'
       );
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      result1 = adminQuizInfo(person1.authUserId, quiz.quizId + 1);
+      result1 = adminQuizInfo(person1.authUserId, quiz1.quizId + 1);
       expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
@@ -384,15 +388,15 @@ describe('////////TESTING ADMINQUIZINFO////////', () => {
         'vincent',
         'xian'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'aarnavQuiz',
         'a very hard interesting quiz'
       );
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      result1 = adminQuizInfo(person2.authUserId, quiz.quizId);
+      result1 = adminQuizInfo(person2.authUserId, quiz1.quizId);
       expect(result1).toStrictEqual({ error: expect.any(String) });
     });
   });
@@ -402,8 +406,8 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
   describe('Testing adminQuizNameUpdate outcomes', () => {
     // adminQuizNameUpdate pre-quiz-creation errors
     test('CASE: Create a user first!', () => {
-      const result = adminQuizNameUpdate(0, 0, 'catQuiz');
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      result1 = adminQuizNameUpdate(0, 0, 'catQuiz');
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Create a quiz first!', () => {
@@ -413,8 +417,8 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
         'Zhi',
         'Zhao'
       );
-      const result = adminQuizNameUpdate(0, 0, 'catQuiz');
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      result1 = adminQuizNameUpdate(0, 0, 'catQuiz');
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     // adminQuizNameUpdate successfully run
@@ -425,16 +429,16 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
         'Zhi',
         'Zhao'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizNameUpdate(person1.authUserId, quiz.quizId, 'catQuiz');
-      expect(result).toStrictEqual({});
+      result1 = adminQuizNameUpdate(person1.authUserId, quiz1.quizId, 'catQuiz');
+      expect(result1).toStrictEqual({});
     });
 
     // adminQuizNameUpdate error(s) occurred.
@@ -445,20 +449,20 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
         'Zhi',
         'Zhao'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizNameUpdate(
+      result1 = adminQuizNameUpdate(
         person1.authUserId + 1,
-        quiz.quizId,
+        quiz1.quizId,
         'CatQuiz'
       );
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Quiz ID does not refer to a valid quiz', () => {
@@ -468,18 +472,18 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
         'Zhi',
         'Zhao'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
       
-      const result = adminQuizNameUpdate(
+      result1 = adminQuizNameUpdate(
         person1.authUserId,
-        quiz.quizId + 1,
+        quiz1.quizId + 1,
         'catQuiz'
       );
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Quiz ID does not refer to a quiz that this user owns', () => {
@@ -489,7 +493,7 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
         'Zhi',
         'Zhao'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
@@ -500,11 +504,11 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
         'Vincent',
         'Xian'
       );
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizNameUpdate(person2.authUserId, quiz.quizId, 'catQuiz');
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      result1 = adminQuizNameUpdate(person2.authUserId, quiz1.quizId, 'catQuiz');
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Name contains any characters that are not alphanumeric or are spaces', () => {
@@ -514,16 +518,16 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
         'Zhi',
         'Zhao'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizNameUpdate(person1.authUserId, quiz.quizId, '!@#$%^&');
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      result1 = adminQuizNameUpdate(person1.authUserId, quiz1.quizId, '!@#$%^&');
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Name is either less than 3 characters long or more than 30 characters long', () => {
@@ -533,16 +537,16 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
         'Zhi',
         'Zhao'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizNameUpdate(person1.authUserId, quiz.quizId, 'qu');
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      result1 = adminQuizNameUpdate(person1.authUserId, quiz1.quizId, 'qu');
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Name is either less than 3 characters long or more than 30 characters long', () => {
@@ -552,20 +556,20 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
         'Zhi',
         'Zhao'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizNameUpdate(
+      result1 = adminQuizNameUpdate(
         person1.authUserId,
-        quiz.quizId,
+        quiz1.quizId,
         'There is a dog holding me hostage'
       );
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Name is already used by the current logged in user for another quiz', () => {
@@ -575,17 +579,17 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
         'Zhi',
         'Zhao'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
       adminQuizCreate(person1.authUserId, 'CatQuiz', 'A quiz about cats :)');
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizNameUpdate(person1.authUserId, quiz.quizId, 'CatQuiz');
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      result1 = adminQuizNameUpdate(person1.authUserId, quiz1.quizId, 'CatQuiz');
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
   });
 });
@@ -600,16 +604,16 @@ describe('////////TESTING ADMINQUIZDESCRIPTIONUPDATE////////', () => {
         'Zhi',
         'Zhao'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizNameUpdate(person1.authUserId, quiz.quizId, 'catQuiz');
-      expect(result).toStrictEqual({});
+      result1 = adminQuizNameUpdate(person1.authUserId, quiz1.quizId, 'catQuiz');
+      expect(result1).toStrictEqual({});
     });
 
     // adminQuizDescriptionUpdate error(s) occurred
@@ -620,20 +624,20 @@ describe('////////TESTING ADMINQUIZDESCRIPTIONUPDATE////////', () => {
         'Zhi',
         'Zhao'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizDescriptionUpdate(
+      result1 = adminQuizDescriptionUpdate(
         person1.authUserId + 1,
-        quiz.quizId,
+        quiz1.quizId,
         'A quiz about cats :)'
       );
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Quiz ID does not refer to a valid quiz', () => {
@@ -643,20 +647,20 @@ describe('////////TESTING ADMINQUIZDESCRIPTIONUPDATE////////', () => {
         'Zhi',
         'Zhao'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizDescriptionUpdate(
+      result1 = adminQuizDescriptionUpdate(
         person1.authUserId,
-        quiz.quizId + 1,
+        quiz1.quizId + 1,
         'A quiz about cats :)'
       );
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Quiz ID does not refer to a quiz that this user owns', () => {
@@ -666,7 +670,7 @@ describe('////////TESTING ADMINQUIZDESCRIPTIONUPDATE////////', () => {
         'Zhi',
         'Zhao'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
@@ -679,15 +683,15 @@ describe('////////TESTING ADMINQUIZDESCRIPTIONUPDATE////////', () => {
         'Xian'
       );
       adminAuthLogin('pasta@gmail.com', 'VincentXian14');
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizDescriptionUpdate(
+      result1 = adminQuizDescriptionUpdate(
         person2.authUserId,
-        quiz.quizId,
+        quiz1.quizId,
         'A quiz about cats :)'
       );
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Description is more than 100 characters in length', () => {
@@ -697,20 +701,20 @@ describe('////////TESTING ADMINQUIZDESCRIPTIONUPDATE////////', () => {
         'Zhi',
         'Zhao'
       );
-      const quiz = adminQuizCreate(
+      quiz1 = adminQuizCreate(
         person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
-      if (quiz.quizId === undefined) {
+      if (quiz1.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizDescriptionUpdate(
+      result1 = adminQuizDescriptionUpdate(
         person1.authUserId,
-        quiz.quizId,
+        quiz1.quizId,
         'blahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlah'
       );
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
   });
 });

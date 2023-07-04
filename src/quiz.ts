@@ -14,9 +14,9 @@ interface Quizzes {
   quizzes: [
     {
       quizId: number,
-      name: string,
+      name: string
     }
-  ]
+  ] | []
 };
 
 interface QuizInfo {
@@ -24,7 +24,7 @@ interface QuizInfo {
   name: string,
   timeCreated: number,
   timeLastEdited: number,
-  description: string,
+  description: string
 }
 
 
@@ -51,7 +51,7 @@ function adminQuizList(authUserId: number): Quizzes | ErrorObject {
     return { error: 'AuthUserId is not a valid user' };
   }
 
-  if (user.quizIds) {
+  if (user.quizIds.length) {
     return { quizzes: user.quizIds.map((quiz) => quiz) };
   }
 
@@ -158,6 +158,7 @@ function adminQuizRemove(authUserId: number, quizId: number): EmptyObject | Erro
 
     const indexQuiz = data.quizzes.findIndex((id) => id.quizId === quizId);
     data.quizzes.splice(indexQuiz, 1);
+
     return {};
 
   }
