@@ -1,5 +1,5 @@
 
-export interface QuizId {
+export interface QuizIds {
   quizId: number;
   name: string;
 }
@@ -10,13 +10,13 @@ export interface User {
   authUserId: number;
   numSuccessfulLogins: number;
   numFailedPasswordsSinceLastLogin: number;
-  quizIds:  QuizId[];
-} 
+  quizIds: QuizIds[];
+}
 
 export interface Quiz {
   quizId: number;
   name: string;
-  timeCreate: number;
+  timeCreated: number;
   timeLastEdited: number;
   description: string;
 }
@@ -29,7 +29,7 @@ export interface DataStore {
 let data: DataStore = {
   users: [],
   quizzes: []
-}
+};
 
 function getData(): DataStore {
   return data;

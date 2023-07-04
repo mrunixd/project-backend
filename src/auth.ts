@@ -1,5 +1,5 @@
 import validator from 'validator';
-import { getData, setData } from './dataStore.ts';
+import { getData, setData } from './dataStore';
 
 /**
  * This function registers a new user into Toohak: requires an email password
@@ -13,7 +13,7 @@ import { getData, setData } from './dataStore.ts';
  *
  * @returns {authUserId: integer}
  */
-function adminAuthRegister(email, password, nameFirst, nameLast) {
+function adminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string) {
   const data = getData();
   // These regexes are needed to check for valid characters in names & password
   const acceptedCharacters = /^[a-zA-Z0-9' -]+$/;
@@ -82,36 +82,30 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
  *
  * @returns {authUserId: integer}
  */
-function adminAuthLogin(email, password) {
+function adminAuthLogin(email: string, password: string) {
   const data = getData();
-
+  
   // Error in finding user with matching email; returns error if email not found
   if (
     !data.users.some(
       (users) => users.email.toLowerCase() === email.toLowerCase()
-    )
-  ) {
-    return {
-      error: 'Email address does not exist',
-    };
-  }
-
-  if (
-    !data.users.some(
-      (users) =>
-        users.email.toLowerCase() === email.toLowerCase() &&
-        users.password === password
-    )
-  ) {
+      )
+      ) {
+        return {
+          error: 'Email address does not exist',
+        };
+      }
+      
+  const userEmail = data.users.find(
+    (users) => users.email.toLowerCase() === email.toLowerCase()
+  );
+  if (userEmail === undefined) {
     // Increment numFailedPasswordsSinceLastLogin if password & email incorrect
-    const userEmail = data.users.find(
-      (users) => users.email === email.toLowerCase()
-    );
-    userEmail.numFailedPasswordsSinceLastLogin++;
     return {
       error: 'Password is incorrect',
     };
   }
+  userEmail.numFailedPasswordsSinceLastLogin++;
 
   // By this point, inputs must be valid
   // Find index of user to return their respective authUserId
@@ -121,6 +115,12 @@ function adminAuthLogin(email, password) {
       users.password === password
   );
 
+  if(user === undefined) {
+    // Increment numFailedPasswordsSinceLastLogin if password & email incorrect
+    return {
+      error: 'Email Address does not exist.',
+    };
+  }
   // Increment numSuccesfulLogins && reset numFailedPasswordsSinceLastLogin
   user.numSuccessfulLogins++;
   user.numFailedPasswordsSinceLastLogin = 0;
@@ -145,7 +145,7 @@ function adminAuthLogin(email, password) {
  *  }
  * }
  */
-function adminUserDetails(authUserId) {
+function adminUserDetails(authUserId: number) {
   const data = getData();
 
   // Find user with matching UserId; returns error if userId not found
@@ -155,7 +155,11 @@ function adminUserDetails(authUserId) {
 
   // Save required user and return relevant information
   const user = data.users.find((users) => users.authUserId === authUserId);
-
+  if (user === undefined) {
+    return {
+      error: 'AuthUserId is not a valid user'
+    }
+  }
   return {
     user: {
       userId: user.authUserId,

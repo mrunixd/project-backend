@@ -6,7 +6,7 @@
  * @returns {}
  *
 */
-import { setData, DataStore } from './dataStore'
+import { setData, DataStore } from './dataStore';
 
 function clear() {
   const clearData: DataStore = {
