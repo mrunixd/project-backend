@@ -1,20 +1,29 @@
-import { adminAuthRegister, adminAuthLogin, adminUserDetails } from './auth.ts';
-import { clear } from './other.ts';
+import { adminAuthRegister, adminAuthLogin, adminUserDetails } from './auth';
+import { clear } from './other';
+
+let result1: any;
+let result2: any;
+let person1: any;
+let person2: any;
 
 beforeEach(() => {
   clear();
+  result1 = undefined;
+  result2 = undefined;
+  person1 = undefined;
+  person2 = undefined;
 });
 
 describe('////////TESTING ADMINAUTHREGISTER////////', () => {
   describe('Testing adminAuthRegister success', () => {
     test('CASE: Successful register', () => {
-      const result = adminAuthRegister(
+      result1 = adminAuthRegister(
         'vincentxian@gmail.com',
         'vincentpassword1',
         'vincent',
         'xian'
       );
-      expect(result).toMatchObject({ authUserId: expect.any(Number) });
+      expect(result1).toMatchObject({ authUserId: expect.any(Number) });
     });
   });
 
@@ -52,73 +61,73 @@ describe('////////TESTING ADMINAUTHREGISTER////////', () => {
     });
 
     test('CASE: Email address is invalid', () => {
-      const result = adminAuthRegister(
+      result1 = adminAuthRegister(
         'vincent123',
         'vincentpassword1',
         'vincent',
         'xian'
       );
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: First name is invalid', () => {
-      const result = adminAuthRegister(
+      result1 = adminAuthRegister(
         'vincentxian@gmail.com',
         'vincentpassword1',
         '!!!',
         'xian'
       );
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: First name is less than 2 characters or more than 20 characters', () => {
-      const result = adminAuthRegister(
+      result1 = adminAuthRegister(
         'vincentxian@gmail.com',
         'vincentpassword1',
         'v',
         'xian'
       );
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Last name is invalid', () => {
-      const result = adminAuthRegister(
+      result1 = adminAuthRegister(
         'vincentxian@gmail.com',
         'vincentpassword1',
         'vincent',
         '!!!'
       );
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Last name is less than 2 characters or more than 20 characters', () => {
-      const result = adminAuthRegister(
+      result1 = adminAuthRegister(
         'vincentxian@gmail.com',
         'vincentpassword1',
         'vincent',
         'x'
       );
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Password is less than 8 characters', () => {
-      const result = adminAuthRegister(
+      result1 = adminAuthRegister(
         'vincentxian@gmail.com',
         'pass',
         'vincent',
         'xian'
       );
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Password does not contain at least one number and at least one letter', () => {
-      const result = adminAuthRegister(
+      result1 = adminAuthRegister(
         'vincentxian@gmail.com',
         'password',
         'vincent',
         'xian'
       );
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
   });
 });
@@ -208,16 +217,16 @@ describe('////////TESTING ADMINAUTHLOGIN////////', () => {
 describe('////////TESTING ADMINUSERDETAILS////////', () => {
   describe('Testing adminUserDetails success', () => {
     test('CASE: Successful self check', () => {
-      const person = adminAuthRegister(
+      person1 = adminAuthRegister(
         'vincentxian@gmail.com',
         'vincentpassword1',
         'vincent',
         'xian'
       );
-      const result = adminUserDetails(person.authUserId);
-      expect(result).toStrictEqual({
+      result1 = adminUserDetails(person1.authUserId);
+      expect(result1).toStrictEqual({
         user: {
-          userId: person.authUserId,
+          userId: person1.authUserId,
           name: 'vincent xian',
           email: 'vincentxian@gmail.com',
           numSuccessfulLogins: 1,
@@ -233,15 +242,15 @@ describe('////////TESTING ADMINUSERDETAILS////////', () => {
         'vincent',
         'xian'
       );
-      const person2 = adminAuthRegister(
+      person2 = adminAuthRegister(
         'manan.j2450@gmail.com',
         'abcd1234',
         'Manan',
         'Jaiswal'
       );
 
-      const result = adminUserDetails(person2.authUserId);
-      expect(result).toStrictEqual({
+      result1 = adminUserDetails(person2.authUserId);
+      expect(result1).toStrictEqual({
         user: {
           userId: person2.authUserId,
           name: 'Manan Jaiswal',
@@ -255,14 +264,14 @@ describe('////////TESTING ADMINUSERDETAILS////////', () => {
 
   describe('Testing adminUserDetails errors', () => {
     test('CASE: AuthUserId is not a valid user', () => {
-      const person = adminAuthRegister(
+      person1 = adminAuthRegister(
         'vincentxian@gmail.com',
         'vincentpassword1',
         'vincent',
         'xian'
       );
-      const result = adminUserDetails(person.authUserId + 1);
-      expect(result).toStrictEqual({ error: expect.any(String) });
+      result1 = adminUserDetails(person1.authUserId + 1);
+      expect(result1).toStrictEqual({ error: expect.any(String) });
     });
   });
 });

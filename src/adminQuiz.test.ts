@@ -13,6 +13,7 @@ let result1: any;
 let result2: any;
 let person1: any;
 let person2: any;
+//put your define here for quiz1 quiz2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 beforeEach(() => {
   clear();
@@ -418,34 +419,34 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
 
     // adminQuizNameUpdate successfully run
     test('CASE: Successful quiz name update', () => {
-      const user = adminAuthRegister(
+      person1 = adminAuthRegister(
         'zhizhao@gmail.com',
         'MeowMeow123',
         'Zhi',
         'Zhao'
       );
       const quiz = adminQuizCreate(
-        user.authUserId,
+        person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
       if (quiz.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizNameUpdate(user.authUserId, quiz.quizId, 'catQuiz');
+      const result = adminQuizNameUpdate(person1.authUserId, quiz.quizId, 'catQuiz');
       expect(result).toStrictEqual({});
     });
 
     // adminQuizNameUpdate error(s) occurred.
     test('CASE: AuthUserId is not a valid user', () => {
-      const user = adminAuthRegister(
+      person1 = adminAuthRegister(
         'zhizhao@gmail.com',
         'MeowMeow123',
         'Zhi',
         'Zhao'
       );
       const quiz = adminQuizCreate(
-        user.authUserId,
+        person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
@@ -453,7 +454,7 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
         throw new Error('adminQuizCreate does not work.')
       };
       const result = adminQuizNameUpdate(
-        user.authUserId + 1,
+        person1.authUserId + 1,
         quiz.quizId,
         'CatQuiz'
       );
@@ -461,20 +462,20 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
     });
 
     test('CASE: Quiz ID does not refer to a valid quiz', () => {
-      const user = adminAuthRegister(
+      person1 = adminAuthRegister(
         'zhizhao@gmail.com',
         'MeowMeow123',
         'Zhi',
         'Zhao'
       );
       const quiz = adminQuizCreate(
-        user.authUserId,
+        person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
       
       const result = adminQuizNameUpdate(
-        user.authUserId,
+        person1.authUserId,
         quiz.quizId + 1,
         'catQuiz'
       );
@@ -482,18 +483,18 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
     });
 
     test('CASE: Quiz ID does not refer to a quiz that this user owns', () => {
-      const user = adminAuthRegister(
+      person1 = adminAuthRegister(
         'zhizhao@gmail.com',
         'MeowMeow123',
         'Zhi',
         'Zhao'
       );
       const quiz = adminQuizCreate(
-        user.authUserId,
+        person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
-      const user1 = adminAuthRegister(
+      person2 = adminAuthRegister(
         'pasta@gmail.com',
         'VincentXian14',
         'Vincent',
@@ -502,57 +503,57 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
       if (quiz.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizNameUpdate(user1.authUserId, quiz.quizId, 'catQuiz');
+      const result = adminQuizNameUpdate(person2.authUserId, quiz.quizId, 'catQuiz');
       expect(result).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Name contains any characters that are not alphanumeric or are spaces', () => {
-      const user = adminAuthRegister(
+      person1 = adminAuthRegister(
         'zhizhao@gmail.com',
         'MeowMeow123',
         'Zhi',
         'Zhao'
       );
       const quiz = adminQuizCreate(
-        user.authUserId,
+        person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
       if (quiz.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizNameUpdate(user.authUserId, quiz.quizId, '!@#$%^&');
+      const result = adminQuizNameUpdate(person1.authUserId, quiz.quizId, '!@#$%^&');
       expect(result).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Name is either less than 3 characters long or more than 30 characters long', () => {
-      const user = adminAuthRegister(
+      person1 = adminAuthRegister(
         'zhizhao@gmail.com',
         'MeowMeow123',
         'Zhi',
         'Zhao'
       );
       const quiz = adminQuizCreate(
-        user.authUserId,
+        person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
       if (quiz.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizNameUpdate(user.authUserId, quiz.quizId, 'qu');
+      const result = adminQuizNameUpdate(person1.authUserId, quiz.quizId, 'qu');
       expect(result).toStrictEqual({ error: expect.any(String) });
     });
 
     test('CASE: Name is either less than 3 characters long or more than 30 characters long', () => {
-      const user = adminAuthRegister(
+      person1 = adminAuthRegister(
         'zhizhao@gmail.com',
         'MeowMeow123',
         'Zhi',
         'Zhao'
       );
       const quiz = adminQuizCreate(
-        user.authUserId,
+        person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
@@ -560,7 +561,7 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
         throw new Error('adminQuizCreate does not work.')
       };
       const result = adminQuizNameUpdate(
-        user.authUserId,
+        person1.authUserId,
         quiz.quizId,
         'There is a dog holding me hostage'
       );
@@ -568,22 +569,22 @@ describe('////////TESTING ADMINQUIZNAMEUPDATE////////', () => {
     });
 
     test('CASE: Name is already used by the current logged in user for another quiz', () => {
-      const user = adminAuthRegister(
+      person1 = adminAuthRegister(
         'zhizhao@gmail.com',
         'MeowMeow123',
         'Zhi',
         'Zhao'
       );
       const quiz = adminQuizCreate(
-        user.authUserId,
+        person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
-      adminQuizCreate(user.authUserId, 'CatQuiz', 'A quiz about cats :)');
+      adminQuizCreate(person1.authUserId, 'CatQuiz', 'A quiz about cats :)');
       if (quiz.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizNameUpdate(user.authUserId, quiz.quizId, 'CatQuiz');
+      const result = adminQuizNameUpdate(person1.authUserId, quiz.quizId, 'CatQuiz');
       expect(result).toStrictEqual({ error: expect.any(String) });
     });
   });
@@ -593,34 +594,34 @@ describe('////////TESTING ADMINQUIZDESCRIPTIONUPDATE////////', () => {
   describe('Testing adminQuizDescriptionUpdate outcomes', () => {
     // adminQuizDescriptionUpdate ran successfully
     test('CASE: Successful quiz name update', () => {
-      const user = adminAuthRegister(
+      person1 = adminAuthRegister(
         'zhizhao@gmail.com',
         'MeowMeow123',
         'Zhi',
         'Zhao'
       );
       const quiz = adminQuizCreate(
-        user.authUserId,
+        person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
       if (quiz.quizId === undefined) {
         throw new Error('adminQuizCreate does not work.')
       };
-      const result = adminQuizNameUpdate(user.authUserId, quiz.quizId, 'catQuiz');
+      const result = adminQuizNameUpdate(person1.authUserId, quiz.quizId, 'catQuiz');
       expect(result).toStrictEqual({});
     });
 
     // adminQuizDescriptionUpdate error(s) occurred
     test('CASE: AuthUserId is not a valid user', () => {
-      const user = adminAuthRegister(
+      person1 = adminAuthRegister(
         'zhizhao@gmail.com',
         'MeowMeow123',
         'Zhi',
         'Zhao'
       );
       const quiz = adminQuizCreate(
-        user.authUserId,
+        person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
@@ -628,7 +629,7 @@ describe('////////TESTING ADMINQUIZDESCRIPTIONUPDATE////////', () => {
         throw new Error('adminQuizCreate does not work.')
       };
       const result = adminQuizDescriptionUpdate(
-        user.authUserId + 1,
+        person1.authUserId + 1,
         quiz.quizId,
         'A quiz about cats :)'
       );
@@ -636,14 +637,14 @@ describe('////////TESTING ADMINQUIZDESCRIPTIONUPDATE////////', () => {
     });
 
     test('CASE: Quiz ID does not refer to a valid quiz', () => {
-      const user = adminAuthRegister(
+      person1 = adminAuthRegister(
         'zhizhao@gmail.com',
         'MeowMeow123',
         'Zhi',
         'Zhao'
       );
       const quiz = adminQuizCreate(
-        user.authUserId,
+        person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
@@ -651,7 +652,7 @@ describe('////////TESTING ADMINQUIZDESCRIPTIONUPDATE////////', () => {
         throw new Error('adminQuizCreate does not work.')
       };
       const result = adminQuizDescriptionUpdate(
-        user.authUserId,
+        person1.authUserId,
         quiz.quizId + 1,
         'A quiz about cats :)'
       );
@@ -659,19 +660,19 @@ describe('////////TESTING ADMINQUIZDESCRIPTIONUPDATE////////', () => {
     });
 
     test('CASE: Quiz ID does not refer to a quiz that this user owns', () => {
-      const user = adminAuthRegister(
+      person1 = adminAuthRegister(
         'zhizhao@gmail.com',
         'MeowMeow123',
         'Zhi',
         'Zhao'
       );
       const quiz = adminQuizCreate(
-        user.authUserId,
+        person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
 
-      const user1 = adminAuthRegister(
+      person2 = adminAuthRegister(
         'pasta@gmail.com',
         'VincentXian14',
         'Vincent',
@@ -682,7 +683,7 @@ describe('////////TESTING ADMINQUIZDESCRIPTIONUPDATE////////', () => {
         throw new Error('adminQuizCreate does not work.')
       };
       const result = adminQuizDescriptionUpdate(
-        user1.authUserId,
+        person2.authUserId,
         quiz.quizId,
         'A quiz about cats :)'
       );
@@ -690,14 +691,14 @@ describe('////////TESTING ADMINQUIZDESCRIPTIONUPDATE////////', () => {
     });
 
     test('CASE: Description is more than 100 characters in length', () => {
-      const user = adminAuthRegister(
+      person1 = adminAuthRegister(
         'zhizhao@gmail.com',
         'MeowMeow123',
         'Zhi',
         'Zhao'
       );
       const quiz = adminQuizCreate(
-        user.authUserId,
+        person1.authUserId,
         'newQuiz',
         'A quiz about cats :)'
       );
@@ -705,7 +706,7 @@ describe('////////TESTING ADMINQUIZDESCRIPTIONUPDATE////////', () => {
         throw new Error('adminQuizCreate does not work.')
       };
       const result = adminQuizDescriptionUpdate(
-        user.authUserId,
+        person1.authUserId,
         quiz.quizId,
         'blahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlahBlah'
       );
