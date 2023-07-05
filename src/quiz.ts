@@ -1,4 +1,31 @@
-import { getData, setData } from './dataStore';
+import { getData, setData, QuizIds } from './dataStore';
+
+interface EmptyObject {};
+
+interface ErrorObject {
+  error: string;
+}
+
+interface QuizId {
+  quizId: number;
+}
+
+interface EmptyQuizList {
+  quizzes: []
+}
+
+interface QuizList {
+  quizzes: QuizIds[]
+};
+
+interface QuizInfo {
+  quizId: number,
+  name: string,
+  timeCreated: number,
+  timeLastEdited: number,
+  description: string
+}
+
 /**
  * This function provides a list of all the quizzes owned by the currently
  * logged in user.
@@ -9,12 +36,12 @@ import { getData, setData } from './dataStore';
  *  quizzes: [
  *      {
  *          quizId: integer,
- *          name: string,
+ *          name: string
  *      }
  *  ]
  * }
  */
-function adminQuizList(authUserId: number) {
+function adminQuizList(authUserId: number): EmptyQuizList | QuizList | ErrorObject {
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
@@ -25,6 +52,7 @@ function adminQuizList(authUserId: number) {
   if (user.quizIds) {
     return { quizzes: user.quizIds.map((quiz) => quiz) };
   }
+
   return {
     quizzes: [],
   };
@@ -40,8 +68,7 @@ function adminQuizList(authUserId: number) {
  *
  * @returns {{quizId: number}}
  */
-
-function adminQuizCreate(authUserId: number, name: string, description: string) {
+function adminQuizCreate(authUserId: number, name: string, description: string): QuizId | ErrorObject {
   const data = getData();
 
   // Save the selected user to be used for error checking & return values
@@ -51,26 +78,30 @@ function adminQuizCreate(authUserId: number, name: string, description: string) 
   // Error checking block
   if (user === undefined) {
     return { error: 'AuthUserId is not a valid user' };
+
   } else if (!acceptedCharacters.test(name)) {
     return { error: 'Name contains invalid characters' };
+
   } else if (name.length > 30 || name.length < 3) {
     return { error: 'Name is less than 3 or more than 30 characters' };
 
-  // checks if 'quizIds' exists as an array & that it has the correct quiz 'name
+  // Checks if 'quizIds' exists as an array & that it has the correct quiz 'name
   } else if (
     user.quizIds &&
     Array.isArray(user.quizIds) &&
     user.quizIds.some((quiz) => quiz.name === name)
   ) {
     return { error: 'Name is already used for another quiz' };
+
   } else if (description.length > 100) {
     return { error: 'Description is more than 100 characters' };
+
   }
 
   const quizId = data.quizzes.length;
   const currentTime = Math.floor(Date.now() / 1000);
 
-  // adds this quiz to the quizIds array in this user's object
+  // Adds quiz to the quizIds array in this user's object.
   user.quizIds.push({
     quizId: quizId,
     name: name,
@@ -88,6 +119,7 @@ function adminQuizCreate(authUserId: number, name: string, description: string) 
 
   return {
     quizId: quizId,
+
   };
 }
 
@@ -100,27 +132,33 @@ function adminQuizCreate(authUserId: number, name: string, description: string) 
  *
  * @returns {}
  */
-function adminQuizRemove(authUserId: number, quizId: number) {
+function adminQuizRemove(authUserId: number, quizId: number): EmptyObject | ErrorObject {
   const data = getData();
   const user = data.users.find((user) => user.authUserId === authUserId);
 
   // Error checking block
   if (user === undefined) {
     return { error: 'AuthUserId is not a valid user' };
+
   } else if (!data.quizzes.some((quizzes) => quizzes.quizId === quizId)) {
     return { error: 'Quiz ID does not refer to a valid quiz' };
+
   } else if (!user.quizIds.some((id) => id.quizId === quizId)) {
     return {
       error: 'Quiz ID does not refer to a valid quiz that this user owns',
     };
+
   } else {
+
     // If no errors; remove the quiz and update 'quizzes' in dataStore.js
     const index = user.quizIds.findIndex((id) => id.quizId === quizId);
     user.quizIds.splice(index, 1);
 
     const indexQuiz = data.quizzes.findIndex((id) => id.quizId === quizId);
     data.quizzes.splice(indexQuiz, 1);
+
     return {};
+
   }
 }
 
@@ -139,20 +177,25 @@ function adminQuizRemove(authUserId: number, quizId: number) {
  *  description: string,
  * }
  */
-function adminQuizInfo(authUserId: number, quizId: number) {
+function adminQuizInfo(authUserId: number, quizId: number): QuizInfo | ErrorObject {
   const data = getData();
 
   // Save the selected user to be used for error checking & return values
   const user = data.users.find((user) => user.authUserId === authUserId);
   const selected = data.quizzes.find((quiz) => quiz.quizId === quizId);
+
   // Error checking block
   if (user === undefined) {
     return { error: 'AuthUserId is not a valid user' };
+
   } else if (selected === undefined) {
     return { error: 'Quiz Id does not refer to a valid quiz' };
+
   } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
     return { error: 'Quiz Id does not refer to a quiz that this user owns' };
+
   }
+
   return {
     quizId: selected.quizId,
     name: selected.name,
@@ -171,7 +214,7 @@ function adminQuizInfo(authUserId: number, quizId: number) {
  *
  * @returns {}
  */
-function adminQuizNameUpdate(authUserId: number, quizId: number, name: string) {
+function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): EmptyObject | ErrorObject {
   const data = getData();
   const acceptedCharacters = /^[a-zA-Z0-9 ]+$/;
 
@@ -182,24 +225,30 @@ function adminQuizNameUpdate(authUserId: number, quizId: number, name: string) {
   // Error checking block
   if (user === undefined) {
     return { error: 'AuthUserId is not a valid user' };
+
   } else if (!acceptedCharacters.test(name)) {
     return {
       error:
       'Name contains any characters that are not alphanumeric or are spaces',
     };
+
   } else if (name.length < 3 || name.length > 30) {
     return {
       error:
       'Name is either less than 3 characters long or more than 30 characters long',
     };
+
   } else if (selected === undefined) {
     return { error: 'Quiz Id does not refer to a valid quiz' };
+
   } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
     return { error: 'Quiz Id does not refer to a quiz that this user owns' };
+
   } else if (user.quizIds.some((quiz) => quiz.name === name)) {
     return {
       error:
       'Name is already used by the current logged in user for another quiz',
+
     };
   }
 
@@ -207,7 +256,9 @@ function adminQuizNameUpdate(authUserId: number, quizId: number, name: string) {
   const userQuiz = user.quizIds.find((quiz) => quiz.quizId === quizId);
   if (userQuiz === undefined) {
     return { error: 'Quiz Id does not refer to a valid quiz' };
+
   }
+
   selected.name = name;
   userQuiz.name = name;
   selected.timeLastEdited = Math.floor(Date.now() / 1000);
@@ -226,7 +277,7 @@ function adminQuizNameUpdate(authUserId: number, quizId: number, name: string) {
  * @returns {}
  *
  */
-function adminQuizDescriptionUpdate(authUserId: number, quizId: number, description: string) {
+function adminQuizDescriptionUpdate(authUserId: number, quizId: number, description: string): EmptyObject | ErrorObject {
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
@@ -235,12 +286,16 @@ function adminQuizDescriptionUpdate(authUserId: number, quizId: number, descript
   // Error checking block
   if (user === undefined) {
     return { error: 'AuthUserId is not a valid user' };
+
   } else if (selected === undefined) {
     return { error: 'Quiz Id does not refer to a valid quiz' };
+
   } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
     return { error: 'Quiz Id does not refer to a quiz that this user owns' };
+
   } else if (description.length > 100) {
     return { error: 'Description is more than 100 characters in length' };
+
   }
 
   // Inputs are valid thus change description and timeLastEdited
