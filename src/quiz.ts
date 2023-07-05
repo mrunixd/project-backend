@@ -1,4 +1,4 @@
-import { getData, setData } from './dataStore';
+import { getData, setData, QuizIds } from './dataStore';
 
 interface EmptyObject {};
 
@@ -10,13 +10,12 @@ interface QuizId {
   quizId: number;
 }
 
-interface Quizzes {
-  quizzes: [
-    {
-      quizId: number,
-      name: string
-    }
-  ] | []
+interface EmptyQuizList {
+  quizzes: []
+}
+
+interface QuizList {
+  quizzes: QuizIds[]
 };
 
 interface QuizInfo {
@@ -26,7 +25,6 @@ interface QuizInfo {
   timeLastEdited: number,
   description: string
 }
-
 
 /**
  * This function provides a list of all the quizzes owned by the currently
@@ -38,12 +36,12 @@ interface QuizInfo {
  *  quizzes: [
  *      {
  *          quizId: integer,
- *          name: string,
+ *          name: string
  *      }
  *  ]
  * }
  */
-function adminQuizList(authUserId: number): Quizzes | ErrorObject {
+function adminQuizList(authUserId: number): EmptyQuizList | QuizList | ErrorObject {
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
@@ -51,7 +49,7 @@ function adminQuizList(authUserId: number): Quizzes | ErrorObject {
     return { error: 'AuthUserId is not a valid user' };
   }
 
-  if (user.quizIds.length) {
+  if (user.quizIds) {
     return { quizzes: user.quizIds.map((quiz) => quiz) };
   }
 

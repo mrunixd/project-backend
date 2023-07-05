@@ -24,6 +24,7 @@ beforeEach(() => {
   person2 = undefined;
   quiz1 = undefined;
   quiz2 = undefined;
+
 });
 
 describe('////////TESTING ADMINQUIZLIST////////', () => {
@@ -82,7 +83,8 @@ describe('////////TESTING ADMINQUIZLIST////////', () => {
         'secondquiz',
         'a very hard interesting quiz'
       );
-      const quiz3 = adminQuizCreate(
+      let quiz3: any;
+      quiz3 = adminQuizCreate(
         person1.authUserId,
         'thirdquiz',
         'a very hard interesting quiz'
@@ -92,15 +94,15 @@ describe('////////TESTING ADMINQUIZLIST////////', () => {
         quizzes: [
           {
             quizId: quiz1.quizId,
-            name: 'aarnavsquiz',
+            name: 'firstquiz'
           },
           {
             quizId: quiz2.quizId,
-            name: 'secondquiz',
+            name: 'secondquiz'
           },
           {
             quizId: quiz3.quizId,
-            name: 'thirdquiz',
+            name: 'thirdquiz'
           },
         ],
       });
