@@ -35,7 +35,7 @@ describe('////////TESTING ADMINAUTHREGISTER////////', () => {
         'vincent',
         'xian'
       );
-      const result2 = adminAuthRegister(
+      result2 = adminAuthRegister(
         'Vincentxian@gmail.com',
         'vincentpassword1',
         'vincent',
@@ -51,7 +51,7 @@ describe('////////TESTING ADMINAUTHREGISTER////////', () => {
         'vincent',
         'xian'
       );
-      const result2 = adminAuthRegister(
+      result2 = adminAuthRegister(
         'vincentxian@gmail.com',
         'vincentpassword1',
         'vincent',

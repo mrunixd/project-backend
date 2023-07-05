@@ -3,11 +3,11 @@ import { getData, setData } from './dataStore';
 
 interface AuthUserId {
   authUserId: number;
-};
+}
 
 interface ErrorObject {
   error: string;
-};
+}
 
 interface User {
   user: {
@@ -17,7 +17,7 @@ interface User {
     numSuccessfulLogins: number;
     numFailedPasswordsSinceLastLogin: number;
   },
-};
+}
 
 /**
  * This function registers a new user into Toohak: requires an email password
@@ -102,18 +102,18 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
  */
 function adminAuthLogin(email: string, password: string): AuthUserId | ErrorObject {
   const data = getData();
-  
+
   // Error in finding user with matching email; returns error if email not found
   if (
     !data.users.some(
       (users) => users.email.toLowerCase() === email.toLowerCase()
-      )
-      ) {
-        return {
-          error: 'Email address does not exist',
-        };
-      }
-      
+    )
+  ) {
+    return {
+      error: 'Email address does not exist',
+    };
+  }
+
   const userEmail = data.users.find(
     (users) => users.email.toLowerCase() === email.toLowerCase()
   );
@@ -133,7 +133,7 @@ function adminAuthLogin(email: string, password: string): AuthUserId | ErrorObje
       users.password === password
   );
 
-  if(user === undefined) {
+  if (user === undefined) {
     // Increment numFailedPasswordsSinceLastLogin if password & email incorrect
     return {
       error: 'Email Address does not exist.',
@@ -176,7 +176,7 @@ function adminUserDetails(authUserId: number): User | ErrorObject {
   if (user === undefined) {
     return {
       error: 'AuthUserId is not a valid user'
-    }
+    };
   }
   return {
     user: {

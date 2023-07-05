@@ -6,6 +6,15 @@ import cors from 'cors';
 import YAML from 'yaml';
 import sui from 'swagger-ui-express';
 import fs from 'fs';
+import { adminAuthRegister, adminAuthLogin, adminUserDetails } from './auth';
+import {
+  adminQuizCreate,
+  adminQuizList,
+  adminQuizInfo,
+  adminQuizRemove,
+  adminQuizNameUpdate,
+  adminQuizDescriptionUpdate,
+} from './quiz';
 
 // Set up web app
 const app = express();
@@ -37,6 +46,15 @@ app.get('/echo', (req: Request, res: Response) => {
   return res.json(ret);
 });
 
+app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
+  const {email, password, nameFirst, nameLast} = req.body;
+  const response = adminAuthRegister(email, password, nameFirst, nameLast);
+
+  if ('error' in response) {
+    return res.status(400).json(response);
+  }
+  return res.json(response);
+});
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================
