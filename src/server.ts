@@ -15,6 +15,7 @@ import {
   adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
 } from './quiz';
+import { clear } from './other';
 
 // Set up web app
 const app = express();
@@ -27,7 +28,13 @@ app.use(morgan('dev'));
 // for producing the docs that define the API
 const file = fs.readFileSync('./swagger.yaml', 'utf8');
 app.get('/', (req: Request, res: Response) => res.redirect('/docs'));
-app.use('/docs', sui.serve, sui.setup(YAML.parse(file), { swaggerOptions: { docExpansion: config.expandDocs ? 'full' : 'list' } }));
+app.use(
+  '/docs',
+  sui.serve,
+  sui.setup(YAML.parse(file), {
+    swaggerOptions: { docExpansion: config.expandDocs ? 'full' : 'list' },
+  })
+);
 
 const PORT: number = parseInt(process.env.PORT || config.port);
 const HOST: string = process.env.IP || 'localhost';
@@ -47,7 +54,7 @@ app.get('/echo', (req: Request, res: Response) => {
 });
 
 app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
-  const {email, password, nameFirst, nameLast} = req.body;
+  const { email, password, nameFirst, nameLast } = req.body;
   const response = adminAuthRegister(email, password, nameFirst, nameLast);
 
   if ('error' in response) {
@@ -55,6 +62,22 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   }
   return res.json(response);
 });
+
+app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const response = adminAuthLogin(email, password);
+
+  if ('error' in response) {
+    return res.status(400).json(response);
+  }
+  return res.json(response);
+});
+
+app.delete('/v1/clear', (red: Request, res: Response) => {
+  const response = clear();
+  return res.json(response);
+});
+
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================
@@ -64,7 +87,6 @@ const server = app.listen(PORT, HOST, () => {
   // DO NOT CHANGE THIS LINE
   console.log(`⚡️ Server started on port ${PORT} at ${HOST}`);
 });
-
 // For coverage, handle Ctrl+C gracefully
 process.on('SIGINT', () => {
   server.close(() => console.log('Shutting down server gracefully.'));
