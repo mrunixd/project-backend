@@ -19,6 +19,11 @@ function deleteRequest(route: string, json: any) {
   return JSON.parse(res.body.toString());
 }
 
+function getRequest(route: string, json: any) {
+  const res = request('GET', `${SERVER_URL}${route}`, { json: json });
+  return JSON.parse(res.body.toString());
+}
+
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
 });
@@ -143,3 +148,248 @@ describe('TESTING v1/clear', () => {
   });
   // will continue to do more test as more functions are produced.
 });
+
+let person1: any = undefined;
+
+describe('TESTING v1/admin/quiz', () => {
+
+  beforeEach(() => {
+      person1 = postRequest('/v1/admin/auth/register', {
+      email: 'aarnavsample@gmail.com',
+      password: 'Abcd12345',
+      nameFirst: 'aarnav',
+      nameLast: 'sheth',
+    });
+  });
+
+  describe('SUCCESS CASES', () => {
+    test('Successful adminQuizCreate 1 quiz', () => {
+      const result1 = postRequest('/v1/admin/quiz', {
+        authUserId: person1.authUserId,
+        name: 'first quiz',
+        description: 'first quiz being tested',
+      });
+      expect(result1).toStrictEqual({ quizId: expect.any(Number) });
+      // expect(result1.statusCode).toBe(OK);
+    });
+  });
+
+  describe('ERROR CASES', () => {
+    test('CASE: AuthUserId is not a valid user', () => {
+      const result1 = postRequest('/v1/admin/quiz', {
+        authUserId: person1.authUserId + 1, //not sure if this is right
+        name: 'first quiz',
+        description: 'first quiz being tested',
+      });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+      // expect(result1.statusCode).toBe(OK);
+    });
+
+    test('CASE: not alpahnumeric name', () => {
+      const result1 = postRequest('/v1/admin/quiz', {
+        authUserId: person1.authUserId,
+        name: '*not^lph+',
+        description: 'first quiz being tested',
+      });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+      // expect(result1.statusCode).toBe(OK);
+    });
+    
+    test('CASE: name is less than 3 or more than 30 characters', () => {
+      const result1 = postRequest('/v1/admin/quiz', {
+        authUserId: person1.authUserId,
+        name: 'as',
+        description: 'first quiz being tested',
+      });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+      // expect(result1.statusCode).toBe(OK);
+    });
+
+    test('CASE: name is already used for a quiz by user', () => {
+      postRequest('/v1/admin/quiz', {
+        authUserId: person1.authUserId,
+        name: 'first quiz', 
+        description: 'first quiz being tested',
+      });
+      const result1 = postRequest('/v1/admin/quiz', {
+        authUserId: person1.authUserId,
+        name: 'first quiz', 
+        description: 'first quiz being tested again',
+      });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
+
+    test('CASE: description is more than 100 characters', () => {
+      const result1 = postRequest('/v1/admin/quiz', {
+        authUserId: person1.authUserId,
+        name: 'as',
+        description: 'abcdefghijklmanoinapqrstuvfkdlhzbljkfs kj;kadvbjp kj;aobadbo;udvk; j kja jna dnad j;canlnlxc gjanjk  bafhlbahwlbvkljbhw;KEWBF;KBNE;BNKBGGJRNAJLKVBJ;KV',
+      });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+      // expect(result1.statusCode).toBe(OK);
+    });
+  });
+});
+
+describe('TESTING v1/admin/quiz', () => {
+
+  beforeEach(() => {
+      person1 = postRequest('/v1/admin/auth/register', {
+      email: 'aarnavsample@gmail.com',
+      password: 'Abcd12345',
+      nameFirst: 'aarnav',
+      nameLast: 'sheth',
+    });
+  });
+
+  describe('SUCCESS CASES', () => {
+    test('Successful adminQuizCreate 1 quiz', () => {
+      const result1 = postRequest('/v1/admin/quiz', {
+        authUserId: person1.authUserId,
+        name: 'first quiz',
+        description: 'first quiz being tested',
+      });
+      expect(result1).toStrictEqual({ quizId: expect.any(Number) });
+      // expect(result1.statusCode).toBe(OK);
+    });
+  });
+
+  describe('ERROR CASES', () => {
+    test('CASE: AuthUserId is not a valid user', () => {
+      const result1 = postRequest('/v1/admin/quiz', {
+        authUserId: person1.authUserId + 1, //not sure if this is right
+        name: 'first quiz',
+        description: 'first quiz being tested',
+      });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+      // expect(result1.statusCode).toBe(OK);
+    });
+
+    test('CASE: not alpahnumeric name', () => {
+      const result1 = postRequest('/v1/admin/quiz', {
+        authUserId: person1.authUserId,
+        name: '*not^lph+',
+        description: 'first quiz being tested',
+      });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+      // expect(result1.statusCode).toBe(OK);
+    });
+    
+    test('CASE: name is less than 3 or more than 30 characters', () => {
+      const result1 = postRequest('/v1/admin/quiz', {
+        authUserId: person1.authUserId,
+        name: 'as',
+        description: 'first quiz being tested',
+      });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+      // expect(result1.statusCode).toBe(OK);
+    });
+
+    test('CASE: name is already used for a quiz by user', () => {
+      postRequest('/v1/admin/quiz/list', {
+        authUserId: person1.authUserId,
+        name: 'first quiz', 
+        description: 'first quiz being tested',
+      });
+      const result1 = postRequest('/v1/admin/quiz', {
+        authUserId: person1.authUserId,
+        name: 'first quiz', 
+        description: 'first quiz being tested again',
+      });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
+
+    test('CASE: description is more than 100 characters', () => {
+      const result1 = postRequest('/v1/admin/quiz', {
+        authUserId: person1.authUserId,
+        name: 'as',
+        description: 'abcdefghijklmanoinapqrstuvfkdlhzbljkfs kj;kadvbjp kj;aobadbo;udvk; j kja jna dnad j;canlnlxc gjanjk  bafhlbahwlbvkljbhw;KEWBF;KBNE;BNKBGGJRNAJLKVBJ;KV',
+      });
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+      // expect(result1.statusCode).toBe(OK);
+    });
+  });
+});
+
+// describe('TESTING v1/admin/quiz/list', () => {
+
+//   beforeEach(() => {
+//       person1 = postRequest('/v1/admin/auth/register', {
+//       email: 'aarnavsample@gmail.com',
+//       password: 'Abcd12345',
+//       nameFirst: 'aarnav',
+//       nameLast: 'sheth',
+//     });
+//   });
+
+//   describe('SUCCESS CASES', () => {
+//     test('Successful adminQuizCreate 1 quiz', () => {
+//       postRequest('/v1/admin/quiz', {
+//         authUserId: person1.authUserId,
+//         name: 'first quiz',
+//         description: 'first quiz being tested',
+//       });
+
+//       getRequest('/v1/admin/quiz/list', { })
+
+//       expect(result1).toStrictEqual({ quizId: expect.any(Number) });
+//       // expect(result1.statusCode).toBe(OK);
+//     });
+//   });
+
+//   describe('ERROR CASES', () => {
+//     test('CASE: AuthUserId is not a valid user', () => {
+//       const result1 = postRequest('/v1/admin/quiz', {
+//         authUserId: person1.authUserId + 1, //not sure if this is right
+//         name: 'first quiz',
+//         description: 'first quiz being tested',
+//       });
+//       expect(result1).toStrictEqual({ error: expect.any(String) });
+//       // expect(result1.statusCode).toBe(OK);
+//     });
+
+//     test('CASE: not alpahnumeric name', () => {
+//       const result1 = postRequest('/v1/admin/quiz', {
+//         authUserId: person1.authUserId,
+//         name: '*not^lph+',
+//         description: 'first quiz being tested',
+//       });
+//       expect(result1).toStrictEqual({ error: expect.any(String) });
+//       // expect(result1.statusCode).toBe(OK);
+//     });
+    
+//     test('CASE: name is less than 3 or more than 30 characters', () => {
+//       const result1 = postRequest('/v1/admin/quiz', {
+//         authUserId: person1.authUserId,
+//         name: 'as',
+//         description: 'first quiz being tested',
+//       });
+//       expect(result1).toStrictEqual({ error: expect.any(String) });
+//       // expect(result1.statusCode).toBe(OK);
+//     });
+
+//     test('CASE: name is already used for a quiz by user', () => {
+//       postRequest('/v1/admin/quiz/list', {
+//         authUserId: person1.authUserId,
+//         name: 'first quiz', 
+//         description: 'first quiz being tested',
+//       });
+//       const result1 = postRequest('/v1/admin/quiz', {
+//         authUserId: person1.authUserId,
+//         name: 'first quiz', 
+//         description: 'first quiz being tested again',
+//       });
+//       expect(result1).toStrictEqual({ error: expect.any(String) });
+//     });
+
+//     test('CASE: description is more than 100 characters', () => {
+//       const result1 = postRequest('/v1/admin/quiz', {
+//         authUserId: person1.authUserId,
+//         name: 'as',
+//         description: 'abcdefghijklmanoinapqrstuvfkdlhzbljkfs kj;kadvbjp kj;aobadbo;udvk; j kja jna dnad j;canlnlxc gjanjk  bafhlbahwlbvkljbhw;KEWBF;KBNE;BNKBGGJRNAJLKVBJ;KV',
+//       });
+//       expect(result1).toStrictEqual({ error: expect.any(String) });
+//       // expect(result1.statusCode).toBe(OK);
+//     });
+//   });
+// });
