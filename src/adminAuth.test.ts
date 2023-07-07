@@ -23,7 +23,10 @@ describe('////////TESTING ADMINAUTHREGISTER////////', () => {
         'vincent',
         'xian'
       );
-      expect(result1).toMatchObject({ authUserId: expect.any(Number) });
+      expect(result1).toMatchObject({
+        sessionId: expect.any(Number),
+        authUserId: expect.any(Number)
+      });
     });
   });
 
@@ -137,7 +140,8 @@ describe('////////TESTING ADMINAUTHLOGIN////////', () => {
     test('CASE: Email and password are exact same', () => {
       adminAuthRegister('manan.j2450@gmail.com', 'abcd1234', 'Manan', 'Jaiswal');
       expect(adminAuthLogin('manan.j2450@gmail.com', 'abcd1234')).toStrictEqual({
-        authUserId: expect.any(Number),
+        sessionId: 1,
+        authUserId: expect.any(Number)
       });
     });
   });
@@ -173,21 +177,24 @@ describe('////////TESTING ADMINAUTHLOGIN////////', () => {
     test('CASE: test case sensitivity of email address letters', () => {
       adminAuthRegister('manan.j2450@gmail.com', 'abcd1234', 'Manan', 'Jaiswal');
       expect(adminAuthLogin('Manan.j2450@gmail.com', 'abcd1234')).toStrictEqual({
-        authUserId: expect.any(Number),
+        sessionId: expect.any(Number),
+        authUserId: expect.any(Number)
       });
     });
 
     test('CASE: test case sensitivity of email address letters', () => {
       adminAuthRegister('manan.j2450@gmail.com', 'abcd1234', 'Manan', 'Jaiswal');
       expect(adminAuthLogin('manan.j2450@gMail.com', 'abcd1234')).toStrictEqual({
-        authUserId: expect.any(Number),
+        sessionId: expect.any(Number),
+        authUserId: expect.any(Number)
       });
     });
 
     test('CASE: test of email address letters - registered with capital letters', () => {
       adminAuthRegister('MANAN.j2450@gmail.com', 'abcd1234', 'Manan', 'Jaiswal');
       expect(adminAuthLogin('manan.j2450@gMail.com', 'abcd1234')).toStrictEqual({
-        authUserId: expect.any(Number),
+        sessionId: expect.any(Number),
+        authUserId: expect.any(Number)
       });
     });
   });
@@ -198,7 +205,8 @@ describe('////////TESTING ADMINAUTHLOGIN////////', () => {
       adminAuthLogin('manan.j2450@gmail.com', 'abcd1234');
       adminAuthLogin('manan.j2450@gmail.com', 'abcd1234');
       expect(adminAuthLogin('manan.j2450@gmail.com', 'abcd1234')).toStrictEqual({
-        authUserId: expect.any(Number),
+        sessionId: expect.any(Number),
+        authUserId: expect.any(Number)
       });
     });
 
@@ -208,7 +216,8 @@ describe('////////TESTING ADMINAUTHLOGIN////////', () => {
       adminAuthLogin('manan.j2450@gmail.com', 'incorrectpw1');
       adminAuthLogin('manan.j2450@gmail.com', 'incorrectpw2');
       expect(adminAuthLogin('manan.j2450@gmail.com', 'abcd1234')).toStrictEqual({
-        authUserId: expect.any(Number),
+        sessionId: expect.any(Number),
+        authUserId: expect.any(Number)
       });
     });
   });
