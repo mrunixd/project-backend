@@ -73,7 +73,7 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
   return res.json(response);
 });
 
-app.delete('/v1/clear', (red: Request, res: Response) => {
+app.delete('/v1/clear', (req: Request, res: Response) => {
   const response = clear();
   return res.json(response);
 });

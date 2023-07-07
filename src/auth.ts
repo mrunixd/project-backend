@@ -1,7 +1,11 @@
 import validator from 'validator';
 import { getData, setData } from './dataStore';
 
-interface AuthUserId {
+// interface AuthUserId {
+//   authUserId: number;
+// }
+interface Token {
+  sessionId: number;
   authUserId: number;
 }
 
@@ -31,7 +35,7 @@ interface User {
  *
  * @returns {authUserId: integer}
  */
-function adminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string): AuthUserId | ErrorObject {
+function adminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string): Token | ErrorObject {
   const data = getData();
   // These regexes are needed to check for valid characters in names & password
   const acceptedCharacters = /^[a-zA-Z0-9' -]+$/;
@@ -82,10 +86,16 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
     numSuccessfulLogins: 1,
     numFailedPasswordsSinceLastLogin: 0,
     quizIds: [],
+    sessionIds: [0]
   });
   setData(data);
 
+  // return {
+  //   authUserId: authUserId,
+  // };
+
   return {
+    sessionId: 0,
     authUserId: authUserId,
   };
 }
@@ -100,7 +110,7 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
  *
  * @returns {authUserId: integer}
  */
-function adminAuthLogin(email: string, password: string): AuthUserId | ErrorObject {
+function adminAuthLogin(email: string, password: string): Token | ErrorObject {
   const data = getData();
 
   // Error in finding user with matching email; returns error if email not found
@@ -142,7 +152,11 @@ function adminAuthLogin(email: string, password: string): AuthUserId | ErrorObje
   // Increment numSuccesfulLogins && reset numFailedPasswordsSinceLastLogin
   user.numSuccessfulLogins++;
   user.numFailedPasswordsSinceLastLogin = 0;
+  // return {
+  //   authUserId: user.authUserId,
+  // };
   return {
+    sessionId: user.sessionIds.length,
     authUserId: user.authUserId,
   };
 }

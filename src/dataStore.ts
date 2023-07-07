@@ -11,6 +11,7 @@ export interface User {
   numSuccessfulLogins: number;
   numFailedPasswordsSinceLastLogin: number;
   quizIds: QuizIds[];
+  sessionIds: number[];
 }
 
 export interface Quiz {
