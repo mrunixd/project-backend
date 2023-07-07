@@ -19,10 +19,10 @@ function deleteRequest(route: string, json: any) {
   return JSON.parse(res.body.toString());
 }
 
-function getRequest(route: string, json: any) {
-  const res = request('GET', `${SERVER_URL}${route}`, { json: json });
-  return JSON.parse(res.body.toString());
-}
+// function getRequest(route: string, json: any) {
+//   const res = request('GET', `${SERVER_URL}${route}`, { json: json });
+//   return JSON.parse(res.body.toString());
+// }
 
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
@@ -286,9 +286,9 @@ describe('TESTING v1/admin/quiz', () => {
     });
 
     test('CASE: name is already used for a quiz by user', () => {
-      postRequest('/v1/admin/quiz/list', {
+      postRequest('/v1/admin/quiz', {
         authUserId: person1.authUserId,
-        name: 'first quiz', 
+        name: 'first quiz',
         description: 'first quiz being tested',
       });
       const result1 = postRequest('/v1/admin/quiz', {
@@ -297,6 +297,7 @@ describe('TESTING v1/admin/quiz', () => {
         description: 'first quiz being tested again',
       });
       expect(result1).toStrictEqual({ error: expect.any(String) });
+      // expect(result1.statusCode).toBe(OK);
     });
 
     test('CASE: description is more than 100 characters', () => {
