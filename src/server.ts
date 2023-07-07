@@ -78,6 +78,26 @@ app.delete('/v1/clear', (red: Request, res: Response) => {
   return res.json(response);
 });
 
+app.post('/v1/admin/quiz', (req: Request, res: Response) => {
+  const { authUserId, name, description } = req.body;
+  const response = adminQuizCreate(authUserId, name, description);
+
+  if ('error' in response) {
+    return res.status(400).json(response);
+  }
+  return res.json(response);
+});
+
+// app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
+//   const { authUserId } = req.body;
+//   const response = adminQuizList( authUserId );
+
+//   if ('error' in response) {
+//     return res.status(400).json(response);
+//   }
+//   return res.json(response);
+// });
+
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================
