@@ -15,7 +15,7 @@ import {
   adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
 } from './quiz';
-import { clear } from './other';
+import { clear, sessionIdtoUserId } from './other';
 
 // Set up web app
 const app = express();
@@ -60,6 +60,7 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   if ('error' in response) {
     return res.status(400).json(response);
   }
+  // return res.json(response);
   return res.json(response);
 });
 
@@ -79,8 +80,8 @@ app.delete('/v1/clear', (req: Request, res: Response) => {
 });
 
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
-  const { authUserId, name, description } = req.body;
-  const response = adminQuizCreate(authUserId, name, description);
+  const { sessionId, name, description } = req.body;
+  const response = adminQuizCreate(sessionId, name, description);
 
   if ('error' in response) {
     return res.status(400).json(response);
@@ -88,15 +89,29 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   return res.json(response);
 });
 
-// app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
-//   const { authUserId } = req.body;
-//   const response = adminQuizList( authUserId );
+app.get('/v1/admin/user/details', (req: Request, res: Response) => {
+  const sessionId = (req.query.sessionId).toString();
+  if (sessionId.length !== 5 || /^\d+$/.test(sessionId) === false) {
+    return res.status(401).json({ error: 'token has invalid structure' })
+  }
+  const userId = sessionIdtoUserId(sessionId);
+  if (userId === -1) {
+    return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' })
+  }
+  const response = adminUserDetails(userId);
+  return res.json(response);
+});
 
-//   if ('error' in response) {
-//     return res.status(400).json(response);
-//   }
-//   return res.json(response);
-// });
+
+app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
+  const { authUserId } = req.body;
+  const response = adminQuizList( authUserId );
+
+  if ('error' in response) {
+    return res.status(400).json(response);
+  }
+  return res.json(response);
+});
 
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
