@@ -1,30 +1,34 @@
-// import {
-//   adminQuizCreate,
-//   adminQuizList,
-//   adminQuizInfo,
-//   adminQuizRemove,
-//   adminQuizNameUpdate,
-//   adminQuizDescriptionUpdate,
-// } from './quiz';
-// import { adminAuthRegister, adminAuthLogin } from './auth';
-// import { clear } from './other';
+import {
+  adminQuizCreate,
+  adminQuizList,
+  adminQuizInfo,
+  adminQuizRemove,
+  adminQuizNameUpdate,
+  adminQuizDescriptionUpdate,
+} from './quiz';
+import { adminAuthRegister, adminAuthLogin } from './auth';
+import { clear } from './other';
 
-// let result1: any;
-// let result2: any;
-// let person1: any;
-// let person2: any;
-// let quiz1: any;
-// let quiz2: any;
+let result1: any;
+let result2: any;
+let person1: any;
+let person2: any;
+let quiz1: any;
+let quiz2: any;
 
-// beforeEach(() => {
-//   clear();
-//   result1 = undefined;
-//   result2 = undefined;
-//   person1 = undefined;
-//   person2 = undefined;
-//   quiz1 = undefined;
-//   quiz2 = undefined;
-// });
+beforeEach(() => {
+  clear();
+  result1 = undefined;
+  result2 = undefined;
+  person1 = undefined;
+  person2 = undefined;
+  quiz1 = undefined;
+  quiz2 = undefined;
+});
+
+test('DUD CASE, DELETE THIS AFTER IMPLEMENTING QUIZ FUNCTIONS IN ITER2', () => {
+    expect(1).toBe(1);
+});
 
 // describe('////////TESTING ADMINQUIZLIST////////', () => {
 //   describe('Testing adminQuizList errors', () => {
