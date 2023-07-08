@@ -11,7 +11,6 @@ export interface User {
   numSuccessfulLogins: number;
   numFailedPasswordsSinceLastLogin: number;
   quizIds: QuizIds[];
-  sessionIds: number[];
 }
 
 export interface Quiz {
@@ -25,11 +24,26 @@ export interface Quiz {
 export interface DataStore {
   users: User[];
   quizzes: Quiz[];
+  tokens: Token[];
 }
+
+export interface SessionId {
+  token: string;
+}
+export interface ErrorObject {
+  error: string;
+}
+
+export interface Token {
+  sessionId: string;
+  authUserId: number;
+}
+
 
 let data: DataStore = {
   users: [],
-  quizzes: []
+  quizzes: [],
+  tokens: []
 };
 
 function getData(): DataStore {

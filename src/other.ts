@@ -6,16 +6,27 @@
  * @returns {}
  *
 */
-import { setData, DataStore } from './dataStore';
+import { setData, getData, DataStore, SessionId, ErrorObject } from './dataStore';
 
 function clear() {
   const clearData: DataStore = {
     users: [],
 
-    quizzes: []
+    quizzes: [],
+    tokens: []
   };
   setData(clearData);
   return {};
 }
 
-export { clear };
+function sessionIdtoUserId(sessionId: string): number {
+  const data = getData();
+  const selectedToken = data.tokens.find((token) => token.sessionId === sessionId);
+
+  if (selectedToken === undefined) {
+    return -1;
+  }
+  return selectedToken.authUserId;
+}
+
+export { clear, sessionIdtoUserId };

@@ -6,10 +6,14 @@ let result2: any;
 let person1: any;
 let person2: any;
 
+// ====================================================================
+//  == TESTS ARE NO LONGER BLACKBOX AS THEY AREN'T TESTED FOR ITER2 ==
+// ====================================================================
+
 beforeEach(() => {
   clear();
   result1 = undefined;
-  result2 = undefined;
+  result2 = undefined; 
   person1 = undefined;
   person2 = undefined;
 });
@@ -24,8 +28,7 @@ describe('////////TESTING ADMINAUTHREGISTER////////', () => {
         'xian'
       );
       expect(result1).toMatchObject({
-        sessionId: expect.any(Number),
-        authUserId: expect.any(Number)
+        token: expect.any(String)
       });
     });
   });
@@ -140,8 +143,7 @@ describe('////////TESTING ADMINAUTHLOGIN////////', () => {
     test('CASE: Email and password are exact same', () => {
       adminAuthRegister('manan.j2450@gmail.com', 'abcd1234', 'Manan', 'Jaiswal');
       expect(adminAuthLogin('manan.j2450@gmail.com', 'abcd1234')).toStrictEqual({
-        sessionId: 1,
-        authUserId: expect.any(Number)
+        token: expect.any(String)
       });
     });
   });
@@ -177,24 +179,21 @@ describe('////////TESTING ADMINAUTHLOGIN////////', () => {
     test('CASE: test case sensitivity of email address letters', () => {
       adminAuthRegister('manan.j2450@gmail.com', 'abcd1234', 'Manan', 'Jaiswal');
       expect(adminAuthLogin('Manan.j2450@gmail.com', 'abcd1234')).toStrictEqual({
-        sessionId: expect.any(Number),
-        authUserId: expect.any(Number)
+        token: expect.any(String)
       });
     });
 
     test('CASE: test case sensitivity of email address letters', () => {
       adminAuthRegister('manan.j2450@gmail.com', 'abcd1234', 'Manan', 'Jaiswal');
       expect(adminAuthLogin('manan.j2450@gMail.com', 'abcd1234')).toStrictEqual({
-        sessionId: expect.any(Number),
-        authUserId: expect.any(Number)
+        token: expect.any(String)
       });
     });
 
     test('CASE: test of email address letters - registered with capital letters', () => {
       adminAuthRegister('MANAN.j2450@gmail.com', 'abcd1234', 'Manan', 'Jaiswal');
       expect(adminAuthLogin('manan.j2450@gMail.com', 'abcd1234')).toStrictEqual({
-        sessionId: expect.any(Number),
-        authUserId: expect.any(Number)
+        token: expect.any(String)
       });
     });
   });
@@ -205,8 +204,7 @@ describe('////////TESTING ADMINAUTHLOGIN////////', () => {
       adminAuthLogin('manan.j2450@gmail.com', 'abcd1234');
       adminAuthLogin('manan.j2450@gmail.com', 'abcd1234');
       expect(adminAuthLogin('manan.j2450@gmail.com', 'abcd1234')).toStrictEqual({
-        sessionId: expect.any(Number),
-        authUserId: expect.any(Number)
+        token: expect.any(String)
       });
     });
 
@@ -216,8 +214,7 @@ describe('////////TESTING ADMINAUTHLOGIN////////', () => {
       adminAuthLogin('manan.j2450@gmail.com', 'incorrectpw1');
       adminAuthLogin('manan.j2450@gmail.com', 'incorrectpw2');
       expect(adminAuthLogin('manan.j2450@gmail.com', 'abcd1234')).toStrictEqual({
-        sessionId: expect.any(Number),
-        authUserId: expect.any(Number)
+        token: expect.any(String)
       });
     });
   });
@@ -232,10 +229,10 @@ describe('////////TESTING ADMINUSERDETAILS////////', () => {
         'vincent',
         'xian'
       );
-      result1 = adminUserDetails(person1.authUserId);
+      result1 = adminUserDetails(0);
       expect(result1).toStrictEqual({
         user: {
-          userId: person1.authUserId,
+          userId: 0,
           name: 'vincent xian',
           email: 'vincentxian@gmail.com',
           numSuccessfulLogins: 1,
@@ -243,7 +240,6 @@ describe('////////TESTING ADMINUSERDETAILS////////', () => {
         },
       });
     });
-
     test('CASE: Successful check on 2nd person', () => {
       adminAuthRegister(
         'vincentxian@gmail.com',
@@ -257,11 +253,10 @@ describe('////////TESTING ADMINUSERDETAILS////////', () => {
         'Manan',
         'Jaiswal'
       );
-
-      result1 = adminUserDetails(person2.authUserId);
+      result1 = adminUserDetails(1);
       expect(result1).toStrictEqual({
         user: {
-          userId: person2.authUserId,
+          userId: 1,
           name: 'Manan Jaiswal',
           email: 'manan.j2450@gmail.com',
           numSuccessfulLogins: 1,
@@ -279,7 +274,7 @@ describe('////////TESTING ADMINUSERDETAILS////////', () => {
         'vincent',
         'xian'
       );
-      result1 = adminUserDetails(person1.authUserId + 1);
+      result1 = adminUserDetails(2);
       expect(result1).toStrictEqual({ error: expect.any(String) });
     });
   });
