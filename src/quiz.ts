@@ -74,7 +74,7 @@ function adminQuizCreate(authUserId: number, name: string, description: string):
   const acceptedCharacters = /^[a-zA-Z0-9 ]+$/;
 
   // Error checking block
-  if (user === undefined) {
+  if (!data.users.some((users) => users.authUserId === authUserId)) {
     return { error: 'AuthUserId is not a valid user' };
   } else if (!acceptedCharacters.test(name)) {
     return { error: 'Name contains invalid characters' };
