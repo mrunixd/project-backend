@@ -1,17 +1,13 @@
 import validator from 'validator';
-import { getData, setData } from './dataStore';
+import { getData, setData, SessionId, ErrorObject } from './dataStore';
 
 // interface AuthUserId {
 //   authUserId: number;
 // }
-interface Token {
-  sessionId: number;
-  authUserId: number;
-}
-
-interface ErrorObject {
-  error: string;
-}
+// interface Token {
+//   sessionId: number;
+//   authUserId: number;
+// }
 
 interface User {
   user: {
@@ -35,7 +31,7 @@ interface User {
  *
  * @returns {authUserId: integer}
  */
-function adminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string): Token | ErrorObject {
+function adminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string): SessionId | ErrorObject {
   const data = getData();
   // These regexes are needed to check for valid characters in names & password
   const acceptedCharacters = /^[a-zA-Z0-9' -]+$/;
@@ -77,7 +73,6 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
   // All inputs are valid, thus add user info into dataStore.js
   const authUserId = data.users.length;
   const name = nameFirst.concat(' ', nameLast);
-
   data.users.push({
     email: email,
     password: password,
@@ -86,17 +81,28 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
     numSuccessfulLogins: 1,
     numFailedPasswordsSinceLastLogin: 0,
     quizIds: [],
-    sessionIds: [0]
+  });
+
+  // Generates a unique 5 digit number for the new sessionId
+  let uniqueNumberFlag = false;
+  let sessionId = Math.floor(Math.random()*90000) + 10000;
+  while (uniqueNumberFlag === false) {
+    // If the generated sessionId already exists, generate a new one
+    if (data.tokens.some((token) => token.sessionId === sessionId.toString())) {
+      sessionId = Math.floor(Math.random()*90000) + 10000;
+    } else {
+      uniqueNumberFlag = true;
+    }
+  }
+
+  data.tokens.push({
+    sessionId: sessionId.toString(),
+    authUserId: authUserId
   });
   setData(data);
 
-  // return {
-  //   authUserId: authUserId,
-  // };
-
   return {
-    sessionId: 0,
-    authUserId: authUserId,
+    token: sessionId.toString()
   };
 }
 
@@ -110,7 +116,7 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
  *
  * @returns {authUserId: integer}
  */
-function adminAuthLogin(email: string, password: string): Token | ErrorObject {
+function adminAuthLogin(email: string, password: string): SessionId | ErrorObject {
   const data = getData();
 
   // Error in finding user with matching email; returns error if email not found
@@ -152,12 +158,30 @@ function adminAuthLogin(email: string, password: string): Token | ErrorObject {
   // Increment numSuccesfulLogins && reset numFailedPasswordsSinceLastLogin
   user.numSuccessfulLogins++;
   user.numFailedPasswordsSinceLastLogin = 0;
+
+  // Generates a unique 5 digit number for the new sessionId
+  let uniqueNumberFlag = false;
+  let sessionId = Math.floor(Math.random()*90000) + 10000;
+  while (uniqueNumberFlag === false) {
+    // If the generated sessionId already exists, generate a new one
+    if (data.tokens.some((token) => token.sessionId === sessionId.toString())) {
+      sessionId = Math.floor(Math.random()*90000) + 10000;
+    } else {
+      uniqueNumberFlag = true;
+    }
+  }
+
+  data.tokens.push({
+    sessionId: sessionId.toString(),
+    authUserId: user.authUserId
+  });
+  setData(data);
+
   // return {
   //   authUserId: user.authUserId,
   // };
   return {
-    sessionId: user.sessionIds.length,
-    authUserId: user.authUserId,
+    token: sessionId.toString()
   };
 }
 
