@@ -1371,7 +1371,7 @@ paths:
       summary: Create quiz question
       description: |
         Create a new stub question for a particular quiz.
-        When this route is called, and a question is created, the timeLastEdited for quiz is set as the time this question was created, and the colours of a question are randomly generated.
+        When this route is called, and a question is created, the timeLastEdited for quiz is set as the time this question was created, and the colours of each answer are randomly generated again.
       tags:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (New)"
