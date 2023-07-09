@@ -1,3 +1,4 @@
+import fs from 'fs';
 
 export interface QuizIds {
   quizId: number;
@@ -63,12 +64,21 @@ let data: DataStore = {
   tokens: []
 };
 
-function getData(): DataStore {
-  return data;
+// function getData(): DataStore {
+//   return data;
+// }
+
+
+// function setData(newData: DataStore) {
+//   data = newData;
+// }
+function setData(data: DataStore) {
+  fs.writeFileSync('./dbStore.json', JSON.stringify(data));
 }
 
-function setData(newData: DataStore) {
-  data = newData;
+function getData(): DataStore {
+  const dataString = fs.readFileSync('./dbStore.json');
+  return JSON.parse(String(dataString));
 }
 
 export { getData, setData };

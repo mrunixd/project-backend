@@ -16,6 +16,7 @@ import {
   adminQuizDescriptionUpdate,
 } from './quiz';
 import { clear, sessionIdtoUserId } from './other';
+import { DataStore, getData, setData } from './dataStore';
 
 // Set up web app
 const app = express();
@@ -43,13 +44,8 @@ const HOST: string = process.env.IP || 'localhost';
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
 
-// const setDataGlobal = () => {
-//   fs.writeFileSync('./dbStore.json', JSON.stringify(data));
-// }
-
-// const getDataGlobal = () => {
-
-// }
+// setData(getDataGlobal());
+// setInterval(function() {setDataGlobal()}, 1000);
 
 // Example get request
 app.get('/echo', (req: Request, res: Response) => {
