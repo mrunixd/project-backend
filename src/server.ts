@@ -141,8 +141,12 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   if (userId === -1) {
     return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' })
   }
-
+  
   const response = adminQuizRemove(userId, quizid);
+  if ('error' in response) {
+    return res.status(400).json(response);
+  }
+
   return res.json(response);
 });
 // ====================================================================
