@@ -39,7 +39,6 @@ export interface Token {
   authUserId: number;
 }
 
-
 let data: DataStore = {
   users: [],
   quizzes: [],
