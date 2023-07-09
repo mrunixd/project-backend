@@ -605,7 +605,7 @@ describe('///////Testing /v1/admin/quiz/ delete////////', () => {
       });
       const sessionId = person1.body.token;
       const result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}?token=${sessionId}`, {});
-      const result2 = getRequest(`/v1/admin/quiz/list?token=${person1.body.token}`, {});
+      const result2 = getRequest(`/v1/admin/quiz/list?token=${sessionId}`, {});
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
       expect(result2.body).toStrictEqual({ quizzes: [] });
@@ -624,7 +624,7 @@ describe('///////Testing /v1/admin/quiz/ delete////////', () => {
       });
       const sessionId = person1.body.token;
       const result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}?token=${sessionId}`, {});
-      const result2 = getRequest(`/v1/admin/quiz/list?token=${person1.body.token}`, {});
+      const result2 = getRequest(`/v1/admin/quiz/list?token=${sessionId}`, {});
       expect(result1.body). toStrictEqual({});
       expect(result1.status).toBe(OK);
       expect(result2.body).toStrictEqual({

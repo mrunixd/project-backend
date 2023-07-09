@@ -128,7 +128,14 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
 });
 
 app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
-  return res.status(200);
+  const quizid = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.query.token)
+  if (isNaN(sessionId) || sessionId < 10000 || sessionId > 99999) {
+    return res.status(401).json({ error: 'token has invalid structure' });
+  }
+  const userId = sessionIdtoUserId(sessionId);
+  const response = adminQuizRemove(userId, quizid);
+  return res.json(response);
 });
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
