@@ -7,7 +7,7 @@ import {
   adminQuizDescriptionUpdate,
 } from './quiz';
 import { adminAuthRegister, adminAuthLogin } from './auth';
-import { clear } from './other';
+import { clear, sessionIdtoUserId } from './other';
 
 let result1: any;
 let result2: any;
@@ -15,6 +15,7 @@ let person1: any;
 let person2: any;
 let quiz1: any;
 let quiz2: any;
+let person1authUserId: any;
 
 beforeEach(() => {
   clear();
@@ -24,172 +25,177 @@ beforeEach(() => {
   person2 = undefined;
   quiz1 = undefined;
   quiz2 = undefined;
+  person1authUserId = undefined;
 });
 
 test('DUD CASE, DELETE THIS AFTER IMPLEMENTING QUIZ FUNCTIONS IN ITER2', () => {
     expect(1).toBe(1);
 });
 
-// describe('////////TESTING ADMINQUIZLIST////////', () => {
-//   describe('Testing adminQuizList errors', () => {
-//     test('CASE: AuthUserId is not a valid user', () => {
-//       person1 = adminAuthRegister(
-//         'aarnavsample@gmail.com',
-//         'abcd1234',
-//         'Aarnav',
-//         'Sheth'
-//       );
+describe('////////TESTING ADMINQUIZLIST////////', () => {
+  describe('Testing adminQuizList errors', () => {
+    test('CASE: AuthUserId is not a valid user', () => {
+      person1 = adminAuthRegister(
+        'aarnavsample@gmail.com',
+        'abcd1234',
+        'Aarnav',
+        'Sheth'
+      );
+      person1authUserId = sessionIdtoUserId(person1.token);
+      result1 = adminQuizList(person1authUserId + 1);
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
+  });
 
-//       result1 = adminQuizList(person1.authUserId + 1);
-//       expect(result1).toStrictEqual({ error: expect.any(String) });
-//     });
-//   });
+  describe('Testing adminQuizList success', () => {
+    beforeEach(() => {
+      person1 = adminAuthRegister(
+        'aarnavsample@gmail.com',
+        'abcd1234',
+        'Aarnav',
+        'Sheth'
+      );
+      person1authUserId = sessionIdtoUserId(person1.token);
+    });
 
-//   describe('Testing adminQuizList success', () => {
-//     beforeEach(() => {
-//       person1 = adminAuthRegister(
-//         'aarnavsample@gmail.com',
-//         'abcd1234',
-//         'Aarnav',
-//         'Sheth'
-//       );
-//       adminAuthLogin('aarnavsample@gmail.com', 'abcd1234');
-//     });
+    test('CASE: Successful Quiz Display', () => {
+      quiz1 = adminQuizCreate(
+        person1authUserId,
+        'aarnavsquiz',
+        'a very hard interesting quiz'
+      );
+      result1 = adminQuizList(
+        person1authUserId
+      );
+      expect(result1).toStrictEqual({
+        quizzes: [
+          {
+            quizId: quiz1.quizId,
+            name: 'aarnavsquiz',
+          },
+        ],
+      });
+    });
 
-//     test('CASE: Successful Quiz Display', () => {
-//       quiz1 = adminQuizCreate(
-//         person1.authUserId,
-//         'aarnavsquiz',
-//         'a very hard interesting quiz'
-//       );
-//       result1 = adminQuizList(
-//         person1.authUserId
-//       );
-//       expect(result1).toStrictEqual({
-//         quizzes: [
-//           {
-//             quizId: quiz1.quizId,
-//             name: 'aarnavsquiz',
-//           },
-//         ],
-//       });
-//     });
+    test('CASE: Successful Multiple Quiz Display', () => {
+      quiz1 = adminQuizCreate(
+        person1authUserId,
+        'firstquiz',
+        'a very hard interesting quiz'
+      );
+      quiz2 = adminQuizCreate(
+        person1authUserId,
+        'secondquiz',
+        'a very hard interesting quiz'
+      );
+      const quiz3: any = adminQuizCreate(
+        person1authUserId,
+        'thirdquiz',
+        'a very hard interesting quiz'
+      );
+      result1 = adminQuizList(person1authUserId);
+      expect(result1).toStrictEqual({
+        quizzes: [
+          {
+            quizId: quiz1.quizId,
+            name: 'firstquiz'
+          },
+          {
+            quizId: quiz2.quizId,
+            name: 'secondquiz'
+          },
+          {
+            quizId: quiz3.quizId,
+            name: 'thirdquiz'
+          },
+        ],
+      });
+    });
 
-//     test('CASE: Successful Multiple Quiz Display', () => {
-//       quiz1 = adminQuizCreate(
-//         person1.authUserId,
-//         'firstquiz',
-//         'a very hard interesting quiz'
-//       );
-//       quiz2 = adminQuizCreate(
-//         person1.authUserId,
-//         'secondquiz',
-//         'a very hard interesting quiz'
-//       );
-//       const quiz3: any = adminQuizCreate(
-//         person1.authUserId,
-//         'thirdquiz',
-//         'a very hard interesting quiz'
-//       );
-//       result1 = adminQuizList(person1.authUserId);
-//       expect(result1).toStrictEqual({
-//         quizzes: [
-//           {
-//             quizId: quiz1.quizId,
-//             name: 'firstquiz'
-//           },
-//           {
-//             quizId: quiz2.quizId,
-//             name: 'secondquiz'
-//           },
-//           {
-//             quizId: quiz3.quizId,
-//             name: 'thirdquiz'
-//           },
-//         ],
-//       });
-//     });
+    test('CASE: Successful Empty Display', () => {
+      result1 = adminQuizList(
+        person1authUserId
+      );
+      expect(result1).toStrictEqual({ quizzes: [] });
+    });
+  });
+});
 
-//     test('CASE: Successful Empty Display', () => {
-//       result1 = adminQuizList(
-//         person1.authUserId
-//       );
-//       expect(result1).toStrictEqual({ quizzes: [] });
-//     });
-//   });
-// });
+describe('////////TESTING ADMINQUIZCREATE////////', () => {
+  describe('Testing adminQuizCreate success', () => {
+    test('CASE: Successfully created quiz', () => {
+      person1 = adminAuthRegister(
+        'aarnavsample@gmail.com',
+        'abcd1234',
+        'Aarnav',
+        'Sheth'
+      );
+      
+      person1authUserId = sessionIdtoUserId(person1.token);
 
-// describe('////////TESTING ADMINQUIZCREATE////////', () => {
-//   describe('Testing adminQuizCreate success', () => {
-//     test('CASE: Successfully created quiz', () => {
-//       person1 = adminAuthRegister(
-//         'aarnavsample@gmail.com',
-//         'abcd1234',
-//         'Aarnav',
-//         'Sheth'
-//       );
-//       result1 = adminQuizCreate(
-//         person1.authUserId,
-//         'aarnavsquiz',
-//         'a very hard interesting quiz'
-//       );
-//       expect(result1).toMatchObject({ quizId: expect.any(Number) });
-//     });
-//   });
+      result1 = adminQuizCreate(
+        person1authUserId,
+        'aarnavsquiz',
+        'a very hard interesting quiz'
+      );
+      expect(result1).toMatchObject({ quizId: expect.any(Number) });
+    });
+  });
 
-//   describe('Testing adminQuizCreate errors', () => {
-//     beforeEach(() => {
-//       person1 = adminAuthRegister(
-//         'aarnavsample@gmail.com',
-//         'abcd1234',
-//         'Aarnav',
-//         'Sheth'
-//       );
-//     });
+  describe('Testing adminQuizCreate errors', () => {
+    beforeEach(() => {
+      person1 = adminAuthRegister(
+        'aarnavsample@gmail.com',
+        'abcd1234',
+        'Aarnav',
+        'Sheth'
+      );
+      person1authUserId = sessionIdtoUserId(person1.token);
+    });
 
-//     test('CASE: AuthUserId is not a valid user', () => {
-//       result1 = adminQuizCreate(
-//         1947385608741,
-//         'aarnavsquiz',
-//         'a very hard interesting quiz'
-//       );
-//       expect(result1).toStrictEqual({ error: expect.any(String) });
-//     });
+    test('CASE: AuthUserId is not a valid user', () => {
+      result1 = adminQuizCreate(
+        1947385608741,
+        'aarnavsquiz',
+        'a very hard interesting quiz'
+      );
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
 
-//     test('CASE: not alphanumeric name', () => {
-//       result1 = adminQuizCreate(
-//         person1.authUserId,
-//         '*not^lph+',
-//         'a very hard interesting quiz'
-//       );
-//       expect(result1).toStrictEqual({ error: expect.any(String) });
-//     });
+    test('CASE: not alphanumeric name', () => {
+      result1 = adminQuizCreate(
+        person1authUserId,
+        '*not^lph+',
+        'a very hard interesting quiz'
+      );
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
 
-//     test('CASE: name is less than 3 or more than 30 characters', () => {
-//       result1 = adminQuizCreate(
-//         person1.authUserId,
-//         'qz',
-//         'a very hard interesting quiz'
-//       );
-//       expect(result1).toStrictEqual({ error: expect.any(String) });
-//     });
+    test('CASE: name is less than 3 or more than 30 characters', () => {
+      result1 = adminQuizCreate(
+        person1authUserId,
+        'qz',
+        'a very hard interesting quiz'
+      );
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
 
-//     test('CASE: name is already used for a quiz by user', () => {
-//       adminQuizCreate(person1.authUserId, 'aarnavsquiz', 'first quiz');
-//       result1 = adminQuizCreate(person1.authUserId, 'aarnavsquiz', 'second quiz');
-//       expect(result1).toStrictEqual({ error: expect.any(String) });
-//     });
+    test('CASE: name is already used for a quiz by user', () => {
+      adminQuizCreate(person1authUserId, 'aarnavsquiz', 'first quiz');
+      result1 = adminQuizCreate(person1authUserId, 'aarnavsquiz', 'second quiz');
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
 
-//     test('CASE: description is more than 100 characters', () => {
-//       result1 = adminQuizCreate(
-//         person1.authUserId,
-//         'aarnavsquiz',
-//         'abcdefghijklmanoinapqrstuvfkdlhzbljkfs kj;kadvbjp kj;aobadbo;udvk; j kja jna dnad j;canlnlxc gjanjk  bafhlbahwlbvkljbhw;KEWBF;KBNE;BNKBGGJRNAJLKVBJ;KV'
-//       );
-//       expect(result1).toStrictEqual({ error: expect.any(String) });
-//     });
-//   });
-// });
+    test('CASE: description is more than 100 characters', () => {
+      result1 = adminQuizCreate(
+        person1authUserId,
+        'aarnavsquiz',
+        'abcdefghijklmanoinapqrstuvfkdlhzbljkfs kj;kadvbjp kj;aobadbo;udvk; j kja jna dnad j;canlnlxc gjanjk  bafhlbahwlbvkljbhw;KEWBF;KBNE;BNKBGGJRNAJLKVBJ;KV'
+      );
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
+  });
+});
 
 // describe('/////////TESTING ADMINQUIZREMOVE////////', () => {
 //   describe('Testing all adminQuizRemove success and errors', () => {
