@@ -80,9 +80,11 @@ app.delete('/v1/clear', (req: Request, res: Response) => {
 });
 
 app.get('/v1/admin/user/details', (req: Request, res: Response) => {
-  const sessionId = (req.query.sessionId).toString();
-  if (sessionId.length !== 5 || /^\d+$/.test(sessionId) === false) {
-    return res.status(401).json({ error: 'token has invalid structure' })
+  const token = req.query.token;
+  const sessionId = parseInt(token);
+
+  if (isNaN(sessionId) || sessionId < 10000 || sessionId > 99999) {
+    return res.status(401).json({ error: 'token has invalid structure' });
   }
   const userId = sessionIdtoUserId(sessionId);
   if (userId === -1) {
@@ -95,10 +97,10 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
 
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
 
-  const { sessionId, name, description } = req.body;
-
-  if (sessionId.length !== 5 || /^\d+$/.test(sessionId) === false) {
-    return res.status(401).json({ error: 'token has invalid structure' })
+  const { token, name, description } = req.body;
+  const sessionId = parseInt(token);
+  if (isNaN(sessionId) || sessionId < 10000 || sessionId > 99999) {
+    return res.status(401).json({ error: 'token has invalid structure' });
   }
   const userId = sessionIdtoUserId(sessionId);
 
@@ -113,9 +115,9 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
 });
 
 app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
-  const sessionId = req.query.sessionId
-  if (sessionId.length !== 5 || /^\d+$/.test(sessionId) === false) {
-    return res.status(401).json({ error: 'token has invalid structure' })
+  const sessionId = parseInt(req.query.token);
+  if (isNaN(sessionId) || sessionId < 10000 || sessionId > 99999) {
+    return res.status(401).json({ error: 'token has invalid structure' });
   }
   const userId = sessionIdtoUserId(sessionId);
   if (userId === -1) {

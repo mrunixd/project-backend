@@ -29,11 +29,6 @@ function deleteRequest(route: string, qs: any) {
   };
 }
 
-let result1: any;
-let result2: any;
-let person1: any;
-let person2: any;
-
 function getRequest(route: string, qs: any) {
   const res = request('GET', `${SERVER_URL}${route}`, { qs: qs });
   // return JSON.parse(res.body.toString());
@@ -42,6 +37,12 @@ function getRequest(route: string, qs: any) {
     body: JSON.parse(res.body.toString())
   };
 }
+
+let result1: any;
+let result2: any;
+let person1: any;
+let person2: any;
+
 
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
@@ -61,7 +62,7 @@ describe('////////TESTING v1/admin/auth/register////////', () => {
         nameLast: 'xian',
       });
       expect(result1.body).toStrictEqual({
-        token: expect.any(String)
+        token: expect.any(Number)
       });
       expect(result1.status).toBe(OK);
     });
@@ -198,7 +199,7 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
         password: 'Abcd12345',
       });
       expect(result1.body).toStrictEqual({
-        token: expect.any(String)
+        token: expect.any(Number)
       });
       expect(result1.status).toBe(OK);
     });
@@ -209,7 +210,7 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
         password: 'Abcd12345',
       });
       expect(result1.body).toStrictEqual({
-        token: expect.any(String)
+        token: expect.any(Number)
       });
       expect(result1.status).toBe(OK);
     });
@@ -224,7 +225,7 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
         password: 'Abcd12345',
       });
       expect(result1.body).toStrictEqual({
-        token: expect.any(String)
+        token: expect.any(Number)
       });
       expect(result1.status).toBe(OK);
     });
@@ -243,7 +244,7 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
         password: 'Abcd12345',
       });
       expect(result1.body).toStrictEqual({
-        token: expect.any(String)
+        token: expect.any(Number)
       });
       expect(result1.status).toBe(OK);
     });
@@ -258,7 +259,7 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
         nameLast: 'Jaiswal',
       });
     });
-    test('CASE: Email address does not exist', () => {
+    test('CASE (400): Email address does not exist', () => {
       result1 = postRequest('/v1/admin/auth/login', {
         email: 'unregisteredemail@gmail.com',
         password: 'incorrectpW1234',
@@ -267,7 +268,7 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
-    test('CASE: Password is incorrect: Differing cases', () => {
+    test('CASE (400): Password is incorrect: Differing cases', () => {
       result1 = postRequest('/v1/admin/auth/login', {
         email: 'manan.j2450@gmail.com',
         password: 'abcd12345',
@@ -276,7 +277,7 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
-    test('CASE: Password is incorrect: Differing password', () => {
+    test('CASE (400): Password is incorrect: Differing password', () => {
       result1 = postRequest('/v1/admin/auth/login', {
         email: 'manan.j2450@gmail.com',
         password: 'incorrectpW1234',
@@ -285,7 +286,7 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
-    test('CASE: Password is incorrect: Differing cases', () => {
+    test('CASE (400): Password is incorrect: Differing cases', () => {
       result1 = postRequest('/v1/admin/auth/login', {
         email: 'manan.j2450@gmail.com',
         password: 'incorrectpW1234',
@@ -313,7 +314,8 @@ describe('////////TESTING /v1/admin/user/details////////', () => {
         nameFirst: 'vincent',
         nameLast: 'xian',
       });
-      result1 = getRequest('/v1/admin/user/details', { sessionId: person1.body.token });
+      console.log(person1.body.token);
+      result1 = getRequest(`/v1/admin/user/details?token=${person1.body.token}`, {});
       expect(result1.body).toStrictEqual({
         user: {
           userId: expect.any(Number),
@@ -339,7 +341,7 @@ describe('////////TESTING /v1/admin/user/details////////', () => {
         nameFirst: 'Manan',
         nameLast: 'Jaiswal',
       });
-      result1 = getRequest('/v1/admin/user/details', { sessionId: person2.body.token });
+      result1 = getRequest(`/v1/admin/user/details?token=${person2.body.token}`, {});
       expect(result1.body).toStrictEqual({
         user: {
           userId: expect.any(Number),
@@ -353,12 +355,12 @@ describe('////////TESTING /v1/admin/user/details////////', () => {
     });
     describe('Testing /v1/admin/user/details errors', () => {
       test('CASE (401): Token is not a valid structure - too short', () => {
-        result1 = getRequest('/v1/admin/user/details', { sessionId: 1});
+        result1 = getRequest('/v1/admin/user/details?token=1', {});
         expect(result1.body).toStrictEqual({ error: expect.any(String) });
         expect(result1.status).toBe(UNAUTHORISED);
       });
       test('CASE (401): Token is not a valid structure - special symbols', () => {
-        result1 = getRequest('/v1/admin/user/details', { sessionId: 'lett!'});
+        result1 = getRequest('/v1/admin/user/details?token=lett!', {});
         expect(result1.body).toStrictEqual({ error: expect.any(String) });
         expect(result1.status).toBe(UNAUTHORISED);
       });
@@ -370,7 +372,7 @@ describe('////////TESTING /v1/admin/user/details////////', () => {
           nameLast: 'xian',
         });
         const sessionId = parseInt(person1.body.token) + 1;
-        result1 = getRequest('/v1/admin/user/details', { sessionId: sessionId + 1});
+        result1 = getRequest(`/v1/admin/user/details?token=${sessionId}`, {});
         expect(result1.body).toStrictEqual({ error: expect.any(String) });
         expect(result1.status).toBe(FORBIDDEN);
       });
@@ -378,7 +380,7 @@ describe('////////TESTING /v1/admin/user/details////////', () => {
   });
 });
 
-describe('TESTING v1/admin/quiz', () => {
+describe('////////Testing v1/admin/quiz////////', () => {
 
   beforeEach(() => {
     person1 = postRequest('/v1/admin/auth/register', {
@@ -389,10 +391,10 @@ describe('TESTING v1/admin/quiz', () => {
     });
   });
 
-  describe('SUCCESS CASES', () => {
+  describe('Testing /v1/admin/quiz success cases', () => {
     test('Successful adminQuizCreate 1 quiz', () => {
       result1 = postRequest('/v1/admin/quiz', {
-        sessionId: person1.body.token,
+        token: `${person1.body.token}`,
         name: 'first quiz',
         description: 'first quiz being tested'
       });
@@ -401,11 +403,11 @@ describe('TESTING v1/admin/quiz', () => {
     });
   });
 
-  describe('ERROR CASES', () => {
+  describe('Testing /v1/admin/quiz/ error cases', () => {
 
     test('CASE (401): Token is not a valid structure - too short', () => {
       result1 = postRequest('/v1/admin/quiz', {
-        sessionId: '1',
+        token: '1',
         name: 'first quiz',
         description: 'first quiz being tested',
       });
@@ -415,7 +417,7 @@ describe('TESTING v1/admin/quiz', () => {
 
     test('CASE (401): Token is not a valid structure - special symbols', () => {
       result1 = postRequest('/v1/admin/quiz', {
-        sessionId: 'let!!',
+        token: 'let!!',
         name: 'first quiz',
         description: 'first quiz being tested',
       });
@@ -426,7 +428,7 @@ describe('TESTING v1/admin/quiz', () => {
     test('CASE (403): Token is not valid for a currently logged in session', () => {
       const sessionId = parseInt(person1.body.token) + 1;
       result1 = postRequest('/v1/admin/quiz', {
-        sessionId: sessionId.toString(),
+        token: `${sessionId}`,
         name: 'first quiz',
         description: 'first quiz being tested'
       });
@@ -436,7 +438,7 @@ describe('TESTING v1/admin/quiz', () => {
 
     test('CASE: not alpahnumeric name', () => {
       result1 = postRequest('/v1/admin/quiz', {
-        sessionId: person1.body.token,
+        token: `${person1.body.token}`,
         name: '*not^lph+',
         description: 'first quiz being tested',
       });
@@ -446,12 +448,12 @@ describe('TESTING v1/admin/quiz', () => {
     
     test('CASE: name is less than 3 or more than 30 characters', () => {
       result1 = postRequest('/v1/admin/quiz', {
-        sessionId: person1.body.token,
+        token: `${person1.body.token}`,
         name: 'as',
         description: 'first quiz being tested',
       });
       result2 = postRequest('/v1/admin/quiz', {
-        sessionId: person1.body.token,
+        token: `${person1.body.token}`,
         name: 'this is going to be a lot more than 30 characters',
         description: 'first quiz being tested',
       });
@@ -463,12 +465,12 @@ describe('TESTING v1/admin/quiz', () => {
 
     test('CASE: name is already used for a quiz by user', () => {
       postRequest('/v1/admin/quiz', {
-        sessionId: person1.body.token,
+        token: `${person1.body.token}`,
         name: 'first quiz',
         description: 'first quiz being tested',
       });
       result1 = postRequest('/v1/admin/quiz', {
-        sessionId: person1.body.token,
+        token: `${person1.body.token}`,
         name: 'first quiz', 
         description: 'first quiz being tested again',
       });
@@ -478,7 +480,7 @@ describe('TESTING v1/admin/quiz', () => {
 
     test('CASE: description is more than 100 characters', () => {
       result1 = postRequest('/v1/admin/quiz', {
-        sessionId: person1.body.token,
+        token: `${person1.body.token}`,
         name: 'as',
         description: 'abcdefghijklmanoinapqrstuvfkdlhzbljkfs kj;kadvbjp kj;aobadbo;udvk; j kja jna dnad j;canlnlxc gjanjk  bafhlbahwlbvkljbhw;KEWBF;KBNE;BNKBGGJRNAJLKVBJ;KV',
       });
@@ -502,12 +504,12 @@ describe('TESTING v1/admin/quiz/list', () => {
   describe('SUCCESS CASES', () => {
     test('Successful adminQuizList 1 quiz', () => {
       const quiz1 = postRequest('/v1/admin/quiz', {
-        sessionId: person1.body.token,
+        token: `${person1.body.token}`,
         name: 'first quiz',
         description: 'first quiz being tested',
       });
 
-      result1 = getRequest('/v1/admin/quiz/list', { sessionId: person1.body.token })
+      result1 = getRequest(`/v1/admin/quiz/list?token=${person1.body.token}`, {})
 
       expect(result1.body).toStrictEqual({
         quizzes: [
@@ -521,29 +523,29 @@ describe('TESTING v1/admin/quiz/list', () => {
     });
 
     test('Successful empty display', () => {
-      result1 = getRequest('/v1/admin/quiz/list', { sessionId: person1.body.token })
+      result1 = getRequest(`/v1/admin/quiz/list?token=${person1.body.token}`, {})
       expect(result1.body).toStrictEqual({ quizzes: [] });
       expect(result1.status).toBe(OK);
     });
 
     test('Successful Multiple quiz display', () => {
       const quiz1 = postRequest('/v1/admin/quiz', {
-        sessionId: person1.body.token,
+        token: person1.body.token,
         name: 'first quiz',
         description: 'first quiz being tested',
       });
       const quiz2 = postRequest('/v1/admin/quiz', {
-        sessionId: person1.body.token,
+        token: person1.body.token,
         name: 'second quiz',
         description: 'second quiz being tested',
       });
       const quiz3 = postRequest('/v1/admin/quiz', {
-        sessionId: person1.body.token,
+        token: person1.body.token,
         name: 'third quiz',
         description: 'third quiz being tested',
       });
 
-      result1 = getRequest('/v1/admin/quiz/list', { sessionId: person1.body.token })
+      result1 = getRequest(`/v1/admin/quiz/list?token=${person1.body.token}`, {});
 
       expect(result1.body).toStrictEqual({
         quizzes: [
@@ -567,18 +569,18 @@ describe('TESTING v1/admin/quiz/list', () => {
 
   describe('ERROR CASES', () => {
     test('CASE (401): Token is not a valid structure - too short', () => {
-      result1 = getRequest('/v1/admin/quiz/list', { sessionId: 1});
+      result1 = getRequest(`/v1/admin/quiz/list?token=1`, {})
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
     });
     test('CASE (401): Token is not a valid structure - special symbols', () => {
-      result1 = getRequest('/v1/admin/quiz/list', { sessionId: 'lett!'});
+      result1 = getRequest(`/v1/admin/quiz/list?token=let!!`, {});
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
     });
     test('CASE (403): Token is not valid for a currently logged in session', () => {
       const sessionId = parseInt(person1.body.token) + 1;
-      result1 = getRequest('/v1/admin/quiz/list', { sessionId: sessionId.toString()});
+      result1 = getRequest(`/v1/admin/quiz/list?token=${sessionId}`, {});
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(FORBIDDEN);
     });

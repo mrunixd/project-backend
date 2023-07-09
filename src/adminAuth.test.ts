@@ -28,7 +28,7 @@ describe('////////TESTING ADMINAUTHREGISTER////////', () => {
         'xian'
       );
       expect(result1).toMatchObject({
-        token: expect.any(String)
+        token: expect.any(Number)
       });
     });
   });
@@ -143,7 +143,7 @@ describe('////////TESTING ADMINAUTHLOGIN////////', () => {
     test('CASE: Email and password are exact same', () => {
       adminAuthRegister('manan.j2450@gmail.com', 'abcd1234', 'Manan', 'Jaiswal');
       expect(adminAuthLogin('manan.j2450@gmail.com', 'abcd1234')).toStrictEqual({
-        token: expect.any(String)
+        token: expect.any(Number)
       });
     });
   });
@@ -179,21 +179,21 @@ describe('////////TESTING ADMINAUTHLOGIN////////', () => {
     test('CASE: test case sensitivity of email address letters', () => {
       adminAuthRegister('manan.j2450@gmail.com', 'abcd1234', 'Manan', 'Jaiswal');
       expect(adminAuthLogin('Manan.j2450@gmail.com', 'abcd1234')).toStrictEqual({
-        token: expect.any(String)
+        token: expect.any(Number)
       });
     });
 
     test('CASE: test case sensitivity of email address letters', () => {
       adminAuthRegister('manan.j2450@gmail.com', 'abcd1234', 'Manan', 'Jaiswal');
       expect(adminAuthLogin('manan.j2450@gMail.com', 'abcd1234')).toStrictEqual({
-        token: expect.any(String)
+        token: expect.any(Number)
       });
     });
 
     test('CASE: test of email address letters - registered with capital letters', () => {
       adminAuthRegister('MANAN.j2450@gmail.com', 'abcd1234', 'Manan', 'Jaiswal');
       expect(adminAuthLogin('manan.j2450@gMail.com', 'abcd1234')).toStrictEqual({
-        token: expect.any(String)
+        token: expect.any(Number)
       });
     });
   });
@@ -204,7 +204,7 @@ describe('////////TESTING ADMINAUTHLOGIN////////', () => {
       adminAuthLogin('manan.j2450@gmail.com', 'abcd1234');
       adminAuthLogin('manan.j2450@gmail.com', 'abcd1234');
       expect(adminAuthLogin('manan.j2450@gmail.com', 'abcd1234')).toStrictEqual({
-        token: expect.any(String)
+        token: expect.any(Number)
       });
     });
 
@@ -214,7 +214,7 @@ describe('////////TESTING ADMINAUTHLOGIN////////', () => {
       adminAuthLogin('manan.j2450@gmail.com', 'incorrectpw1');
       adminAuthLogin('manan.j2450@gmail.com', 'incorrectpw2');
       expect(adminAuthLogin('manan.j2450@gmail.com', 'abcd1234')).toStrictEqual({
-        token: expect.any(String)
+        token: expect.any(Number)
       });
     });
   });
