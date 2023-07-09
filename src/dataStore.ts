@@ -28,14 +28,14 @@ export interface DataStore {
 }
 
 export interface SessionId {
-  token: string;
+  token: number;
 }
 export interface ErrorObject {
   error: string;
 }
 
 export interface Token {
-  sessionId: string;
+  sessionId: number;
   authUserId: number;
 }
 

@@ -1,14 +1,6 @@
 import validator from 'validator';
 import { getData, setData, SessionId, ErrorObject } from './dataStore';
 
-// interface AuthUserId {
-//   authUserId: number;
-// }
-// interface Token {
-//   sessionId: number;
-//   authUserId: number;
-// }
-
 interface User {
   user: {
     userId: number;
@@ -88,7 +80,7 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
   let sessionId = Math.floor(Math.random()*90000) + 10000;
   while (uniqueNumberFlag === false) {
     // If the generated sessionId already exists, generate a new one
-    if (data.tokens.some((token) => token.sessionId === sessionId.toString())) {
+    if (data.tokens.some((token) => token.sessionId === sessionId)) {
       sessionId = Math.floor(Math.random()*90000) + 10000;
     } else {
       uniqueNumberFlag = true;
@@ -96,13 +88,13 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
   }
 
   data.tokens.push({
-    sessionId: sessionId.toString(),
+    sessionId: sessionId,
     authUserId: authUserId
   });
   setData(data);
 
   return {
-    token: sessionId.toString()
+    token: sessionId
   };
 }
 
@@ -164,7 +156,7 @@ function adminAuthLogin(email: string, password: string): SessionId | ErrorObjec
   let sessionId = Math.floor(Math.random()*90000) + 10000;
   while (uniqueNumberFlag === false) {
     // If the generated sessionId already exists, generate a new one
-    if (data.tokens.some((token) => token.sessionId === sessionId.toString())) {
+    if (data.tokens.some((token) => token.sessionId === sessionId)) {
       sessionId = Math.floor(Math.random()*90000) + 10000;
     } else {
       uniqueNumberFlag = true;
@@ -172,7 +164,7 @@ function adminAuthLogin(email: string, password: string): SessionId | ErrorObjec
   }
 
   data.tokens.push({
-    sessionId: sessionId.toString(),
+    sessionId: sessionId,
     authUserId: user.authUserId
   });
   setData(data);
@@ -181,7 +173,7 @@ function adminAuthLogin(email: string, password: string): SessionId | ErrorObjec
   //   authUserId: user.authUserId,
   // };
   return {
-    token: sessionId.toString()
+    token: sessionId
   };
 }
 
