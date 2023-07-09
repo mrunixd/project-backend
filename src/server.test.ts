@@ -586,3 +586,59 @@ describe('TESTING v1/admin/quiz/list', () => {
     });
   });
 });
+
+describe('///////Testing /v1/admin/quiz/ delete////////', () => {
+  beforeEach(() => {
+    person1 = postRequest('/v1/admin/auth/register', {
+      email: 'manan.j2450@gmail.com',
+      password: 'Abcd12345',
+      nameFirst: 'Manan',
+      nameLast: 'Jaiswal',
+    });
+  });
+  describe('Testing /v1/admin/quiz/ delete success cases', () => {
+    test('Succesful deletion of quiz', () => {
+      const quiz1 = postRequest('/v1/admin/quiz', {
+        token: person1.body.token,
+        name: 'first quiz',
+        description: 'first quiz being tested',
+      });
+      const sessionId = person1.body.token;
+      const result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}?token=${sessionId}`, {});
+      const result2 = getRequest(`/v1/admin/quiz/list?token=${person1.body.token}`, {});
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toBe(OK);
+      expect(result2.body).toStrictEqual({ quizzes: [] });
+    });
+
+    test('Successful deletion of quiz amongst quizzes', () => {
+      const quiz1 = postRequest('/v1/admin/quiz', {
+        token: person1.body.token,
+        name: 'first quiz',
+        description: 'first quiz being tested',
+      });
+      const quiz2 = postRequest('/v1/admin/quiz', {
+        token: person1.body.token,
+        name: 'second quiz',
+        description: 'second quiz being tested',
+      });
+      const sessionId = person1.body.token;
+      const result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}?token=${sessionId}`, {});
+      const result2 = getRequest(`/v1/admin/quiz/list?token=${person1.body.token}`, {});
+      expect(result1.body). toStrictEqual({});
+      expect(result1.status).toBe(OK);
+      expect(result2.body).toStrictEqual({
+        quizzes: [
+          {
+            quizId: quiz2.body.quizId,
+            name: 'second quiz'
+          },
+        ]
+      })
+    });
+
+  });
+  describe('Testing /v1/admin/quiz/ delete error cases', () => {
+
+  });
+});
