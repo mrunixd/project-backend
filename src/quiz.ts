@@ -107,6 +107,8 @@ function adminQuizCreate(authUserId: number, name: string, description: string):
     timeCreated: currentTime,
     timeLastEdited: currentTime,
     description: description,
+    numQuestions: 0,
+    questions: []
   });
 
   setData(data);
@@ -166,7 +168,7 @@ function adminQuizRemove(authUserId: number, quizId: number): Record<string, nev
  *  description: string,
  * }
  */
-function adminQuizInfo(authUserId: number, quizId: number): QuizInfo | ErrorObject {
+function adminQuizInfo(authUserId: number, quizId: number): QuizInfo | ErrorObject {//can't interface type just be Quiz from dataStore?
   const data = getData();
 
   // Save the selected user to be used for error checking & return values

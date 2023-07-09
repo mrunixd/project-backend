@@ -3,6 +3,7 @@ export interface QuizIds {
   quizId: number;
   name: string;
 }
+
 export interface User {
   email: string;
   password: string;
@@ -13,12 +14,29 @@ export interface User {
   quizIds: QuizIds[];
 }
 
+export interface Answer {
+  answerId: number;
+  answer: string;
+  colour: string;
+  correct: boolean;
+}
+
+export interface Question {
+  questionId: number;
+  question: string;
+  duration: number;
+  points: number;
+  answers: Answer[];
+}
+
 export interface Quiz {
   quizId: number;
   name: string;
   timeCreated: number;
   timeLastEdited: number;
   description: string;
+  numQuestions: number;
+  questions: Answer[];
 }
 
 export interface DataStore {
