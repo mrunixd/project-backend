@@ -36,7 +36,7 @@ export interface Quiz {
   timeLastEdited: number;
   description: string;
   numQuestions: number;
-  questions: Answer[];
+  questions: Question[];
 }
 
 export interface DataStore {
@@ -46,14 +46,14 @@ export interface DataStore {
 }
 
 export interface SessionId {
-  token: number;
+  token: string;
 }
 export interface ErrorObject {
   error: string;
 }
 
 export interface Token {
-  sessionId: number;
+  sessionId: string;
   authUserId: number;
 }
 

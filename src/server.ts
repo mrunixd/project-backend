@@ -43,6 +43,14 @@ const HOST: string = process.env.IP || 'localhost';
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
 
+// const setDataGlobal = () => {
+//   fs.writeFileSync('./dbStore.json', JSON.stringify(data));
+// }
+
+// const getDataGlobal = () => {
+
+// }
+
 // Example get request
 app.get('/echo', (req: Request, res: Response) => {
   const data = req.query.echo as string;
@@ -60,7 +68,6 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   if ('error' in response) {
     return res.status(400).json(response);
   }
-  // return res.json(response);
   return res.json(response);
 });
 
@@ -80,41 +87,31 @@ app.delete('/v1/clear', (req: Request, res: Response) => {
 });
 
 app.get('/v1/admin/user/details', (req: Request, res: Response) => {
-  const token = req.query.token;
-  const sessionId = parseInt(token);
+  const token = (req.query.token).toString();
 
-  if (isNaN(sessionId) || sessionId < 10000 || sessionId > 99999) {
-    return res.status(401).json({ error: 'token has invalid structure' });
+  if (token.length !== 5 || /\d/.test(token) === false) {
+    return res.status(401).json({ error: 'token has invalid structure' })
   }
-  const userId = sessionIdtoUserId(sessionId);
+  const userId = sessionIdtoUserId(token);
   if (userId === -1) {
-    return res
-      .status(403)
-      .json({
-        error:
-          'Provided token is valid structure, but is not for a currently logged in session',
-      });
+    return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' })
   }
+
   const response = adminUserDetails(userId);
   return res.json(response);
 });
 
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const { token, name, description } = req.body;
-  const sessionId = parseInt(token);
-  if (isNaN(sessionId) || sessionId < 10000 || sessionId > 99999) {
-    return res.status(401).json({ error: 'token has invalid structure' });
-  }
-  const userId = sessionIdtoUserId(sessionId);
 
-  if (userId === -1) {
-    return res
-      .status(403)
-      .json({
-        error:
-          'Provided token is valid structure, but is not for a currently logged in session',
-      });
+  if (token.length !== 5 || /\d/.test(token) === false) {
+    return res.status(401).json({ error: 'token has invalid structure' })
   }
+  const userId = sessionIdtoUserId(token);
+  if (userId === -1) {
+    return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' })
+  }
+
   const response = adminQuizCreate(userId, name, description);
   if ('error' in response) {
     return res.status(400).json(response);
@@ -123,30 +120,32 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
 });
 
 app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
-  const sessionId = parseInt(req.query.token);
-  if (isNaN(sessionId) || sessionId < 10000 || sessionId > 99999) {
-    return res.status(401).json({ error: 'token has invalid structure' });
+  const token = (req.query.token).toString();
+
+  if (token.length !== 5 || /\d/.test(token) === false) {
+    return res.status(401).json({ error: 'token has invalid structure' })
   }
-  const userId = sessionIdtoUserId(sessionId);
+  const userId = sessionIdtoUserId(token);
   if (userId === -1) {
-    return res
-      .status(403)
-      .json({
-        error:
-          'Provided token is valid structure, but is not for a currently logged in session',
-      });
+    return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' })
   }
+
   const response = adminQuizList(userId);
   return res.json(response);
 });
 
 app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const quizid = parseInt(req.params.quizid);
-  const sessionId = parseInt(req.query.token);
-  if (isNaN(sessionId) || sessionId < 10000 || sessionId > 99999) {
-    return res.status(401).json({ error: 'token has invalid structure' });
+  const token = (req.query.token).toString();
+
+  if (token.length !== 5 || /\d/.test(token) === false) {
+    return res.status(401).json({ error: 'token has invalid structure' })
   }
-  const userId = sessionIdtoUserId(sessionId);
+  const userId = sessionIdtoUserId(token);
+  if (userId === -1) {
+    return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' })
+  }
+
   const response = adminQuizRemove(userId, quizid);
   return res.json(response);
 });
