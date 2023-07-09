@@ -127,6 +127,9 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   return res.json(response);
 });
 
+app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  return res.status(200);
+});
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================
