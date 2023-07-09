@@ -19,7 +19,7 @@ function clear() {
   return {};
 }
 
-function sessionIdtoUserId(sessionId: number): number {
+function sessionIdtoUserId(sessionId: string): number {
   const data = getData();
   const selectedToken = data.tokens.find((token) => token.sessionId === sessionId);
 

@@ -61,7 +61,7 @@ describe('////////TESTING v1/admin/auth/register////////', () => {
         nameLast: 'xian',
       });
       expect(result1.body).toStrictEqual({
-        token: expect.any(Number),
+        token: expect.any(String),
       });
       expect(result1.status).toBe(OK);
     });
@@ -198,7 +198,7 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
         password: 'Abcd12345',
       });
       expect(result1.body).toStrictEqual({
-        token: expect.any(Number),
+        token: expect.any(String),
       });
       expect(result1.status).toBe(OK);
     });
@@ -209,7 +209,7 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
         password: 'Abcd12345',
       });
       expect(result1.body).toStrictEqual({
-        token: expect.any(Number),
+        token: expect.any(String),
       });
       expect(result1.status).toBe(OK);
     });
@@ -224,7 +224,7 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
         password: 'Abcd12345',
       });
       expect(result1.body).toStrictEqual({
-        token: expect.any(Number),
+        token: expect.any(String),
       });
       expect(result1.status).toBe(OK);
     });
@@ -243,7 +243,7 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
         password: 'Abcd12345',
       });
       expect(result1.body).toStrictEqual({
-        token: expect.any(Number),
+        token: expect.any(String),
       });
       expect(result1.status).toBe(OK);
     });
@@ -313,12 +313,11 @@ describe('////////TESTING /v1/admin/user/details////////', () => {
         nameFirst: 'vincent',
         nameLast: 'xian',
       });
-      console.log(person1.body.token);
       result1 = getRequest(
         `/v1/admin/user/details?token=${person1.body.token}`,
         {}
       );
-      expect(result1.body).toStrictEqual({
+      expect(result1.body).toStrictEqual({ 
         user: {
           userId: expect.any(Number),
           name: 'vincent xian',

@@ -77,11 +77,11 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
 
   // Generates a unique 5 digit number for the new sessionId
   let uniqueNumberFlag = false;
-  let sessionId = Math.floor(Math.random() * 90000) + 10000;
+  let sessionId = (Math.floor(Math.random() * 90000) + 10000).toString();
   while (uniqueNumberFlag === false) {
     // If the generated sessionId already exists, generate a new one
     if (data.tokens.some((token) => token.sessionId === sessionId)) {
-      sessionId = Math.floor(Math.random() * 90000) + 10000;
+      sessionId = (Math.floor(Math.random() * 90000) + 10000).toString();
     } else {
       uniqueNumberFlag = true;
     }
@@ -153,11 +153,11 @@ function adminAuthLogin(email: string, password: string): SessionId | ErrorObjec
 
   // Generates a unique 5 digit number for the new sessionId
   let uniqueNumberFlag = false;
-  let sessionId = Math.floor(Math.random() * 90000) + 10000;
+  let sessionId = (Math.floor(Math.random() * 90000) + 10000).toString();
   while (uniqueNumberFlag === false) {
     // If the generated sessionId already exists, generate a new one
     if (data.tokens.some((token) => token.sessionId === sessionId)) {
-      sessionId = Math.floor(Math.random() * 90000) + 10000;
+      sessionId = (Math.floor(Math.random() * 90000) + 10000).toString();
     } else {
       uniqueNumberFlag = true;
     }

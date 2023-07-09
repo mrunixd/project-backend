@@ -148,7 +148,7 @@ function adminQuizRemove(authUserId: number, quizId: number): Record<string, nev
 
     const indexQuiz = data.quizzes.findIndex((id) => id.quizId === quizId);
     data.quizzes.splice(indexQuiz, 1);
-
+    setData(data);
     return {};
   }
 }
