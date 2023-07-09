@@ -654,5 +654,63 @@ describe('///////Testing /v1/admin/quiz/ delete////////', () => {
       });
     });
   });
-  describe('Testing /v1/admin/quiz/ delete error cases', () => {});
+  describe('Testing /v1/admin/quiz/ delete error cases', () => {
+    beforeEach(() => {
+      person2 = postRequest('/v1/admin/auth/register', {
+      email: 'aarnavsample@gmail.com',
+      password: 'Abcd12345',
+      nameFirst: 'aarnav',
+      nameLast: 'sheth',
+      });
+      result2 = postRequest('/v1/admin/quiz', {
+      token: person1.body.token,
+      name: 'first quiz',
+      description: 'first quiz being tested',
+      });
+    });
+    test('CASE (400): Quiz Id does not refer to a valid quiz', () => {
+      const result1 = deleteRequest(
+        `/v1/admin/quiz/${result2.body.quizId - 1}?token=${person1.body.token}`,
+        {}
+      );
+      expect(result1.body).toStrictEqual({ error: 'Quiz ID does not refer to a valid quiz' });
+      expect(result1.status).toStrictEqual(INPUT_ERROR);
+    });
+
+    test('CASE (400): Quiz Id does not refer to a valid quiz', () => {
+      const result1 = deleteRequest(
+        `/v1/admin/quiz/${result2.body.quizId + 2}?token=${person1.body.token}`,
+        {}
+      );
+      expect(result1.body).toStrictEqual({ error: 'Quiz ID does not refer to a valid quiz' });
+      expect(result1.status).toStrictEqual(INPUT_ERROR);
+    });
+
+    test('CASE (400): Quiz Id does not refer to a valid quiz that a user owns', () => {
+      const result1 = deleteRequest(
+        `/v1/admin/quiz/${result2.body.quizId}?token=${person2.body.token}`,
+        {}
+      );
+      expect(result1.body).toStrictEqual({ error: 'Quiz ID does not refer to a valid quiz that this user owns' })
+      expect(result1.status).toStrictEqual(INPUT_ERROR);
+    });
+
+    test('CASE(401): Token is not valid structure', () => {
+      const result1 = deleteRequest(
+        `/v1/admin/quiz/${result2.body.quizId}?token=hello1234`,
+        {}
+      );
+      expect(result1.body).toStrictEqual({ error: 'token has invalid structure' })
+      expect(result1.status).toStrictEqual(UNAUTHORISED);
+    });
+
+    test('CASE(403): Provided token is of valid structure but no logged session', () => {
+      const result1 = deleteRequest(
+        `/v1/admin/quiz/${result2.body.quizId}?token=12345`,
+        {}
+      );
+      expect(result1.body).toStrictEqual({ error: 'Provided token is valid structure, but is not for a currently logged in session' })
+      expect(result1.status).toStrictEqual(FORBIDDEN);
+    });
+  });
 });
