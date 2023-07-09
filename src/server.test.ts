@@ -375,7 +375,6 @@ describe('////////TESTING /v1/admin/user/details////////', () => {
         expect(result1.status).toBe(FORBIDDEN);
       });
     });
-
   });
 });
 
@@ -489,85 +488,99 @@ describe('TESTING v1/admin/quiz', () => {
   });
 });
 
-// describe('TESTING v1/admin/quiz/list', () => {
+describe('TESTING v1/admin/quiz/list', () => {
 
-//   beforeEach(() => {
-//       person1 = postRequest('/v1/admin/auth/register', {
-//       email: 'aarnavsample@gmail.com',
-//       password: 'Abcd12345',
-//       nameFirst: 'aarnav',
-//       nameLast: 'sheth',
-//     });
-//   });
+  beforeEach(() => {
+      person1 = postRequest('/v1/admin/auth/register', {
+      email: 'aarnavsample@gmail.com',
+      password: 'Abcd12345',
+      nameFirst: 'aarnav',
+      nameLast: 'sheth',
+    });
+  });
 
-//   describe('SUCCESS CASES', () => {
-//     test('Successful adminQuizCreate 1 quiz', () => {
-//       postRequest('/v1/admin/quiz', {
-//         authUserId: person1.authUserId,
-//         name: 'first quiz',
-//         description: 'first quiz being tested',
-//       });
+  describe('SUCCESS CASES', () => {
+    test('Successful adminQuizList 1 quiz', () => {
+      const quiz1 = postRequest('/v1/admin/quiz', {
+        sessionId: person1.body.token,
+        name: 'first quiz',
+        description: 'first quiz being tested',
+      });
 
-//       getRequest('/v1/admin/quiz/list', { })
+      result1 = getRequest('/v1/admin/quiz/list', { sessionId: person1.body.token })
 
-//       expect(result1).toStrictEqual({ quizId: expect.any(Number) });
-//       // expect(result1.statusCode).toBe(OK);
-//     });
-//   });
+      expect(result1.body).toStrictEqual({
+        quizzes: [
+          {
+            quizId: quiz1.body.quizId,
+            name: 'first quiz',
+          },
+        ],
+      });
+      expect(result1.status).toBe(OK);
+    });
 
-//   describe('ERROR CASES', () => {
-//     test('CASE: AuthUserId is not a valid user', () => {
-//       const result1 = postRequest('/v1/admin/quiz', {
-//         authUserId: person1.authUserId + 1, //not sure if this is right
-//         name: 'first quiz',
-//         description: 'first quiz being tested',
-//       });
-//       expect(result1).toStrictEqual({ error: expect.any(String) });
-//       // expect(result1.statusCode).toBe(OK);
-//     });
+    test('Successful empty display', () => {
+      result1 = getRequest('/v1/admin/quiz/list', { sessionId: person1.body.token })
+      expect(result1.body).toStrictEqual({ quizzes: [] });
+      expect(result1.status).toBe(OK);
+    });
 
-//     test('CASE: not alpahnumeric name', () => {
-//       const result1 = postRequest('/v1/admin/quiz', {
-//         authUserId: person1.authUserId,
-//         name: '*not^lph+',
-//         description: 'first quiz being tested',
-//       });
-//       expect(result1).toStrictEqual({ error: expect.any(String) });
-//       // expect(result1.statusCode).toBe(OK);
-//     });
-    
-//     test('CASE: name is less than 3 or more than 30 characters', () => {
-//       const result1 = postRequest('/v1/admin/quiz', {
-//         authUserId: person1.authUserId,
-//         name: 'as',
-//         description: 'first quiz being tested',
-//       });
-//       expect(result1).toStrictEqual({ error: expect.any(String) });
-//       // expect(result1.statusCode).toBe(OK);
-//     });
+    test('Successful Multiple quiz display', () => {
+      const quiz1 = postRequest('/v1/admin/quiz', {
+        sessionId: person1.body.token,
+        name: 'first quiz',
+        description: 'first quiz being tested',
+      });
+      const quiz2 = postRequest('/v1/admin/quiz', {
+        sessionId: person1.body.token,
+        name: 'second quiz',
+        description: 'second quiz being tested',
+      });
+      const quiz3 = postRequest('/v1/admin/quiz', {
+        sessionId: person1.body.token,
+        name: 'third quiz',
+        description: 'third quiz being tested',
+      });
 
-//     test('CASE: name is already used for a quiz by user', () => {
-//       postRequest('/v1/admin/quiz/list', {
-//         authUserId: person1.authUserId,
-//         name: 'first quiz', 
-//         description: 'first quiz being tested',
-//       });
-//       const result1 = postRequest('/v1/admin/quiz', {
-//         authUserId: person1.authUserId,
-//         name: 'first quiz', 
-//         description: 'first quiz being tested again',
-//       });
-//       expect(result1).toStrictEqual({ error: expect.any(String) });
-//     });
+      result1 = getRequest('/v1/admin/quiz/list', { sessionId: person1.body.token })
 
-//     test('CASE: description is more than 100 characters', () => {
-//       const result1 = postRequest('/v1/admin/quiz', {
-//         authUserId: person1.authUserId,
-//         name: 'as',
-//         description: 'abcdefghijklmanoinapqrstuvfkdlhzbljkfs kj;kadvbjp kj;aobadbo;udvk; j kja jna dnad j;canlnlxc gjanjk  bafhlbahwlbvkljbhw;KEWBF;KBNE;BNKBGGJRNAJLKVBJ;KV',
-//       });
-//       expect(result1).toStrictEqual({ error: expect.any(String) });
-//       // expect(result1.statusCode).toBe(OK);
-//     });
-//   });
-// });
+      expect(result1.body).toStrictEqual({
+        quizzes: [
+          {
+            quizId: quiz1.body.quizId,
+            name: 'first quiz'
+          },
+          {
+            quizId: quiz2.body.quizId,
+            name: 'second quiz'
+          },
+          {
+            quizId: quiz3.body.quizId,
+            name: 'third quiz'
+          },
+        ],
+      });
+      expect(result1.status).toBe(OK);
+    });
+  });
+
+  describe('ERROR CASES', () => {
+    test('CASE (401): Token is not a valid structure - too short', () => {
+      result1 = getRequest('/v1/admin/quiz/list', { sessionId: 1});
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(UNAUTHORISED);
+    });
+    test('CASE (401): Token is not a valid structure - special symbols', () => {
+      result1 = getRequest('/v1/admin/quiz/list', { sessionId: 'lett!'});
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(UNAUTHORISED);
+    });
+    test('CASE (403): Token is not valid for a currently logged in session', () => {
+      const sessionId = parseInt(person1.body.token) + 1;
+      result1 = getRequest('/v1/admin/quiz/list', { sessionId: sessionId.toString()});
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(FORBIDDEN);
+    });
+  });
+});

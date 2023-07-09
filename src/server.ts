@@ -112,6 +112,19 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   return res.json(response);
 });
 
+app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
+  const sessionId = req.query.sessionId
+  if (sessionId.length !== 5 || /^\d+$/.test(sessionId) === false) {
+    return res.status(401).json({ error: 'token has invalid structure' })
+  }
+  const userId = sessionIdtoUserId(sessionId);
+  if (userId === -1) {
+    return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' })
+  }
+  const response = adminQuizList(userId);
+  return res.json(response);
+});
+
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================
