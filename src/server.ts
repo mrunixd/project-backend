@@ -88,15 +88,18 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
   }
   const userId = sessionIdtoUserId(sessionId);
   if (userId === -1) {
-    return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' })
+    return res
+      .status(403)
+      .json({
+        error:
+          'Provided token is valid structure, but is not for a currently logged in session',
+      });
   }
   const response = adminUserDetails(userId);
   return res.json(response);
 });
 
-
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
-
   const { token, name, description } = req.body;
   const sessionId = parseInt(token);
   if (isNaN(sessionId) || sessionId < 10000 || sessionId > 99999) {
@@ -105,7 +108,12 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const userId = sessionIdtoUserId(sessionId);
 
   if (userId === -1) {
-    return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' })
+    return res
+      .status(403)
+      .json({
+        error:
+          'Provided token is valid structure, but is not for a currently logged in session',
+      });
   }
   const response = adminQuizCreate(userId, name, description);
   if ('error' in response) {
@@ -121,7 +129,12 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   }
   const userId = sessionIdtoUserId(sessionId);
   if (userId === -1) {
-    return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' })
+    return res
+      .status(403)
+      .json({
+        error:
+          'Provided token is valid structure, but is not for a currently logged in session',
+      });
   }
   const response = adminQuizList(userId);
   return res.json(response);
@@ -129,7 +142,7 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
 
 app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const quizid = parseInt(req.params.quizid);
-  const sessionId = parseInt(req.query.token)
+  const sessionId = parseInt(req.query.token);
   if (isNaN(sessionId) || sessionId < 10000 || sessionId > 99999) {
     return res.status(401).json({ error: 'token has invalid structure' });
   }

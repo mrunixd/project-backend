@@ -29,7 +29,7 @@ beforeEach(() => {
 });
 
 test('DUD CASE, DELETE THIS AFTER IMPLEMENTING QUIZ FUNCTIONS IN ITER2', () => {
-    expect(1).toBe(1);
+  expect(1).toBe(1);
 });
 
 describe('////////TESTING ADMINQUIZLIST////////', () => {
@@ -130,7 +130,7 @@ describe('////////TESTING ADMINQUIZCREATE////////', () => {
         'Aarnav',
         'Sheth'
       );
-      
+
       person1authUserId = sessionIdtoUserId(person1.token);
 
       result1 = adminQuizCreate(

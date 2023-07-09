@@ -13,7 +13,7 @@ let person2: any;
 beforeEach(() => {
   clear();
   result1 = undefined;
-  result2 = undefined; 
+  result2 = undefined;
   person1 = undefined;
   person2 = undefined;
 });
