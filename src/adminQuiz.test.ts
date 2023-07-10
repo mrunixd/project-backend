@@ -935,7 +935,7 @@ describe('////////TESTING ADMINQUIZQUESTION////////', () => {
       quizQuestion = {
         question: "Who is the monarch of England?",
         duration: 13,
-        points: 11,
+        points: 9,
         answers: [
           {
             answer: "this is meant to be more than 30 characters long and i think it is",
@@ -954,10 +954,10 @@ describe('////////TESTING ADMINQUIZQUESTION////////', () => {
       quizQuestion = {
         question: "Who is the monarch of England?",
         duration: 13,
-        points: 11,
+        points: 8,
         answers: [
           {
-            answer: "King Charless",
+            answer: "King Charles",
             correct: false
           },
           {
@@ -969,24 +969,24 @@ describe('////////TESTING ADMINQUIZQUESTION////////', () => {
       result1 = adminQuizQuestion(person1authUserId, quiz1.quizId, quizQuestion);
       expect(result1).toStrictEqual({ error: expect.any(String) });
     });
-    // test('CASE: no correct answers', () => {
-    //   quizQuestion = {
-    //     question: "Who is the monarch of England?",
-    //     duration: 13,
-    //     points: 11,
-    //     answers: [
-    //       {
-    //         answer: "King Charless",
-    //         correct: false
-    //       },
-    //       {
-    //         answer: "Prince Charles",
-    //         correct: false
-    //       }
-    //     ]
-    //   }
-    //   result1 = adminQuizQuestion(person1authUserId, quiz1.quizId, quizQuestion);
-    //   expect(result1).toStrictEqual({ error: expect.any(String) });
-    // });
+    test('CASE: no correct answers', () => {
+      quizQuestion = {
+        question: "Who is the monarch of England?",
+        duration: 13,
+        points: 8,
+        answers: [
+          {
+            answer: "King Charless",
+            correct: false
+          },
+          {
+            answer: "Prince Charles",
+            correct: false
+          }
+        ]
+      }
+      result1 = adminQuizQuestion(person1authUserId, quiz1.quizId, quizQuestion);
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
   });
 });
