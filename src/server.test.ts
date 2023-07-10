@@ -29,6 +29,15 @@ function deleteRequest(route: string, qs: any) {
   };
 }
 
+function putRequest(route: string, qs: any) {
+  const res = request('PUT', `${SERVER_URL}${route}`, { json: json });
+
+  return {
+    status: res.statusCode,
+    body: JSON.parse(res.body.toString()),
+  };
+}
+
 function getRequest(route: string, qs: any) {
   const res = request('GET', `${SERVER_URL}${route}`, { qs: qs });
   // return JSON.parse(res.body.toString());
@@ -612,7 +621,7 @@ describe('///////Testing /v1/admin/quiz/delete////////', () => {
     });
   });
   describe('Testing /v1/admin/quiz/ delete success cases', () => {
-    test('Succesful deletion of quiz', () => {
+    test('Successful deletion of quiz', () => {
       const quiz1 = postRequest('/v1/admin/quiz', {
         token: person1.body.token,
         name: 'first quiz',
@@ -1012,3 +1021,148 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
     });
   });
 });
+
+//////////////////////////// NAME UPDATE ///////////////////////////
+
+describe('/////// TESTING v1/admin/quiz/name ///////', () => {
+  // Creates a user and a quiz.
+  beforeEach(() => {
+    person1 = postRequest('/v1/admin/auth/register', {
+      email: 'aarnavsample@gmail.com',
+      password: 'Abcd12345',
+      nameFirst: 'aarnav',
+      nameLast: 'sheth',
+    });
+
+    quiz1 = postRequest('/v1/admin/quiz', {
+      token: person1.body.token,
+      name: 'first quiz',
+      description: 'first quiz being tested',
+    });  
+  });
+
+  describe('/////// Testing v1/admin/quiz/name success', () => {
+  // Tests if adminQuizNameUpdate runs successfully.
+  test('CASE: Successful adminQuizNameUpdate', () => {})
+    result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
+      token: person1.body.token,
+      name: 'newQuizName'
+    });
+
+    expect(result1.body).toStrictEqual({ name: 'newQuizName'});
+    expect(result1.status).toBe(OK);
+
+    // Verifying that the quiz name has changed. 
+    result2 = getRequest('v1/admin/quiz/list', {
+      token: `${person1.body.token}`
+    });
+
+    expect(result2.body).toStrictEqual({
+      quizzes: [
+        {
+          quizId: quiz1.body.quizId,
+          name: 'newQuizName',
+        },
+      ],
+    });
+    expect(result2.status).toBe(OK);
+
+  });
+
+  // Tests if adminQuizNameUpdate returns an error.
+  describe('/////// Testing v1/admin/quiz/name error', () => {
+    // Status 400
+    test('CASE: quizId does not refer to a valid quiz', () => {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId + 1}/name`, {
+        token: person1.body.token,
+        name: 'newQuizName'
+      });     
+
+      expect(result1.body).toBe({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+
+    });
+
+    test('CASE: quizId does not refer to a quiz that this user owns', () => {
+      person2 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
+        token: person2.body.token,
+        name: 'newQuizName'
+      }); 
+
+      expect(result1.body).toBe({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+      
+    });
+
+    test('CASE: Name contains invalid characters', () => {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
+        token: person1.body.token,
+        name: '%!@#!%'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE: Name is less than 3 characters long', () => {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
+        token: person1.body.token,
+        name: 'zh'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+
+    });
+
+    test('CASE: Name is more than 30 characters long', () => {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
+        token: person1.body.token,
+        name: 'zhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzh'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+
+    });
+
+    test('CASE: Name is already used in the current logged in user for another quiz', () => {
+      expect(result1.status).toBe(INPUT_ERROR);
+
+    });
+      
+    // Status 401
+    test('CASE: Token is not a valid structure - too short', () => {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
+        token: 1424,
+        name: 'newQuizName'
+      });
+
+      expect(result1.body).toBe({ error: expect.any(String) });
+      expect(result1.status).toBe(401);
+    });
+
+    test('CASE: Token is not a valid structure - too long', () => {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
+        token: 142423,
+        name: 'newQuizName'
+      });
+
+      expect(result1.body).toBe({ error: expect.any(String) });
+      expect(result1.status).toBe(401);
+    });
+
+    // Status 403
+    test('CASE: Provided token is valid structure, but is not for a currently logged in session', () => {
+
+    });
+
+  })
+})
