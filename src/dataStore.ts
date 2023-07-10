@@ -44,6 +44,7 @@ export interface DataStore {
   users: User[];
   quizzes: Quiz[];
   tokens: Token[];
+  trash: Quiz[];
 }
 
 export interface SessionId {
@@ -61,7 +62,8 @@ export interface Token {
 let data: DataStore = {
   users: [],
   quizzes: [],
-  tokens: []
+  tokens: [],
+  trash: []
 };
 
 // function getData(): DataStore {

@@ -9,19 +9,19 @@ interface QuizId {
 }
 
 interface EmptyQuizList {
-  quizzes: []
+  quizzes: [];
 }
 
 interface QuizList {
-  quizzes: QuizIds[]
+  quizzes: QuizIds[];
 }
 
 interface QuizInfo {
-  quizId: number,
-  name: string,
-  timeCreated: number,
-  timeLastEdited: number,
-  description: string
+  quizId: number;
+  name: string;
+  timeCreated: number;
+  timeLastEdited: number;
+  description: string;
 }
 
 /**
@@ -39,7 +39,9 @@ interface QuizInfo {
  *  ]
  * }
  */
-function adminQuizList(authUserId: number): EmptyQuizList | QuizList | ErrorObject {
+function adminQuizList(
+  authUserId: number
+): EmptyQuizList | QuizList | ErrorObject {
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
@@ -66,7 +68,11 @@ function adminQuizList(authUserId: number): EmptyQuizList | QuizList | ErrorObje
  *
  * @returns {{quizId: number}}
  */
-function adminQuizCreate(authUserId: number, name: string, description: string): QuizId | ErrorObject {
+function adminQuizCreate(
+  authUserId: number,
+  name: string,
+  description: string
+): QuizId | ErrorObject {
   const data = getData();
 
   // Save the selected user to be used for error checking & return values
@@ -81,7 +87,7 @@ function adminQuizCreate(authUserId: number, name: string, description: string):
   } else if (name.length > 30 || name.length < 3) {
     return { error: 'Name is less than 3 or more than 30 characters' };
 
-  // Checks if 'quizIds' exists as an array & that it has the correct quiz 'name
+    // Checks if 'quizIds' exists as an array & that it has the correct quiz 'name
   } else if (
     user.quizIds &&
     Array.isArray(user.quizIds) &&
@@ -108,14 +114,13 @@ function adminQuizCreate(authUserId: number, name: string, description: string):
     timeLastEdited: currentTime,
     description: description,
     numQuestions: 0,
-    questions: []
+    questions: [],
   });
 
   setData(data);
 
   return {
     quizId: quizId,
-
   };
 }
 
@@ -128,10 +133,13 @@ function adminQuizCreate(authUserId: number, name: string, description: string):
  *
  * @returns {}
  */
-function adminQuizRemove(authUserId: number, quizId: number): Record<string, never> | ErrorObject {
+function adminQuizRemove(
+  authUserId: number,
+  quizId: number
+): Record<string, never> | ErrorObject {
   const data = getData();
   const user = data.users.find((user) => user.authUserId === authUserId);
-
+  const quiz = data.trash.find((item) => item.quizId === quizId);
   // Error checking block
   if (user === undefined) {
     return { error: 'AuthUserId is not a valid user' };
@@ -147,7 +155,13 @@ function adminQuizRemove(authUserId: number, quizId: number): Record<string, nev
     user.quizIds.splice(index, 1);
 
     const indexQuiz = data.quizzes.findIndex((id) => id.quizId === quizId);
-    data.quizzes.splice(indexQuiz, 1);
+    const [removedQuiz] = data.quizzes.splice(indexQuiz, 1);
+    data.trash.push(removedQuiz);
+    const quiz = data.trash.find((item) => item.quizId === quizId);
+    if (quiz === undefined) {
+      return { error: 'Quiz ID does not refer to a valid quiz' };
+    }
+    quiz.timeLastEdited = Math.floor(Date.now() / 1000);
     setData(data);
     return {};
   }
@@ -168,7 +182,11 @@ function adminQuizRemove(authUserId: number, quizId: number): Record<string, nev
  *  description: string,
  * }
  */
-function adminQuizInfo(authUserId: number, quizId: number): QuizInfo | ErrorObject {//can't interface type just be Quiz from dataStore?
+function adminQuizInfo(
+  authUserId: number,
+  quizId: number
+): QuizInfo | ErrorObject {
+  //can't interface type just be Quiz from dataStore?
   const data = getData();
 
   // Save the selected user to be used for error checking & return values
@@ -202,7 +220,11 @@ function adminQuizInfo(authUserId: number, quizId: number): QuizInfo | ErrorObje
  *
  * @returns {}
  */
-function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): Record<string, never> | ErrorObject {
+function adminQuizNameUpdate(
+  authUserId: number,
+  quizId: number,
+  name: string
+): Record<string, never> | ErrorObject {
   const data = getData();
   const acceptedCharacters = /^[a-zA-Z0-9 ]+$/;
 
@@ -216,12 +238,12 @@ function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): 
   } else if (!acceptedCharacters.test(name)) {
     return {
       error:
-      'Name contains any characters that are not alphanumeric or are spaces',
+        'Name contains any characters that are not alphanumeric or are spaces',
     };
   } else if (name.length < 3 || name.length > 30) {
     return {
       error:
-      'Name is either less than 3 characters long or more than 30 characters long',
+        'Name is either less than 3 characters long or more than 30 characters long',
     };
   } else if (selected === undefined) {
     return { error: 'Quiz Id does not refer to a valid quiz' };
@@ -230,8 +252,7 @@ function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): 
   } else if (user.quizIds.some((quiz) => quiz.name === name)) {
     return {
       error:
-      'Name is already used by the current logged in user for another quiz',
-
+        'Name is already used by the current logged in user for another quiz',
     };
   }
 
@@ -259,7 +280,11 @@ function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): 
  * @returns {}
  *
  */
-function adminQuizDescriptionUpdate(authUserId: number, quizId: number, description: string): Record<string, never> | ErrorObject {
+function adminQuizDescriptionUpdate(
+  authUserId: number,
+  quizId: number,
+  description: string
+): Record<string, never> | ErrorObject {
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
