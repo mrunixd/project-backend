@@ -1,4 +1,4 @@
-import { getData, setData, QuizIds } from './dataStore';
+import { getData, setData, QuizIds, Question, Answer } from './dataStore';
 
 interface ErrorObject {
   error: string;
@@ -22,6 +22,22 @@ interface QuizInfo {
   timeCreated: number,
   timeLastEdited: number,
   description: string
+}
+
+interface answerInput {
+  answer: string;
+  correct: boolean;
+}
+
+interface questionInput {
+  question: string;
+  duration: number;
+  points: number;
+  answers: answerInput[];
+}
+
+interface QuestionId {
+  questionId: number;
 }
 
 /**
@@ -284,6 +300,71 @@ function adminQuizDescriptionUpdate(authUserId: number, quizId: number, descript
   return {};
 }
 
+function adminQuizQuestion(authUserId: number, quizId: number, questionBody: questionInput): QuestionId | ErrorObject {
+  const data = getData();
+
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
+
+  if (currentQuiz === undefined) {
+    return { error: 'Quiz ID does not refer to a valid quiz' };
+  } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
+    return { error: 'Quiz ID does not refer to a quiz that this user owns' };
+  } else if (questionBody.question.length < 5 || questionBody.question.length > 50) {
+    return { error: 'Question string is less than 5 characters in length or greater than 50 characters in length' };
+  } else if (questionBody.answers.length < 2 || questionBody.answers.length > 6) {
+    return { error: 'The question has more than 6 answers or less than 2 answers' };
+  } else if (questionBody.duration < 0) {
+    return { error: 'The question duration is not a positive number' };
+  } else if (
+    currentQuiz.questions.reduce((accumulator, currentItem) => accumulator + currentItem.duration, 0) +
+      questionBody.duration >
+    180
+  ) {
+    return { error: 'The sum of the question durations in the quiz exceeds 3 minutes' };
+  } else if (questionBody.points > 10 || questionBody.points < 1) {
+    return { error: 'The points awarded for the question are less than 1 or greater than 10' };
+  } else if (
+    questionBody.answers.some((answer) => answer.answer.length < 1 || answer.answer.length > 30)
+  ) {
+    return { error: 'Answer strings should be between 1 and 30 characters long' };
+  } else if (
+    questionBody.answers.some(
+      (answer, index, answers) =>
+        answers.findIndex((a) => a.answer === answer.answer) !== index
+    )
+  ) {
+    return { error: 'Answer strings should not contain duplicates within the same question' };
+  }
+
+  const questionId = currentQuiz.questions.length + 1;
+  const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
+  const colour = answer.correct ? 'green' : 'red';
+    return {
+      answerId: index,
+      answer: answer.answer,
+      colour: colour,
+      correct: answer.correct,
+    };
+  });
+
+  const newQuestion: Question = {
+    questionId: questionId,
+    question: questionBody.question,
+    duration: questionBody.duration,
+    points: questionBody.points,
+    answers: newAnswers,
+  };
+
+  currentQuiz.questions.push(newQuestion);
+
+  // Update the timeLastEdited for the quiz
+  currentQuiz.timeLastEdited = Math.floor(Date.now() / 1000);
+  setData(data);
+  // Return the questionId of the newly added question
+  return { questionId: questionId };
+}
+
 export {
   adminQuizCreate,
   adminQuizList,
@@ -291,4 +372,5 @@ export {
   adminQuizDescriptionUpdate,
   adminQuizNameUpdate,
   adminQuizRemove,
+  adminQuizQuestion
 };
