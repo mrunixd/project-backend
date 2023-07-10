@@ -13,7 +13,7 @@ const SERVER_URL = `${url}:${port}`;
 
 function postRequest(route: string, json: any) {
   const res = request('POST', `${SERVER_URL}${route}`, { json: json });
-  // return JSON.parse(res.body.toString());
+
   return {
     status: res.statusCode,
     body: JSON.parse(res.body.toString()),
@@ -694,7 +694,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
 
   describe('Testing /v1/admin/quiz/{quizid}/question success cases', () => {
     test('Successful adminQuizCreate 1 quiz question', () => {
-      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}`, {
+      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion,
       });
@@ -705,7 +705,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
 
   describe('Testing /v1/admin/quiz/{quizid}/question error cases', () => {
     test('CASE (401): Token is not a valid structure - too short', () => {
-      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}`, {
+      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: '1',
         questionBody: quizQuestion
       });
@@ -714,7 +714,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
     });
 
     test('CASE (401): Token is not a valid structure - special symbols', () => {
-      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}`, {
+      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: 'let!!',
         questionBody: quizQuestion
       });
@@ -724,7 +724,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
 
     test('CASE (403): Token is not valid for a currently logged in session', () => {
       const sessionId = parseInt(person1.body.token) + 1;
-      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}`, {
+      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${sessionId}`,
         questionBody: quizQuestion
       });
@@ -733,7 +733,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
     });
 
     test('CASE: quiz does not exist', () => {
-      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId + 1}`, {
+      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId + 1}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion,
       });
@@ -748,7 +748,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
         nameFirst: 'vincent',
         nameLast: 'xian',
       });
-      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}`, {
+      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person2.body.token}`,
         questionBody: quizQuestion,
       });
@@ -771,7 +771,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
           }
         ]
       };
-      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}`, {
+      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion,
       });
@@ -791,7 +791,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
           }
         ]
       };
-      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}`, {
+      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion,
       });
@@ -815,7 +815,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
           }
         ]
       }
-      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}`, {
+      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion,
       });
@@ -839,7 +839,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
           }
         ]
       }
-      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}`, {
+      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion,
       });
@@ -863,7 +863,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
           }
         ]
       }
-      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}`, {
+      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion,
       });
@@ -887,7 +887,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
           }
         ]
       }
-      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}`, {
+      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion,
       });
@@ -911,7 +911,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
           }
         ]
       }
-      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}`, {
+      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion,
       });
@@ -934,7 +934,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
           }
         ]
       }
-      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}`, {
+      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion,
       });
