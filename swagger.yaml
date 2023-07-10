@@ -1251,7 +1251,7 @@ paths:
   /v1/admin/quiz/trash:
     get:
       summary: View the quizzes in trash
-      description: View the quizzes that are currently in the trash
+      description: View the quizzes that are currently in the trash for the logged in user
       tags:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (New)"

@@ -13,6 +13,8 @@
 * 04/07: Clarification of the order of errors to be thrown in. The docs automatically changed the ordering from how they're defined. See section 4.10.
 * 05/07: Correctly stated auth/logout is `POST` (previously it was `PUT`); GET `admin/quiz/{quizid}` no longer includes thumbnail; `trash/empty` route now correctly includes the `quizIds` in query.
 * 08/07: For people using a JSONified object as a token, we have added advice on encoding and decoding in section 4.9;  `/v1/admin/quiz/{quizid}/question` has clarification that the "answer" colour should be randomly generated, not the question. This is apparent when looking at the data types, but it was written incorrectly in the spec there
+* 11/07: Clarified for `/v1/admin/quiz/trash` that you are viewing the trash "for the logged in user"
+
 ## 🫡 0. Aims:
 
 1. Demonstrate effective use of software development tools to build full-stack end-user applications.
