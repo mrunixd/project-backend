@@ -306,7 +306,9 @@ function adminQuizQuestion(authUserId: number, quizId: number, questionBody: que
   const user = data.users.find((user) => user.authUserId === authUserId);
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
 
-  if (currentQuiz === undefined) {
+  if (user === undefined) {
+    return { error: 'AuthUserId is not a valid user' };
+  } else if (currentQuiz === undefined) {
     return { error: 'Quiz ID does not refer to a valid quiz' };
   } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
     return { error: 'Quiz ID does not refer to a quiz that this user owns' };
@@ -335,6 +337,8 @@ function adminQuizQuestion(authUserId: number, quizId: number, questionBody: que
     )
   ) {
     return { error: 'Answer strings should not contain duplicates within the same question' };
+  } else if (!questionBody.answers.some((answer) => answer.correct)) {
+    return { error: 'Question must have at least one correct answer' };
   }
 
   const questionId = currentQuiz.questions.length + 1;
