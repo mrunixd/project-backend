@@ -15,6 +15,7 @@ import {
   adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
   adminQuizQuestion,
+  adminQuizQuestionMove,
   adminQuizQuestionDuplicate,
   adminQuizTrash
 } from './quiz';
@@ -240,6 +241,29 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   return res.status(200).json(response);
 });
 
+app.put('/v1/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const { token, newPosition } = req.body;
+
+  if (!checkValidToken(token)) {
+    return res.status(401).json({ error: 'token has invalid structure' });
+  }
+  const userId = sessionIdtoUserId(token);
+  if (userId === -1) {
+    return res.status(403).json({
+      error:
+        'Provided token is valid structure, but is not for a currently logged in session',
+    });
+  }
+
+  const response = adminQuizQuestionMove(userId, quizId, questionId, newPosition);
+  if ('error' in response) {
+    return res.status(400).json(response);
+  }
+  return res.json(response);
+});
+
 app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const questionId = parseInt(req.params.questionid);
@@ -262,7 +286,6 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
   }
   return res.json(response);
 });
-
 
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
