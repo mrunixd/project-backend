@@ -5,6 +5,7 @@ import {
   adminQuizRemove,
   adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
+  adminQuizQuestion
 } from './quiz';
 import { adminAuthRegister, adminAuthLogin } from './auth';
 import { clear, sessionIdtoUserId } from './other';
@@ -16,6 +17,7 @@ let person2: any;
 let quiz1: any;
 let quiz2: any;
 let person1authUserId: any;
+let quizQuestion: any;
 
 beforeEach(() => {
   clear();
@@ -26,6 +28,7 @@ beforeEach(() => {
   quiz1 = undefined;
   quiz2 = undefined;
   person1authUserId = undefined;
+  quizQuestion = undefined;
 });
 
 test('DUD CASE, DELETE THIS AFTER IMPLEMENTING QUIZ FUNCTIONS IN ITER2', () => {
@@ -728,3 +731,262 @@ describe('////////TESTING ADMINQUIZCREATE////////', () => {
 //     });
 //   });
 // });
+
+describe('////////TESTING ADMINQUIZQUESTION////////', () => {
+  describe('Testing question create success', () => {
+    test('CASE: Successful question creation', () => {
+      person1 = adminAuthRegister(
+        'aarnavsample@gmail.com',
+        'abcd1234',
+        'Aarnav',
+        'Sheth'
+      );
+      
+      person1authUserId = sessionIdtoUserId(person1.token);
+      quiz1 = adminQuizCreate(person1authUserId, 'aarnavsquiz', 'first quiz');
+
+      quizQuestion = {
+        question: "Who is the Monarch of England?",
+        duration: 4,
+        points: 5,
+        answers: [
+          {
+            answer: "Prince Charles",
+            correct: false
+          },
+          {
+            answer: "King Charles",
+            correct: true
+          }
+        ]
+      }
+      result1 = adminQuizQuestion(person1authUserId, quiz1.quizId, quizQuestion);
+      expect(result1).toStrictEqual({ questionId: expect.any(Number) });
+    });
+  });
+  describe('Testing question create success', () => {
+    test('CASE: Successful question creation', () => {
+      person1 = adminAuthRegister(
+        'aarnavsample@gmail.com',
+        'abcd1234',
+        'Aarnav',
+        'Sheth'
+      );
+      
+      person1authUserId = sessionIdtoUserId(person1.token);
+      quiz1 = adminQuizCreate(person1authUserId, 'aarnavsquiz', 'first quiz');
+
+      quizQuestion = {
+        question: "Who is the Monarch of England?",
+        duration: 4,
+        points: 5,
+        answers: [
+          {
+            answer: "Prince Charles",
+            correct: false
+          },
+          {
+            answer: "King Charles",
+            correct: true
+          }
+        ]
+      }
+      result1 = adminQuizQuestion(person1authUserId, quiz1.quizId, quizQuestion);
+      expect(result1).toStrictEqual({ questionId: expect.any(Number) });
+    });
+  });
+  describe('Testing question create errors', () => {
+
+    beforeEach(() => {
+      person1 = adminAuthRegister(
+        'aarnavsample@gmail.com',
+        'abcd1234',
+        'Aarnav',
+        'Sheth'
+      );
+      person1authUserId = sessionIdtoUserId(person1.token);
+      quiz1 = adminQuizCreate(person1authUserId, 'aarnavsquiz', 'first quiz');
+      quizQuestion = {
+        question: "Who is the Monarch of England?",
+        duration: 4,
+        points: 5,
+        answers: [
+          {
+            answer: "Prince Charles",
+            correct: false
+          },
+          {
+            answer: "King Charles",
+            correct: true
+          }
+        ]
+      }
+    });
+
+    test('CASE: quiz does not exist', () => {
+      result1 = adminQuizQuestion(person1authUserId, quiz1.quizId + 1, quizQuestion);
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
+    test('CASE: quiz does not exist for this user', () => {
+      person2 = adminAuthRegister(
+        'aarnavse@gmail.com',
+        'abcd1234',
+        'Aarnavs',
+        'Shethe'
+      );
+      const person2authUserId = sessionIdtoUserId(person2.token);
+      result1 = adminQuizQuestion(person2authUserId, quiz1.quizId, quizQuestion);
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
+    test('CASE: question string is less than 5 or more than 50 characters', () => {
+      quizQuestion = {
+        question: "Who?",
+        duration: 4,
+        points: 5,
+        answers: [
+          {
+            answer: "Prince Charles",
+            correct: false
+          },
+          {
+            answer: "King Charles",
+            correct: true
+          }
+        ]
+      }
+      result1 = adminQuizQuestion(person1authUserId, quiz1.quizId, quizQuestion);
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
+
+    test('CASE: question has more than 6 answers or less than 2', () => {
+      quizQuestion = {
+        question: "Who is the monarch of England?",
+        duration: 4,
+        points: 5,
+        answers: [
+          {
+            answer: "Prince Charles",
+            correct: false
+          },
+        ]
+      }
+      result1 = adminQuizQuestion(person1authUserId, quiz1.quizId, quizQuestion);
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
+    test('CASE: duration is not a positive number', () => {
+      quizQuestion = {
+        question: "Who is the monarch of England?",
+        duration: -1,
+        points: 5,
+        answers: [
+          {
+            answer: "Prince Charles",
+            correct: false
+          },
+          {
+            answer: "King Charles",
+            correct: true
+          }
+        ]
+      }
+      result1 = adminQuizQuestion(person1authUserId, quiz1.quizId, quizQuestion);
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
+    test('CASE: total duration is more than 3 minutes', () => {
+      quizQuestion = {
+        question: "Who is the monarch of England?",
+        duration: 181,
+        points: 5,
+        answers: [
+          {
+            answer: "Prince Charles",
+            correct: false
+          },
+          {
+            answer: "King Charles",
+            correct: true
+          }
+        ]
+      }
+      result1 = adminQuizQuestion(person1authUserId, quiz1.quizId, quizQuestion);
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
+
+    test('CASE: Points awarded are more than 10 or less than 1', () => {
+      quizQuestion = {
+        question: "Who is the monarch of England?",
+        duration: 13,
+        points: 11,
+        answers: [
+          {
+            answer: "Prince Charles",
+            correct: false
+          },
+          {
+            answer: "King Charles",
+            correct: true
+          }
+        ]
+      }
+      result1 = adminQuizQuestion(person1authUserId, quiz1.quizId, quizQuestion);
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
+    test('CASE: answer strings are less than 1 or greater than 30', () => {
+      quizQuestion = {
+        question: "Who is the monarch of England?",
+        duration: 13,
+        points: 9,
+        answers: [
+          {
+            answer: "this is meant to be more than 30 characters long and i think it is",
+            correct: false
+          },
+          {
+            answer: "King Charles",
+            correct: true
+          }
+        ]
+      }
+      result1 = adminQuizQuestion(person1authUserId, quiz1.quizId, quizQuestion);
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
+    test('CASE: duplicate answers', () => {
+      quizQuestion = {
+        question: "Who is the monarch of England?",
+        duration: 13,
+        points: 8,
+        answers: [
+          {
+            answer: "King Charles",
+            correct: false
+          },
+          {
+            answer: "King Charles",
+            correct: true
+          }
+        ]
+      }
+      result1 = adminQuizQuestion(person1authUserId, quiz1.quizId, quizQuestion);
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
+    test('CASE: no correct answers', () => {
+      quizQuestion = {
+        question: "Who is the monarch of England?",
+        duration: 13,
+        points: 8,
+        answers: [
+          {
+            answer: "King Charless",
+            correct: false
+          },
+          {
+            answer: "Prince Charles",
+            correct: false
+          }
+        ]
+      }
+      result1 = adminQuizQuestion(person1authUserId, quiz1.quizId, quizQuestion);
+      expect(result1).toStrictEqual({ error: expect.any(String) });
+    });
+  });
+});

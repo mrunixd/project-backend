@@ -11,9 +11,9 @@ import { setData, getData, DataStore, SessionId, ErrorObject } from './dataStore
 function clear() {
   const clearData: DataStore = {
     users: [],
-
     quizzes: [],
-    tokens: []
+    tokens: [],
+    trash: []
   };
   setData(clearData);
   return {};

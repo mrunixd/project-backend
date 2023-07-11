@@ -1,4 +1,4 @@
-import { getData, setData, QuizIds, Quiz } from './dataStore';
+import { getData, setData, QuizIds, Quiz, Question, Answer } from './dataStore';
 
 interface ErrorObject {
   error: string;
@@ -9,20 +9,28 @@ interface QuizId {
 }
 
 interface EmptyQuizList {
-  quizzes: []
+  quizzes: [];
 }
 
 interface QuizList {
-  quizzes: QuizIds[]
+  quizzes: QuizIds[];
 }
 
-// interface QuizInfo {
-//   quizId: number;
-//   name: string;
-//   timeCreated: number;
-//   timeLastEdited: number;
-//   description: string;
-// }
+interface answerInput {
+  answer: string;
+  correct: boolean;
+}
+
+interface questionInput {
+  question: string;
+  duration: number;
+  points: number;
+  answers: answerInput[];
+}
+
+interface QuestionId {
+  questionId: number;
+}
 
 /**
  * This function provides a list of all the quizzes owned by the currently
@@ -39,7 +47,9 @@ interface QuizList {
  *  ]
  * }
  */
-function adminQuizList(authUserId: number): EmptyQuizList | QuizList | ErrorObject {
+function adminQuizList(
+  authUserId: number
+): EmptyQuizList | QuizList | ErrorObject {
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
@@ -66,7 +76,11 @@ function adminQuizList(authUserId: number): EmptyQuizList | QuizList | ErrorObje
  *
  * @returns {{quizId: number}}
  */
-function adminQuizCreate(authUserId: number, name: string, description: string): QuizId | ErrorObject {
+function adminQuizCreate(
+  authUserId: number,
+  name: string,
+  description: string
+): QuizId | ErrorObject {
   const data = getData();
 
   // Save the selected user to be used for error checking & return values
@@ -81,7 +95,7 @@ function adminQuizCreate(authUserId: number, name: string, description: string):
   } else if (name.length > 30 || name.length < 3) {
     return { error: 'Name is less than 3 or more than 30 characters' };
 
-  // Checks if 'quizIds' exists as an array & that it has the correct quiz 'name
+    // Checks if 'quizIds' exists as an array & that it has the correct quiz 'name
   } else if (
     user.quizIds &&
     Array.isArray(user.quizIds) &&
@@ -116,7 +130,6 @@ function adminQuizCreate(authUserId: number, name: string, description: string):
 
   return {
     quizId: quizId,
-
   };
 }
 
@@ -129,10 +142,13 @@ function adminQuizCreate(authUserId: number, name: string, description: string):
  *
  * @returns {}
  */
-function adminQuizRemove(authUserId: number, quizId: number): Record<string, never> | ErrorObject {
+function adminQuizRemove(
+  authUserId: number,
+  quizId: number
+): Record<string, never> | ErrorObject {
   const data = getData();
   const user = data.users.find((user) => user.authUserId === authUserId);
-
+  const quiz = data.trash.find((item) => item.quizId === quizId);
   // Error checking block
   if (user === undefined) {
     return { error: 'AuthUserId is not a valid user' };
@@ -148,7 +164,13 @@ function adminQuizRemove(authUserId: number, quizId: number): Record<string, nev
     user.quizIds.splice(index, 1);
 
     const indexQuiz = data.quizzes.findIndex((id) => id.quizId === quizId);
-    data.quizzes.splice(indexQuiz, 1);
+    const [removedQuiz] = data.quizzes.splice(indexQuiz, 1);
+    data.trash.push(removedQuiz);
+    const quiz = data.trash.find((item) => item.quizId === quizId);
+    if (quiz === undefined) {
+      return { error: 'Quiz ID does not refer to a valid quiz' };
+    }
+    quiz.timeLastEdited = Math.floor(Date.now() / 1000);
     setData(data);
     return {};
   }
@@ -169,7 +191,11 @@ function adminQuizRemove(authUserId: number, quizId: number): Record<string, nev
  *  description: string,
  * }
  */
-function adminQuizInfo(authUserId: number, quizId: number): Quiz | ErrorObject {
+function adminQuizInfo(
+  authUserId: number,
+  quizId: number
+): Quiz | ErrorObject {
+  //can't interface type just be Quiz from dataStore?
   const data = getData();
 
   // Save the selected user to be used for error checking & return values
@@ -206,7 +232,11 @@ function adminQuizInfo(authUserId: number, quizId: number): Quiz | ErrorObject {
  *
  * @returns {}
  */
-function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): Record<string, never> | ErrorObject {
+function adminQuizNameUpdate(
+  authUserId: number,
+  quizId: number,
+  name: string
+): Record<string, never> | ErrorObject {
   const data = getData();
   const acceptedCharacters = /^[a-zA-Z0-9 ]+$/;
 
@@ -220,12 +250,12 @@ function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): 
   } else if (!acceptedCharacters.test(name)) {
     return {
       error:
-      'Name contains any characters that are not alphanumeric or are spaces',
+        'Name contains any characters that are not alphanumeric or are spaces',
     };
   } else if (name.length < 3 || name.length > 30) {
     return {
       error:
-      'Name is either less than 3 characters long or more than 30 characters long',
+        'Name is either less than 3 characters long or more than 30 characters long',
     };
   } else if (selected === undefined) {
     return { error: 'Quiz Id does not refer to a valid quiz' };
@@ -234,8 +264,7 @@ function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): 
   } else if (user.quizIds.some((quiz) => quiz.name === name)) {
     return {
       error:
-      'Name is already used by the current logged in user for another quiz',
-
+        'Name is already used by the current logged in user for another quiz',
     };
   }
 
@@ -263,7 +292,11 @@ function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): 
  * @returns {}
  *
  */
-function adminQuizDescriptionUpdate(authUserId: number, quizId: number, description: string): Record<string, never> | ErrorObject {
+function adminQuizDescriptionUpdate(
+  authUserId: number,
+  quizId: number,
+  description: string
+): Record<string, never> | ErrorObject {
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
@@ -288,6 +321,75 @@ function adminQuizDescriptionUpdate(authUserId: number, quizId: number, descript
   return {};
 }
 
+function adminQuizQuestion(authUserId: number, quizId: number, questionBody: questionInput): QuestionId | ErrorObject {
+  const data = getData();
+
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
+
+  if (user === undefined) {
+    return { error: 'AuthUserId is not a valid user' };
+  } else if (currentQuiz === undefined) {
+    return { error: 'Quiz ID does not refer to a valid quiz' };
+  } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
+    return { error: 'Quiz ID does not refer to a quiz that this user owns' };
+  } else if (questionBody.question.length < 5 || questionBody.question.length > 50) {
+    return { error: 'Question string is less than 5 characters in length or greater than 50 characters in length' };
+  } else if (questionBody.answers.length < 2 || questionBody.answers.length > 6) {
+    return { error: 'The question has more than 6 answers or less than 2 answers' };
+  } else if (questionBody.duration < 0) {
+    return { error: 'The question duration is not a positive number' };
+  } else if (
+    currentQuiz.questions.reduce((accumulator, currentItem) => accumulator + currentItem.duration, 0) +
+      questionBody.duration >
+    180
+  ) {
+    return { error: 'The sum of the question durations in the quiz exceeds 3 minutes' };
+  } else if (questionBody.points > 10 || questionBody.points < 1) {
+    return { error: 'The points awarded for the question are less than 1 or greater than 10' };
+  } else if (
+    questionBody.answers.some((answer) => answer.answer.length < 1 || answer.answer.length > 30)
+  ) {
+    return { error: 'Answer strings should be between 1 and 30 characters long' };
+  } else if (
+    questionBody.answers.some(
+      (answer, index, answers) =>
+        answers.findIndex((a) => a.answer === answer.answer) !== index
+    )
+  ) {
+    return { error: 'Answer strings should not contain duplicates within the same question' };
+  } else if (!questionBody.answers.some((answer) => answer.correct)) {
+    return { error: 'Question must have at least one correct answer' };
+  }
+
+  const questionId = currentQuiz.questions.length + 1;
+  const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
+  const colour = answer.correct ? 'green' : 'red';
+    return {
+      answerId: index,
+      answer: answer.answer,
+      colour: colour,
+      correct: answer.correct,
+    };
+  });
+
+  const newQuestion: Question = {
+    questionId: questionId,
+    question: questionBody.question,
+    duration: questionBody.duration,
+    points: questionBody.points,
+    answers: newAnswers,
+  };
+
+  currentQuiz.questions.push(newQuestion);
+
+  // Update the timeLastEdited for the quiz
+  currentQuiz.timeLastEdited = Math.floor(Date.now() / 1000);
+  setData(data);
+  // Return the questionId of the newly added question
+  return { questionId: questionId };
+}
+
 export {
   adminQuizCreate,
   adminQuizList,
@@ -295,4 +397,5 @@ export {
   adminQuizDescriptionUpdate,
   adminQuizNameUpdate,
   adminQuizRemove,
+  adminQuizQuestion
 };
