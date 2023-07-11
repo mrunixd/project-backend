@@ -1,4 +1,4 @@
-import { getData, setData, QuizIds, Question, Answer } from './dataStore';
+import { getData, setData, QuizIds, Quiz, Question, Answer } from './dataStore';
 
 interface ErrorObject {
   error: string;
@@ -14,14 +14,6 @@ interface EmptyQuizList {
 
 interface QuizList {
   quizzes: QuizIds[];
-}
-
-interface QuizInfo {
-  quizId: number;
-  name: string;
-  timeCreated: number;
-  timeLastEdited: number;
-  description: string;
 }
 
 interface answerInput {
@@ -131,6 +123,7 @@ function adminQuizCreate(
     description: description,
     numQuestions: 0,
     questions: [],
+    duration: 0
   });
 
   setData(data);
@@ -201,7 +194,7 @@ function adminQuizRemove(
 function adminQuizInfo(
   authUserId: number,
   quizId: number
-): QuizInfo | ErrorObject {
+): Quiz | ErrorObject {
   //can't interface type just be Quiz from dataStore?
   const data = getData();
 
@@ -224,6 +217,9 @@ function adminQuizInfo(
     timeCreated: selected.timeCreated,
     timeLastEdited: selected.timeLastEdited,
     description: selected.description,
+    numQuestions: selected.numQuestions,
+    questions: selected.questions,
+    duration: selected.duration //this might need to be coded
   };
 }
 
