@@ -3,6 +3,7 @@ import { getData, setData, QuizIds, Quiz, Question, Answer } from './dataStore';
 interface ErrorObject {
   error: string;
 }
+interface EmptyObject {}
 
 interface QuizId {
   quizId: number;
@@ -462,9 +463,13 @@ function adminQuizQuestionMove(
     return {
       error: 'Question Id does not refer to a valid question within this quiz',
     };
-  } else if (newPosition < 0 || newPosition > currentQuiz.questions.length - 1) {
+  } else if (
+    newPosition < 0 ||
+    newPosition > currentQuiz.questions.length - 1
+  ) {
     return {
-      error: 'NewPosition is less than 0, or NewPosition is greater than n-1 where n is the number of questions',
+      error:
+        'NewPosition is less than 0, or NewPosition is greater than n-1 where n is the number of questions',
     };
   }
   const sourceQuestion = currentQuiz.questions.find(
@@ -560,6 +565,37 @@ function adminQuizTrash(
   return { quizzes: user.trash };
 }
 
+function adminQuizRestore(
+  authUserId: number,
+  quizId: number
+): EmptyObject | ErrorObject {
+  const data = getData();
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  if (user === undefined) {
+    return { error: 'AuthUserId is not a valid user' };
+  }
+  const quizzes = data.quizzes.find((quiz) => quiz.quizId === quizId);
+  const restoredQuiz = user.trash.find((quiz) => quiz.quizId === quizId);
+  const checkQuizzes = user.quizIds.find((quiz) => quiz.quizId === quizId);
+  const index = user.trash.findIndex((trash) => trash.quizId === quizId);
+
+  if (quizzes === undefined) {
+    return { error: 'Quiz id does not refer to a valid quiz' };
+  } else if (checkQuizzes === undefined && restoredQuiz === undefined) {
+    return {
+      error: 'Quiz id does not refer to a valid quiz that this user owns',
+    };
+  } else if (restoredQuiz === undefined) {
+    return { error: 'Quiz id refers to a quiz that is not currently in trash' };
+  } else {
+    const [movingQuiz] = user.trash.splice(index, 1);
+    user.trash.push(movingQuiz);
+    quizzes.timeLastEdited = Math.floor(Date.now() / 1000);
+    setData(data);
+    return {};
+  }
+}
+
 export {
   adminQuizCreate,
   adminQuizList,
@@ -570,5 +606,6 @@ export {
   adminQuizQuestion,
   adminQuizQuestionMove,
   adminQuizQuestionDuplicate,
-  adminQuizTrash
+  adminQuizTrash,
+  adminQuizRestore,
 };

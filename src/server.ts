@@ -17,7 +17,8 @@ import {
   adminQuizQuestion,
   adminQuizQuestionMove,
   adminQuizQuestionDuplicate,
-  adminQuizTrash
+  adminQuizTrash,
+  adminQuizRestore
 } from './quiz';
 import { clear, sessionIdtoUserId, checkValidToken } from './other';
 
@@ -287,6 +288,27 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
   return res.json(response);
 });
 
+app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const { token } = req.body;
+
+  if (!checkValidToken(token)) {
+    return res.status(401).json({ error: 'token has invalid structure' });
+  }
+
+  const userId = sessionIdtoUserId(token);
+  if (userId === -1) {
+    return res.status(403).json({
+      error:
+        'Provided token is valid structure, but is not for a currently logged in session',
+    });
+  }
+  const response = adminQuizRestore(userId, quizId);
+  if ('error' in response) {
+    return res.status(400).json(response);
+  }
+  return res.json(response);
+});
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================
