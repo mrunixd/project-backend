@@ -1538,12 +1538,12 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
         nameFirst: 'aarnav',
         nameLast: 'sheth',
       });
-  
+
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
         name: 'first quiz',
         description: 'first quiz being tested',
-      });  
+      });
 
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
         token: `${person1.body.token}`,
@@ -1561,8 +1561,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
         description: 'newDescriptionToBeChangedTo'
       });
       expect(result2.status).toBe(OK);
-  
-    })
+    });
   });
 
   describe('/////// Testing v1/admin/quiz/description error(s)', () => {
@@ -1579,7 +1578,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
         token: `${person1.body.token}`,
         name: 'first quiz',
         description: 'first quiz being tested',
-      });  
+      });
 
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
         token: '1424',
@@ -1588,7 +1587,6 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
-
     });
 
     test('CASE: Token is not a valid structure - too long', () => {
@@ -1603,7 +1601,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
         token: `${person1.body.token}`,
         name: 'first quiz',
         description: 'first quiz being tested',
-      });  
+      });
 
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
         token: '142324',
@@ -1612,7 +1610,6 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
-      
     });
 
     test('CASE: Token is not a valid structure - special characters', () => {
@@ -1627,7 +1624,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
         token: `${person1.body.token}`,
         name: 'first quiz',
         description: 'first quiz being tested',
-      });  
+      });
 
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
         token: 'd@421',
@@ -1636,9 +1633,8 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
-      
     });
-  })
+  });
 
   // Status 403
   test('CASE: Provided token is valid structure, but is not for a currently logged in session', () => {
@@ -1656,7 +1652,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
     });
 
     result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
-      token: `12345`,
+      token: '12345',
       description: 'newDescription'
     });
 
@@ -1730,7 +1726,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
       token: `${person1.body.token}`,
       name: 'first quiz',
       description: 'first quiz being tested',
-    });  
+    });
 
     result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
       token: `${person1.body.token}`,
@@ -1753,7 +1749,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
       token: `${person1.body.token}`,
       name: 'first quiz',
       description: 'first quiz being tested',
-    });  
+    });
 
     result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
       token: `${person1.body.token}`,
@@ -1763,8 +1759,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
     expect(result1.body).toStrictEqual({ error: expect.any(String) });
     expect(result1.status).toBe(INPUT_ERROR);
   });
-
-})
+});
 
 describe('////////Testing v1/admin/quiz/trash////////', () => {
   beforeEach(() => {
@@ -1879,6 +1874,338 @@ describe('////////Testing v1/admin/quiz/trash////////', () => {
       result1 = getRequest('/v1/admin/quiz/trash?token=a1aaa', {});
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(UNAUTHORISED);
+    });
+  });
+});
+
+describe('///////Testing /v1/admin/quiz/transfer////////', () => {
+  const quizQuestion1Body = {
+    question: 'Who is the Monarch of England?',
+    duration: 4,
+    points: 5,
+    answers: [
+      {
+        answer: 'Prince Charles',
+        correct: false,
+      },
+      {
+        answer: 'King Charles',
+        correct: true,
+      },
+    ],
+  };
+  const quizQuestion2Body = {
+    question: 'second question?',
+    duration: 2,
+    points: 3,
+    answers: [
+      {
+        answer: 'second answer',
+        correct: false,
+      },
+      {
+        answer: 'second real answer',
+        correct: true,
+      },
+    ],
+  };
+
+  beforeEach(() => {
+    person1 = postRequest('/v1/admin/auth/register', {
+      email: 'vincentxian@gmail.com',
+      password: 'password1',
+      nameFirst: 'vincent',
+      nameLast: 'xian',
+    });
+    person2 = postRequest('/v1/admin/auth/register', {
+      email: 'aarnavsample@gmail.com',
+      password: 'Abcd12345',
+      nameFirst: 'aarnav',
+      nameLast: 'sheth',
+    });
+    quiz1 = postRequest('/v1/admin/quiz', {
+      token: `${person1.body.token}`,
+      name: 'first quiz',
+      description: 'first quiz being tested',
+    });
+    quizQuestion1 = postRequest(
+      `/v1/admin/quiz/${quiz1.body.quizId}/question`,
+      {
+        token: `${person1.body.token}`,
+        questionBody: quizQuestion1Body,
+      }
+    );
+  });
+
+  describe('Testing /v1/admin/quiz/question/move success cases', () => {
+    test('move quiz to 2nd person who already has a quiz', () => {
+      quiz2 = postRequest('/v1/admin/quiz', {
+        token: `${person2.body.token}`,
+        name: 'second quiz',
+        description: 'second quiz being tested',
+      });
+      result1 = postRequest(
+        `/v1/admin/quiz/${quiz1.body.quizId}/transfer`,
+        {
+          token: `${person1.body.token}`,
+          userEmail: 'aarnavsample@gmail.com',
+        }
+      );
+
+      result2 = getRequest(
+        `/v1/admin/quiz/${quiz1.body.quizId}?token=${person2.body.token}`,
+        {}
+      );
+      const result3 = getRequest(
+        `/v1/admin/quiz/${quiz2.body.quizId}?token=${person2.body.token}`,
+        {}
+      );
+
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toBe(OK);
+
+      expect(result2.body).toStrictEqual({
+        quizId: quiz1.body.quizId,
+        name: 'first quiz',
+        timeCreated: expect.any(Number),
+        timeLastEdited: expect.any(Number),
+        description: 'first quiz being tested',
+        numQuestions: 1,
+        questions: [{
+          questionId: quizQuestion1.body.questionId,
+          question: 'Who is the Monarch of England?',
+          duration: 4,
+          points: 5,
+          answers: [
+            {
+              answer: 'Prince Charles',
+              answerId: expect.any(Number),
+              colour: expect.any(String),
+              correct: false,
+            },
+            {
+              answer: 'King Charles',
+              answerId: expect.any(Number),
+              colour: expect.any(String),
+              correct: true,
+            },
+          ],
+        }],
+        duration: 4
+      });
+      expect(result3.body).toStrictEqual({
+        quizId: quiz2.body.quizId,
+        name: 'second quiz',
+        timeCreated: expect.any(Number),
+        timeLastEdited: expect.any(Number),
+        description: 'second quiz being tested',
+        numQuestions: 0,
+        questions: [],
+        duration: 0
+      });
+    });
+
+    test('duplicate 1st question after transfer to 2nd person', () => {
+      quizQuestion2 = postRequest(
+        `/v1/admin/quiz/${quiz1.body.quizId}/question`,
+        {
+          token: `${person1.body.token}`,
+          questionBody: quizQuestion2Body,
+        }
+      );
+
+      result1 = postRequest(
+        `/v1/admin/quiz/${quiz1.body.quizId}/transfer`,
+        {
+          token: `${person1.body.token}`,
+          userEmail: 'aarnavsample@gmail.com',
+        }
+      );
+
+      const expectedTime = Math.floor(Date.now() / 1000);
+      const quizQuestion3 = postRequest(
+        `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}/duplicate`,
+        {
+          token: `${person2.body.token}`,
+        }
+      );
+      result2 = getRequest(
+        `/v1/admin/quiz/${quiz1.body.quizId}?token=${person2.body.token}`,
+        {}
+      );
+      const result3 = getRequest(
+        `/v1/admin/quiz/${quiz1.body.quizId}?token=${person1.body.token}`,
+        {}
+      );
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toBe(OK);
+
+      expect(result3.status).toBe(INPUT_ERROR);
+
+      expect(result2.body.timeLastEdited).toBeGreaterThanOrEqual(expectedTime);
+      expect(result2.body).toStrictEqual({
+        quizId: quiz1.body.quizId,
+        name: 'first quiz',
+        timeCreated: expect.any(Number),
+        timeLastEdited: expect.any(Number),
+        description: 'first quiz being tested',
+        numQuestions: 3,
+        questions: [
+          {
+            questionId: quizQuestion1.body.questionId,
+            question: 'Who is the Monarch of England?',
+            duration: 4,
+            points: 5,
+            answers: [
+              {
+                answer: 'Prince Charles',
+                answerId: expect.any(Number),
+                colour: expect.any(String),
+                correct: false,
+              },
+              {
+                answer: 'King Charles',
+                answerId: expect.any(Number),
+                colour: expect.any(String),
+                correct: true,
+              },
+            ],
+          }, {
+            questionId: quizQuestion3.body.newQuestionId,
+            question: 'Who is the Monarch of England?',
+            duration: 4,
+            points: 5,
+            answers: [
+              {
+                answer: 'Prince Charles',
+                answerId: expect.any(Number),
+                colour: expect.any(String),
+                correct: false,
+              },
+              {
+                answer: 'King Charles',
+                answerId: expect.any(Number),
+                colour: expect.any(String),
+                correct: true,
+              },
+            ],
+          }, {
+            questionId: quizQuestion2.body.questionId,
+            question: 'second question?',
+            duration: 2,
+            points: 3,
+            answers: [
+              {
+                answer: 'second answer',
+                answerId: expect.any(Number),
+                colour: expect.any(String),
+                correct: false,
+              },
+              {
+                answer: 'second real answer',
+                answerId: expect.any(Number),
+                colour: expect.any(String),
+                correct: true,
+              },
+            ],
+          },
+        ],
+        duration: 10,
+      });
+    });
+  });
+  describe('Testing /v1/admin/quiz/transfer error cases', () => {
+    test('CASE (401): Token is not a valid structure - special symbols', () => {
+      result1 = postRequest(
+        `/v1/admin/quiz/${quiz1.body.quizId}/transfer`,
+        {
+          token: `${'le1!!'}`,
+          userEmail: 'aarnavsample@gmail.com',
+        }
+      );
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(UNAUTHORISED);
+    });
+
+    test('CASE (403): Provided token is valid structure, but is not for a currently logged in session', () => {
+      const sessionId = parseInt(person1.body.token) + 1;
+      result1 = postRequest(
+        `/v1/admin/quiz/${quiz1.body.quizId}/transfer`,
+        {
+          token: `${sessionId}`,
+          userEmail: 'aarnavsample@gmail.com',
+        }
+      );
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(FORBIDDEN);
+    });
+
+    test('CASE (400): Quiz ID does not refer to a valid quiz', () => {
+      result1 = postRequest(
+        `/v1/admin/quiz/${quiz1.body.quizId + 1}/transfer`,
+        {
+          token: `${person1.body.token}`,
+          userEmail: 'aarnavsample@gmail.com',
+        }
+      );
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE (400): Quiz ID does not refer to a quiz that this user owns', () => {
+      const person3 = postRequest('/v1/admin/auth/register', {
+        email: 'manan.j2450@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Manan',
+        nameLast: 'Jaiswal',
+      });
+      result1 = postRequest(
+        `/v1/admin/quiz/${quiz1.body.quizId}/transfer`,
+        {
+          token: `${person2.body.token}`,
+          userEmail: 'manan.j2450@gmail.com',
+        }
+      );
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+    test('CASE (400): userEmail is not a real user', () => {
+      result1 = postRequest(
+        `/v1/admin/quiz/${quiz1.body.quizId}/transfer`,
+        {
+          token: `${person1.body.token}`,
+          userEmail: 'fakeEmail',
+        }
+      );
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+    test('CASE (400): userEmail is the current logged in user', () => {
+      result1 = postRequest(
+        `/v1/admin/quiz/${quiz1.body.quizId}/transfer`,
+        {
+          token: `${person1.body.token}`,
+          userEmail: 'vincentxian@gmail.com',
+        }
+      );
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+    test('CASE (400): Quiz ID refers to a quiz that has a name that is already used by the target user', () => {
+      quiz2 = postRequest('/v1/admin/quiz', {
+        token: `${person2.body.token}`,
+        name: 'first quiz',
+        description: 'second quiz being tested',
+      });
+      result1 = postRequest(
+        `/v1/admin/quiz/${quiz1.body.quizId}/transfer`,
+        {
+          token: `${person1.body.token}`,
+          userEmail: 'aarnavsample@gmail.com',
+        }
+      );
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
     });
   });
 });
@@ -2537,7 +2864,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       );
     });
     test('Testing successful restoration of 1 quiz', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       const result1 = postRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}/restore`,
         { token: sessionId }
@@ -2546,7 +2873,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       expect(result1.status).toStrictEqual(OK);
     });
     test('Testing successful restoration of 2 quiz', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       deleteRequest(
         `/v1/admin/quiz/${quiz2.body.quizId}?token=${sessionId}`,
         {}
@@ -2578,7 +2905,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       );
     });
     test('CASE (400): Quiz id does not refer to a valid quiz', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       const result1 = postRequest(
         `/v1/admin/quiz/${quiz1.body.quizId + 1}/restore`,
         { token: sessionId }
@@ -2608,7 +2935,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (401): Token is not a valid structure', () => {
-      const result1 = postRequest(`/v1/admin/quiz/1111/restore`, {
+      const result1 = postRequest('/v1/admin/quiz/1111/restore', {
         token: '1234_',
       });
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
