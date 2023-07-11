@@ -835,7 +835,7 @@ describe('///////Testing /v1/admin/quiz/ info////////', () => {
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),
         description: 'first quiz being tested',
-        numQuestions: 0,
+        numQuestions: 2,
         questions: [{
           questionId: quizQuestion1.body.questionId,
           question: 'Who is the Monarch of England?',
@@ -1484,8 +1484,27 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
 
     // Status 403
     test('CASE: Provided token is valid structure, but is not for a currently logged in session', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'aarnavsample@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'aarnav',
+        nameLast: 'sheth',
+      });
+  
+      quiz1 = postRequest('/v1/admin/quiz', {
+        token: `${person1.body.token}`,
+        name: 'first quiz',
+        description: 'first quiz being tested'
+      });
 
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
+        token: '12345',
+        name: 'newQuizName'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(FORBIDDEN);
     });
 
-  })
-})
+  });
+});

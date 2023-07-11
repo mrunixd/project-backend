@@ -14,10 +14,10 @@ import {
   adminQuizRemove,
   adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
-  adminQuizQuestion
+  adminQuizQuestion,
+  adminQuizQuestionDuplicate
 } from './quiz';
 import { clear, sessionIdtoUserId } from './other';
-import { DataStore, getData, setData } from './dataStore';
 
 // Set up web app
 const app = express();

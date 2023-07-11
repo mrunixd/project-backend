@@ -169,9 +169,6 @@ function adminAuthLogin(email: string, password: string): SessionId | ErrorObjec
   });
   setData(data);
 
-  // return {
-  //   authUserId: user.authUserId,
-  // };
   return {
     token: sessionId
   };
