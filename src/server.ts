@@ -224,7 +224,7 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   }
 
   const userId = sessionIdtoUserId(token);
-  
+
   // Status 403
   if (userId === -1) {
     return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' });
@@ -238,7 +238,6 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
 
   // Status 200
   return res.status(200).json(response);
-
 });
 
 // ====================================================================

@@ -1232,7 +1232,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
   });
 });
 
-//////////////////////////// NAME UPDATE ///////////////////////////
+/// ///////////////////////// NAME UPDATE ///////////////////////////
 
 describe('/////// TESTING v1/admin/quiz/name ///////', () => {
   describe('/////// Testing v1/admin/quiz/name success', () => {
@@ -1244,7 +1244,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         nameFirst: 'aarnav',
         nameLast: 'sheth'
       });
-  
+
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
         name: 'first quiz',
@@ -1255,15 +1255,15 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         token: `${person1.body.token}`,
         name: 'newQuizName'
       });
-  
+
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
-  
-      // Verifying that the quiz name has changed. 
+
+      // Verifying that the quiz name has changed.
       result2 = getRequest('/v1/admin/quiz/list', {
         token: `${person1.body.token}`
       });
-  
+
       expect(result2.body).toStrictEqual({
         quizzes: [
           {
@@ -1273,8 +1273,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         ],
       });
       expect(result2.status).toBe(OK);
-
-    })
+    });
   });
 
   // Tests if adminQuizNameUpdate returns an error.
@@ -1287,7 +1286,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         nameFirst: 'aarnav',
         nameLast: 'sheth',
       });
-  
+
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
         name: 'first quiz',
@@ -1297,11 +1296,10 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId + 1}/name`, {
         token: person1.body.token,
         name: 'newQuizName'
-      });     
+      });
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
-
     });
 
     test('CASE: quizId does not refer to a quiz that this user owns', () => {
@@ -1311,7 +1309,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         nameFirst: 'aarnav',
         nameLast: 'sheth',
       });
-  
+
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
         name: 'first quiz',
@@ -1328,11 +1326,10 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
         token: person2.body.token,
         name: 'newQuizName'
-      }); 
+      });
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
-      
     });
 
     test('CASE: Name contains invalid characters', () => {
@@ -1342,7 +1339,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         nameFirst: 'aarnav',
         nameLast: 'sheth',
       });
-  
+
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
         name: 'first quiz',
@@ -1365,7 +1362,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         nameFirst: 'aarnav',
         nameLast: 'sheth',
       });
-  
+
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
         name: 'first quiz',
@@ -1379,7 +1376,6 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
-
     });
 
     test('CASE: Name is more than 30 characters long', () => {
@@ -1389,7 +1385,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         nameFirst: 'aarnav',
         nameLast: 'sheth',
       });
-  
+
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
         name: 'first quiz',
@@ -1403,7 +1399,6 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
-
     });
 
     test('CASE: Name is already used in the current logged in user for another quiz', () => {
@@ -1413,7 +1408,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         nameFirst: 'aarnav',
         nameLast: 'sheth',
       });
-  
+
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
         name: 'first quiz',
@@ -1424,18 +1419,17 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         token: person1.body.token,
         name: 'existingQuiz',
         description: 'A pre-existing quiz with the name "existingQuiz".'
-      })
+      });
 
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizid}/name`, {
         token: person1.body.token,
         name: 'existingQuiz'
-      })
+      });
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
-
     });
-      
+
     // Status 401
     test('CASE: Token is not a valid structure - too short', () => {
       person1 = postRequest('/v1/admin/auth/register', {
@@ -1444,7 +1438,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         nameFirst: 'aarnav',
         nameLast: 'sheth',
       });
-  
+
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
         name: 'first quiz',
@@ -1467,7 +1461,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         nameFirst: 'aarnav',
         nameLast: 'sheth',
       });
-  
+
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
         name: 'first quiz',
@@ -1491,7 +1485,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         nameFirst: 'aarnav',
         nameLast: 'sheth',
       });
-  
+
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
         name: 'first quiz',
@@ -1506,10 +1500,8 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(FORBIDDEN);
     });
-
   });
 });
-
 
 describe('////////Testing v1/admin/quiz/trash////////', () => {
   beforeEach(() => {
@@ -1540,7 +1532,7 @@ describe('////////Testing v1/admin/quiz/trash////////', () => {
       });
     });
     test('succesfully removing 1 quiz and viewing in trash', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       deleteRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}?token=${sessionId}`,
         {}
@@ -1557,7 +1549,7 @@ describe('////////Testing v1/admin/quiz/trash////////', () => {
       expect(result1.status).toBe(OK);
     });
     test('succesfully removing all quizzes and viewing in trash', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       deleteRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}?token=${sessionId}`,
         {}
@@ -1590,7 +1582,7 @@ describe('////////Testing v1/admin/quiz/trash////////', () => {
       expect(result1.status).toBe(OK);
     });
     test('checking successful empty trash', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       result1 = getRequest(`/v1/admin/quiz/trash?token=${sessionId}`, {});
       expect(result1.body).toStrictEqual({
         quizzes: [],
@@ -1607,21 +1599,20 @@ describe('////////Testing v1/admin/quiz/trash////////', () => {
       });
     });
     test('CASE (403): provided token is a valid structure, but is not for a currently logged on session', () => {
-      let sessionId = person1.body.token
+      const sessionId = person1.body.token;
       result1 = getRequest(`/v1/admin/quiz/trash?token=${parseInt(sessionId) - 1}`, {});
-      expect(result1.body).toStrictEqual({error: expect.any(String)});
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(FORBIDDEN);
     });
     test('CASE (401): token is not valid structure', () => {
-      result1 = getRequest(`/v1/admin/quiz/trash?token=hi!!!`, {});
-      expect(result1.body).toStrictEqual({error: expect.any(String)});
+      result1 = getRequest('/v1/admin/quiz/trash?token=hi!!!', {});
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(UNAUTHORISED);
     });
     test('CASE (401): token is not valid structure', () => {
-      result1 = getRequest(`/v1/admin/quiz/trash?token=a1aaa`, {});
-      expect(result1.body).toStrictEqual({error: expect.any(String)});
+      result1 = getRequest('/v1/admin/quiz/trash?token=a1aaa', {});
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(UNAUTHORISED);
     });
   });
 });
-
