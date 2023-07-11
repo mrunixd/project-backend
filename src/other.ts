@@ -13,7 +13,6 @@ function clear() {
     users: [],
     quizzes: [],
     tokens: [],
-    trash: [],
     unclaimedQuestionId: 0
   };
   setData(clearData);

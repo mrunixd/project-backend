@@ -51,7 +51,6 @@ export interface DataStore {
   users: User[];
   quizzes: Quiz[];
   tokens: Token[];
-  trash: Quiz[];
   unclaimedQuestionId: number;
 }
 

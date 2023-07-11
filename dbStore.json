@@ -1,1 +1,1 @@
-{"users":[],"quizzes":[],"tokens":[],"trash":[],"unclaimedQuestionId":0}
+{"users":[{"email":"vincentxian@gmail.com","password":"vincentpassword1","name":"vincent xian","authUserId":0,"numSuccessfulLogins":1,"numFailedPasswordsSinceLastLogin":0,"quizIds":[],"trash":[]}],"quizzes":[],"tokens":[{"sessionId":"12858","authUserId":0}],"unclaimedQuestionId":0}
