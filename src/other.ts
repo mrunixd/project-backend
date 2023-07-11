@@ -6,14 +6,15 @@
  * @returns {}
  *
 */
-import { setData, getData, DataStore, SessionId, ErrorObject } from './dataStore';
+import { setData, getData, DataStore } from './dataStore';
 
 function clear() {
   const clearData: DataStore = {
     users: [],
     quizzes: [],
     tokens: [],
-    trash: []
+    trash: [],
+    unclaimedQuestionId: 0
   };
   setData(clearData);
   return {};

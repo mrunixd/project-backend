@@ -32,6 +32,10 @@ interface QuestionId {
   questionId: number;
 }
 
+interface NewQuestionId {
+  newQuestionId: number;
+}
+
 /**
  * This function provides a list of all the quizzes owned by the currently
  * logged in user.
@@ -210,9 +214,6 @@ function adminQuizInfo(
     return { error: 'Quiz Id does not refer to a quiz that this user owns' };
   }
 
-  const totalDuration = (total: number, question: Question) => { return total + question.duration; };
-  const quizDuration = selected.questions.reduce(totalDuration, 0);
-
   return {
     quizId: selected.quizId,
     name: selected.name,
@@ -221,7 +222,7 @@ function adminQuizInfo(
     description: selected.description,
     numQuestions: selected.numQuestions,
     questions: selected.questions,
-    duration: quizDuration
+    duration: selected.duration
   };
 }
 
@@ -364,7 +365,6 @@ function adminQuizQuestion(authUserId: number, quizId: number, questionBody: que
     return { error: 'Question must have at least one correct answer' };
   }
 
-  const questionId = currentQuiz.questions.length;
   const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
     const colour = answer.correct ? 'green' : 'red';
     return {
@@ -374,7 +374,8 @@ function adminQuizQuestion(authUserId: number, quizId: number, questionBody: que
       correct: answer.correct,
     };
   });
-
+  const questionId = data.unclaimedQuestionId;
+  // const questionId = currentQuiz.questions.length;
   const newQuestion: Question = {
     questionId: questionId,
     question: questionBody.question,
@@ -383,13 +384,66 @@ function adminQuizQuestion(authUserId: number, quizId: number, questionBody: que
     answers: newAnswers,
   };
 
+  data.unclaimedQuestionId++;
   currentQuiz.questions.push(newQuestion);
 
-  // Update the timeLastEdited for the quiz
+  // Update the timeLastEdited for the quiz and total duration
   currentQuiz.timeLastEdited = Math.floor(Date.now() / 1000);
+  const totalDuration = (total: number, question: Question) => { return total + question.duration; };
+  currentQuiz.duration = currentQuiz.questions.reduce(totalDuration, 0);
+  currentQuiz.numQuestions++;
+
   setData(data);
   // Return the questionId of the newly added question
   return { questionId: questionId };
+}
+
+/**
+ * This function duplicates a question and adds it directly afterwards.
+ *
+ * @param {number} authUserId
+ * @param {number} quizId
+ * @param {number} questionId
+ *
+ * @returns {{questionId: number}}
+ *
+ */
+function adminQuizQuestionDuplicate(authUserId: number, quizId: number, questionId: number): NewQuestionId | ErrorObject {
+  const data = getData();
+
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
+
+  // Error checking block
+  if (user === undefined) {
+    return { error: 'AuthUserId is not a valid user' };
+  } else if (currentQuiz === undefined) {
+    return { error: 'Quiz ID does not refer to a valid quiz' };
+  } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
+    return { error: 'Quiz ID does not refer to a quiz that this user owns' };
+  } else if (!currentQuiz.questions.some((question) => question.questionId === questionId)) {
+    return { error: 'Question Id does not refer to a valid question within this quiz' };
+  }
+
+  // Create a copy 'newQuestion' and splice to correct index
+  const sourceQuestion = currentQuiz.questions.find((question) => question.questionId === questionId);
+  const questionIndex = currentQuiz.questions.indexOf(sourceQuestion);
+  const newQuestion = { ...sourceQuestion };
+
+  // also increment unclaimedQuestionId
+  newQuestion.questionId = data.unclaimedQuestionId;
+  data.unclaimedQuestionId++;
+
+  currentQuiz.questions.splice(questionIndex + 1, 0, newQuestion);
+
+  // Update values for currentQuiz: timeLastEdited & duration & numQuestions
+  currentQuiz.timeLastEdited = Math.floor(Date.now() / 1000);
+  const totalDuration = (total: number, question: Question) => { return total + question.duration; };
+  currentQuiz.duration = currentQuiz.questions.reduce(totalDuration, 0);
+  currentQuiz.numQuestions++;
+
+  setData(data);
+  return { newQuestionId: newQuestion.questionId };
 }
 
 export {
@@ -399,5 +453,6 @@ export {
   adminQuizDescriptionUpdate,
   adminQuizNameUpdate,
   adminQuizRemove,
-  adminQuizQuestion
+  adminQuizQuestion,
+  adminQuizQuestionDuplicate
 };
