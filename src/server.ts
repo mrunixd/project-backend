@@ -219,8 +219,8 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   const { token, name } = req.body;
 
   // Status 401
-  if (token.length !== 5 || /\d/.test(token) === false) {
-    return res.status(401).json({ error: 'Token has invalid structure' });
+  if (!checkValidToken(token)) {
+    return res.status(401).json({ error: 'token has invalid structure' });
   }
 
   const userId = sessionIdtoUserId(token);
