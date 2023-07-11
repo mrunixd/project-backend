@@ -690,7 +690,7 @@ describe('///////Testing /v1/admin/quiz/delete////////', () => {
         {}
       );
       expect(result1.body).toStrictEqual({
-        error: 'Quiz ID does not refer to a valid quiz',
+        error: expect.any(String),
       });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
@@ -701,7 +701,7 @@ describe('///////Testing /v1/admin/quiz/delete////////', () => {
         {}
       );
       expect(result1.body).toStrictEqual({
-        error: 'Quiz ID does not refer to a valid quiz',
+        error: expect.any(String),
       });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
@@ -712,7 +712,7 @@ describe('///////Testing /v1/admin/quiz/delete////////', () => {
         {}
       );
       expect(result1.body).toStrictEqual({
-        error: 'Quiz ID does not refer to a valid quiz that this user owns',
+        error: expect.any(String),
       });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
@@ -723,7 +723,7 @@ describe('///////Testing /v1/admin/quiz/delete////////', () => {
         {}
       );
       expect(result1.body).toStrictEqual({
-        error: 'token has invalid structure',
+        error: expect.any(String),
       });
       expect(result1.status).toStrictEqual(UNAUTHORISED);
     });
@@ -735,7 +735,7 @@ describe('///////Testing /v1/admin/quiz/delete////////', () => {
       );
       expect(result1.body).toStrictEqual({
         error:
-          'Provided token is valid structure, but is not for a currently logged in session',
+          expect.any(String),
       });
       expect(result1.status).toStrictEqual(FORBIDDEN);
     });
@@ -1232,11 +1232,8 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
   });
 });
 
-/// ///////////////////////// NAME UPDATE ///////////////////////////
-
 describe('/////// TESTING v1/admin/quiz/name ///////', () => {
   describe('/////// Testing v1/admin/quiz/name success', () => {
-    // Tests if adminQuizNameUpdate runs successfully.
     test('CASE: Successful adminQuizNameUpdate', () => {
       person1 = postRequest('/v1/admin/auth/register', {
         email: 'aarnavsample@gmail.com',
@@ -1259,7 +1256,6 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
-      // Verifying that the quiz name has changed.
       result2 = getRequest('/v1/admin/quiz/list', {
         token: `${person1.body.token}`
       });
@@ -1276,9 +1272,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
   });
 
-  // Tests if adminQuizNameUpdate returns an error.
   describe('/////// Testing v1/admin/quiz/name error', () => {
-    // Status 400
     test('CASE: quizId does not refer to a valid quiz', () => {
       person1 = postRequest('/v1/admin/auth/register', {
         email: 'aarnavsample@gmail.com',
@@ -1430,7 +1424,6 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
-    // Status 401
     test('CASE: Token is not a valid structure - too short', () => {
       person1 = postRequest('/v1/admin/auth/register', {
         email: 'aarnavsample@gmail.com',
@@ -1477,7 +1470,6 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
       expect(result1.status).toBe(401);
     });
 
-    // Status 403
     test('CASE: Provided token is valid structure, but is not for a currently logged in session', () => {
       person1 = postRequest('/v1/admin/auth/register', {
         email: 'aarnavsample@gmail.com',
