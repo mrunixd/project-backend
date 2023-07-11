@@ -51,6 +51,7 @@ export interface DataStore {
   quizzes: Quiz[];
   tokens: Token[];
   trash: Quiz[];
+  unclaimedQuestionId: number;
 }
 
 export interface SessionId {
@@ -60,20 +61,14 @@ export interface ErrorObject {
   error: string;
 }
 
-const data: DataStore = {
-  users: [],
-  quizzes: [],
-  tokens: [],
-  trash: []
-};
+// const data: DataStore = {
+//   users: [],
+//   quizzes: [],
+//   tokens: [],
+//   trash: [],
+//   unclaimedQuestionId: 0,
+// };
 
-// function getData(): DataStore {
-//   return data;
-// }
-
-// function setData(newData: DataStore) {
-//   data = newData;
-// }
 function setData(data: DataStore) {
   fs.writeFileSync('./dbStore.json', JSON.stringify(data));
 }

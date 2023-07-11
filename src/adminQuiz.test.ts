@@ -31,6 +31,10 @@ beforeEach(() => {
   quizQuestion = undefined;
 });
 
+// ====================================================================
+//  == TESTS ARE NO LONGER BLACKBOX AS THEY AREN'T TESTED FOR ITER2 ==
+// ====================================================================
+
 test('DUD CASE, DELETE THIS AFTER IMPLEMENTING QUIZ FUNCTIONS IN ITER2', () => {
   expect(1).toBe(1);
 });
