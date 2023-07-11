@@ -1,4 +1,4 @@
-import { getData, setData, QuizIds, Question, Answer } from './dataStore';
+import { getData, setData, QuizIds, Quiz, Question, Answer } from './dataStore';
 
 interface ErrorObject {
   error: string;
@@ -14,14 +14,6 @@ interface EmptyQuizList {
 
 interface QuizList {
   quizzes: QuizIds[];
-}
-
-interface QuizInfo {
-  quizId: number;
-  name: string;
-  timeCreated: number;
-  timeLastEdited: number;
-  description: string;
 }
 
 interface answerInput {
@@ -131,6 +123,7 @@ function adminQuizCreate(
     description: description,
     numQuestions: 0,
     questions: [],
+    duration: 0
   });
 
   setData(data);
@@ -155,7 +148,6 @@ function adminQuizRemove(
 ): Record<string, never> | ErrorObject {
   const data = getData();
   const user = data.users.find((user) => user.authUserId === authUserId);
-  const quiz = data.trash.find((item) => item.quizId === quizId);
   // Error checking block
   if (user === undefined) {
     return { error: 'AuthUserId is not a valid user' };
@@ -201,8 +193,8 @@ function adminQuizRemove(
 function adminQuizInfo(
   authUserId: number,
   quizId: number
-): QuizInfo | ErrorObject {
-  //can't interface type just be Quiz from dataStore?
+): Quiz | ErrorObject {
+  // can't interface type just be Quiz from dataStore?
   const data = getData();
 
   // Save the selected user to be used for error checking & return values
@@ -218,12 +210,18 @@ function adminQuizInfo(
     return { error: 'Quiz Id does not refer to a quiz that this user owns' };
   }
 
+  const totalDuration = (total: number, question: Question) => { return total + question.duration; };
+  const quizDuration = selected.questions.reduce(totalDuration, 0);
+
   return {
     quizId: selected.quizId,
     name: selected.name,
     timeCreated: selected.timeCreated,
     timeLastEdited: selected.timeLastEdited,
     description: selected.description,
+    numQuestions: selected.numQuestions,
+    questions: selected.questions,
+    duration: quizDuration
   };
 }
 
@@ -366,9 +364,9 @@ function adminQuizQuestion(authUserId: number, quizId: number, questionBody: que
     return { error: 'Question must have at least one correct answer' };
   }
 
-  const questionId = currentQuiz.questions.length + 1;
+  const questionId = currentQuiz.questions.length;
   const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
-  const colour = answer.correct ? 'green' : 'red';
+    const colour = answer.correct ? 'green' : 'red';
     return {
       answerId: index,
       answer: answer.answer,

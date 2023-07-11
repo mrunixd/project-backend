@@ -38,6 +38,12 @@ export interface Quiz {
   description: string;
   numQuestions: number;
   questions: Question[];
+  duration: number;
+}
+
+export interface Token {
+  sessionId: string;
+  authUserId: number;
 }
 
 export interface DataStore {
@@ -54,12 +60,7 @@ export interface ErrorObject {
   error: string;
 }
 
-export interface Token {
-  sessionId: string;
-  authUserId: number;
-}
-
-let data: DataStore = {
+const data: DataStore = {
   users: [],
   quizzes: [],
   tokens: [],
@@ -69,7 +70,6 @@ let data: DataStore = {
 // function getData(): DataStore {
 //   return data;
 // }
-
 
 // function setData(newData: DataStore) {
 //   data = newData;
