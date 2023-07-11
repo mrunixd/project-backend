@@ -5,7 +5,7 @@
  *
  * @returns {}
  *
-*/
+ */
 import { setData, getData, DataStore } from './dataStore';
 
 function clear() {
@@ -13,7 +13,7 @@ function clear() {
     users: [],
     quizzes: [],
     tokens: [],
-    unclaimedQuestionId: 0
+    unclaimedQuestionId: 0,
   };
   setData(clearData);
   return {};
@@ -21,7 +21,9 @@ function clear() {
 
 function sessionIdtoUserId(sessionId: string): number {
   const data = getData();
-  const selectedToken = data.tokens.find((token) => token.sessionId === sessionId);
+  const selectedToken = data.tokens.find(
+    (token) => token.sessionId === sessionId
+  );
 
   if (selectedToken === undefined) {
     return -1;
