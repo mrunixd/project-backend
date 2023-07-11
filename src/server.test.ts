@@ -1299,7 +1299,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
       });
 
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId + 1}/name`, {
-        token: person1.body.token,
+        token: `${person1.body.token}`,
         name: 'newQuizName',
       });
 
