@@ -32,9 +32,9 @@ function sessionIdtoUserId(sessionId: string): number {
 
 function checkValidToken(token: string): boolean {
   if (token.length !== 5 || /^\d+$/.test(token) === false) {
-      return false;
+    return false;
   }
   return true;
-};
+}
 
 export { clear, sessionIdtoUserId, checkValidToken };
