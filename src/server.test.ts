@@ -1531,7 +1531,6 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
 
 describe('/////// TESTING v1/admin/quiz/description ///////', () => {
   describe('//////// Testing v1/admin/quiz/description success ////////', () => {
-    // Tests if adminQuizDescriptionUpdate runs successfully.
     test('CASE: Successful adminQuizDescriptionUpdate', () => {
       person1 = postRequest('/v1/admin/auth/register', {
         email: 'aarnavsample@gmail.com',
@@ -1550,29 +1549,21 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
         token: `${person1.body.token}`,
         description: 'newDescriptionToBeChangedTo'
       });
+
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toBe(OK);
+
+      result2 = getRequest(`/v1/admin/quiz/${quiz1.body.quizId}`, {
+        token: `${person1.body.token}`
+      });
+
+      expect(result2.body).toMatchObject({
+        description: 'newDescriptionToBeChangedTo'
+      });
+      expect(result2.status).toBe(OK);
+  
     })
-    
-    expect(result1.body).toStrictEqual({});
-    expect(result1.status).toBe(OK);
-
-    // Verifying that the quiz description has changed. 
-    result2 = getRequest('v1/admin/quiz/list', {
-      token: `${person1.body.token}`
-    });
-
-    expect(result2.body).toStrictEqual({
-      quizzes: [
-        {
-          quizId: quiz1.body.quizId,
-          description: 'newDescriptionToBeChangedTo',
-        },
-      ],
-    });
-    expect(result2.status).toBe(OK);
-
   });
-
-  ////////////////////////////////////////////////////////////////////////////////
 
   describe('/////// Testing v1/admin/quiz/description error(s)', () => {
     // Status 401
@@ -1718,7 +1709,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
       nameLast: 'Zhao',
     });
 
-    result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
+    result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
       token: `${person2.body.token}`,
       description: 'newDescription',
     });
