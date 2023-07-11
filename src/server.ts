@@ -15,9 +15,10 @@ import {
   adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
   adminQuizQuestion,
-  adminQuizQuestionDuplicate
+  adminQuizQuestionDuplicate,
+  adminQuizTrash
 } from './quiz';
-import { clear, sessionIdtoUserId } from './other';
+import { clear, sessionIdtoUserId, checkValidToken } from './other';
 
 // Set up web app
 const app = express();
@@ -86,7 +87,7 @@ app.delete('/v1/clear', (req: Request, res: Response) => {
 app.get('/v1/admin/user/details', (req: Request, res: Response) => {
   const token = req.query.token.toString();
 
-  if (token.length !== 5 || /\d/.test(token) === false) {
+  if (!checkValidToken(token)) {
     return res.status(401).json({ error: 'token has invalid structure' });
   }
   const userId = sessionIdtoUserId(token);
@@ -104,7 +105,7 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const { token, name, description } = req.body;
 
-  if (token.length !== 5 || /\d/.test(token) === false) {
+  if (!checkValidToken(token)) {
     return res.status(401).json({ error: 'token has invalid structure' });
   }
   const userId = sessionIdtoUserId(token);
@@ -125,7 +126,7 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
 app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   const token = req.query.token.toString();
 
-  if (token.length !== 5 || /\d/.test(token) === false) {
+  if (!checkValidToken(token)) {
     return res.status(401).json({ error: 'token has invalid structure' });
   }
   const userId = sessionIdtoUserId(token);
@@ -140,11 +141,24 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   return res.json(response);
 });
 
+app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
+  const token = req.query.token.toString();
+  if (!checkValidToken(token)) {
+    return res.status(401).json({ error: 'token has invalid structure' });
+  }
+  const userId = sessionIdtoUserId(token);
+  if (userId === -1) {
+    return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' });
+  }
+  const response = adminQuizTrash(userId);
+  return res.json(response);
+});
+
 app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const quizid = parseInt(req.params.quizid);
   const token = req.query.token.toString();
 
-  if (token.length !== 5 || /\d/.test(token) === false) {
+  if (!checkValidToken(token)) {
     return res.status(401).json({ error: 'token has invalid structure' });
   }
   const userId = sessionIdtoUserId(token);
@@ -165,7 +179,7 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const quizid = parseInt(req.params.quizid);
   const token = (req.query.token).toString();
 
-  if (token.length !== 5 || /\d/.test(token) === false) {
+  if (!checkValidToken(token)) {
     return res.status(401).json({ error: 'token has invalid structure' });
   }
   const userId = sessionIdtoUserId(token);
@@ -184,7 +198,7 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const { token, questionBody } = req.body;
 
-  if (token.length !== 5 || /\d/.test(token) === false) {
+  if (!checkValidToken(token)) {
     return res.status(401).json({ error: 'token has invalid structure' });
   }
 
@@ -210,7 +224,7 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   }
 
   const userId = sessionIdtoUserId(token);
-
+  
   // Status 403
   if (userId === -1) {
     return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' });
@@ -224,6 +238,7 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
 
   // Status 200
   return res.status(200).json(response);
+
 });
 
 // ====================================================================

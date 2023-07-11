@@ -30,4 +30,11 @@ function sessionIdtoUserId(sessionId: string): number {
   return selectedToken.authUserId;
 }
 
-export { clear, sessionIdtoUserId };
+function checkValidToken(token: string): boolean {
+  if (token.length !== 5 || /^\d+$/.test(token) === false) {
+      return false;
+  }
+  return true;
+};
+
+export { clear, sessionIdtoUserId, checkValidToken };
