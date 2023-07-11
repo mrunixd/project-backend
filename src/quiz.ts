@@ -3,7 +3,6 @@ import { getData, setData, QuizIds, Quiz, Question, Answer } from './dataStore';
 interface ErrorObject {
   error: string;
 }
-interface EmptyObject {}
 
 interface QuizId {
   quizId: number;
@@ -439,7 +438,7 @@ function adminQuizQuestion(
 function adminQuizTransfer(
   authUserId: number,
   quizId: number,
-  userEmail: string,
+  userEmail: string
 ): Record<string, never> | ErrorObject {
   const data = getData();
 
@@ -616,7 +615,7 @@ function adminQuizTrash(
 function adminQuizRestore(
   authUserId: number,
   quizId: number
-): EmptyObject | ErrorObject {
+): Record<string, never> | ErrorObject {
   const data = getData();
   const user = data.users.find((user) => user.authUserId === authUserId);
   if (user === undefined) {
@@ -641,7 +640,6 @@ function adminQuizRestore(
   quizzes.timeLastEdited = Math.floor(Date.now() / 1000);
   setData(data);
   return {};
-  
 }
 
 export {
