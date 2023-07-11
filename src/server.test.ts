@@ -2825,7 +2825,6 @@ describe('///////Testing /v1/admin/quiz/question/duplicate////////', () => {
     });
   });
 });
-
 describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
   beforeEach(() => {
     person1 = postRequest('/v1/admin/auth/register', {
@@ -2864,7 +2863,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       );
     });
     test('Testing successful restoration of 1 quiz', () => {
-      const sessionId = person1.body.token;
+      let sessionId = person1.body.token;
       const result1 = postRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}/restore`,
         { token: sessionId }
@@ -2873,7 +2872,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       expect(result1.status).toStrictEqual(OK);
     });
     test('Testing successful restoration of 2 quiz', () => {
-      const sessionId = person1.body.token;
+      let sessionId = person1.body.token;
       deleteRequest(
         `/v1/admin/quiz/${quiz2.body.quizId}?token=${sessionId}`,
         {}
@@ -2891,6 +2890,26 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       expect(result2.body).toStrictEqual({});
       expect(result2.status).toStrictEqual(OK);
     });
+    test('Testing successful restoratiasdfdon of 2 quiz', () => {
+      let sessionId = person1.body.token;
+      deleteRequest(
+        `/v1/admin/quiz/${quiz3.body.quizId}?token=${sessionId}`,
+        {}
+      );
+      postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/restore`, {
+        token: sessionId,
+      });
+
+      const result1 = postRequest(
+        `/v1/admin/quiz/${quiz3.body.quizId}/restore`,
+        { token: sessionId }
+      );
+      const result2 = getRequest(`/v1/admin/quiz/trash?token=${sessionId}`, {});
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toStrictEqual(OK);
+      expect(result2.body).toStrictEqual({ quizzes: [] });
+      expect(result2.status).toStrictEqual(OK);
+    });
   });
   describe('Testing v1/admin/quiz/:quizid/restore error cases', () => {
     beforeEach(() => {
@@ -2905,7 +2924,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       );
     });
     test('CASE (400): Quiz id does not refer to a valid quiz', () => {
-      const sessionId = person1.body.token;
+      let sessionId = person1.body.token;
       const result1 = postRequest(
         `/v1/admin/quiz/${quiz1.body.quizId + 1}/restore`,
         { token: sessionId }
@@ -2935,7 +2954,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (401): Token is not a valid structure', () => {
-      const result1 = postRequest('/v1/admin/quiz/1111/restore', {
+      const result1 = postRequest(`/v1/admin/quiz/1111/restore`, {
         token: '1234_',
       });
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -2945,6 +2964,159 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       const result1 = postRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}/restore`,
         { token: `${parseInt(person1.body.token) - 1}` }
+      );
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toStrictEqual(FORBIDDEN);
+    });
+  });
+});
+
+
+
+describe('////////Testing /v1/admin/quiz/trash/empty', () => {
+  beforeEach(() => {
+    person1 = postRequest('/v1/admin/auth/register', {
+      email: 'manan.j2450@gmail.com',
+      password: 'Abcd12345',
+      nameFirst: 'Manan',
+      nameLast: 'Jaiswal',
+    });
+    person2 = postRequest('/v1/admin/auth/register', {
+      email: 'test@gmail.com',
+      password: 'Abcd12345',
+      nameFirst: 'Fake',
+      nameLast: 'Name',
+    });
+    quiz1 = postRequest('/v1/admin/quiz', {
+      token: person1.body.token,
+      name: 'first quiz',
+      description: 'first quiz being tested',
+    });
+    quiz2 = postRequest('/v1/admin/quiz', {
+      token: person1.body.token,
+      name: 'second quiz',
+      description: 'second quiz being tested',
+    });
+    quiz3 = postRequest('/v1/admin/quiz', {
+      token: person1.body.token,
+      name: 'third quiz',
+      description: 'second quiz being tested',
+    });
+    deleteRequest(
+      `/v1/admin/quiz/${quiz1.body.quizId}?token=${person1.body.token}`,
+      {}
+    );
+    deleteRequest(
+      `/v1/admin/quiz/${quiz2.body.quizId}?token=${person1.body.token}`,
+      {}
+    );
+    deleteRequest(
+      `/v1/admin/quiz/${quiz3.body.quizId}?token=${person1.body.token}`,
+      {}
+    );
+  });
+  describe('Testing /v1/admin/quiz/trash/empty success cases', () => {
+    test('testing successful deletion of 1 quiz in trash', () => {
+      let sessionId = person1.body.token;
+      const result1 = deleteRequest(
+        `/v1/admin/quiz/trash/empty?token=${sessionId}&quizIds=[${quiz1.body.quizId}]`,
+        {}
+      );
+      const result2 = getRequest(`/v1/admin/quiz/trash?token=${sessionId}`, {});
+      expect(result2.body).toStrictEqual({
+        quizzes: [
+          {
+            quizId: quiz2.body.quizId,
+            name: 'second quiz',
+          },
+          {
+            quizId: quiz3.body.quizId,
+            name: 'third quiz',
+          },
+        ],
+      });
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toStrictEqual(OK);
+    });
+    test('testing successful deletion of 2 quiz in trash', () => {
+      let sessionId = person1.body.token;
+      const result1 = deleteRequest(
+        `/v1/admin/quiz/trash/empty?token=${sessionId}&quizIds=[${quiz1.body.quizId},${quiz2.body.quizId}]`,
+        {}
+      );
+      const result2 = getRequest(`/v1/admin/quiz/trash?token=${sessionId}`, {});
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toStrictEqual(OK);
+      expect(result2.body).toStrictEqual({
+        quizzes: [
+          {
+            quizId: quiz3.body.quizId,
+            name: 'third quiz',
+          },
+        ],
+      });
+    });
+  });
+  describe('Testing /v1/admin/quiz/trash/empty error cases', () => {
+    test('CASE (400): One or more of the QuizIDs is not a valid quiz', () => {
+      let sessionId = person1.body.token;
+      const result1 = deleteRequest(
+        `/v1/admin/quiz/trash/empty?token=${sessionId}&quizIds=[${
+          quiz1.body.quizId - 15
+        },${quiz2.body.quizId}]`,
+        {}
+      );
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toStrictEqual(INPUT_ERROR);
+    });
+    test('CASE (400): One or more of the QuizIDs refers to a quiz that this current user does not own', () => {
+      const result1 = deleteRequest(
+        `/v1/admin/quiz/trash/empty?token=${person2.body.token}&quizIds=[${quiz1.body.quizId},${quiz2.body.quizId}]`,
+        {}
+      );
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toStrictEqual(INPUT_ERROR);
+    });
+    test('CASE (400): One or more of the QuizIDs is not currently in trash', () => {
+      let sessionId = person1.body.token;
+
+      postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/restore`, {
+        token: sessionId,
+      });
+      const result1 = deleteRequest(
+        `/v1/admin/quiz/trash/empty?token=${person2.body.token}&quizIds=[${quiz1.body.quizId}]`,
+        {}
+      );
+      const result2 = getRequest(`/v1/admin/quiz/trash?token=${sessionId}`, {});
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toStrictEqual(INPUT_ERROR);
+      expect(result2.body).toStrictEqual({
+        quizzes: [
+          {
+            quizId: 1,
+            name: 'second quiz',
+          },
+          {
+            quizId: 2,
+            name: 'third quiz',
+          },
+        ],
+      });
+    });
+    test('CASE (401): Token is not a valid structure', () => {
+      const result1 = deleteRequest(
+        `/v1/admin/quiz/trash/empty?token=111a1&quizIds=[${quiz1.body.quizId},${quiz2.body.quizId}]`,
+        {}
+      );
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toStrictEqual(UNAUTHORISED);
+    });
+    test('CASE (403): Provided token is a valid structure, but is not for a currently logged in session', () => {
+      const result1 = deleteRequest(
+        `/v1/admin/quiz/trash/empty?token=${
+          parseInt(person1.body.token) - 1
+        }&quizIds=[${quiz1.body.quizId},${quiz2.body.quizId}]`,
+        {}
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(FORBIDDEN);
