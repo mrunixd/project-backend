@@ -265,6 +265,31 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   return res.json(response);
 });
 
+app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const { token, description } = req.body;
+
+  // Status 401
+  if (!checkValidToken(token)) {
+    return res.status(401).json({ error: 'token has invalid structure' });
+  }
+
+  const userId = sessionIdtoUserId(token);
+
+  // Status 403
+  if (userId === -1) {
+    return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' })
+  }
+
+  // Status 400
+  const response = adminQuizDescriptionUpdate(userId, quizId, description);
+  if ('error' in response) {
+    return res.status(400).json(response);
+  }
+
+  // Status 200
+  return res.status(200).json(response);
+})
 
 app.put('/v1/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
