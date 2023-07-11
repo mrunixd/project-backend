@@ -13,7 +13,6 @@ const SERVER_URL = `${url}:${port}`;
 
 function postRequest(route: string, json: any) {
   const res = request('POST', `${SERVER_URL}${route}`, { json: json });
-  // return JSON.parse(res.body.toString());
   return {
     status: res.statusCode,
     body: JSON.parse(res.body.toString()),
@@ -22,7 +21,6 @@ function postRequest(route: string, json: any) {
 
 function deleteRequest(route: string, qs: any) {
   const res = request('DELETE', `${SERVER_URL}${route}`, { qs: qs });
-  // return JSON.parse(res.body.toString());
   return {
     status: res.statusCode,
     body: JSON.parse(res.body.toString()),
@@ -31,7 +29,6 @@ function deleteRequest(route: string, qs: any) {
 
 function getRequest(route: string, qs: any) {
   const res = request('GET', `${SERVER_URL}${route}`, { qs: qs });
-  // return JSON.parse(res.body.toString());
   return {
     status: res.statusCode,
     body: JSON.parse(res.body.toString()),
@@ -42,6 +39,8 @@ let result1: any;
 let result2: any;
 let person1: any;
 let person2: any;
+let quiz1: any;
+let quiz2: any;
 
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
@@ -49,6 +48,8 @@ beforeEach(() => {
   result2 = undefined;
   person1 = undefined;
   person2 = undefined;
+  quiz1 = undefined;
+  quiz2 = undefined;
 });
 
 describe('////////TESTING v1/admin/auth/register////////', () => {
@@ -655,4 +656,30 @@ describe('///////Testing /v1/admin/quiz/ delete////////', () => {
     });
   });
   describe('Testing /v1/admin/quiz/ delete error cases', () => {});
+});
+
+describe('///////Testing /v1/admin/quiz/ info////////', () => {
+  describe('Testing /v1/admin/quiz/ info success cases', () => {
+    test('Success info 1 person 1 quiz 0 questions', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'vincentxian@gmail.com',
+        password: 'password1',
+        nameFirst: 'vincent',
+        nameLast: 'xian',
+      });
+      quiz1 = postRequest('/v1/admin/quiz', {
+        token: person1.body.token,
+        name: 'first quiz',
+        description: 'first quiz being tested',
+      });
+      const result1 = getRequest(
+        `/v1/admin/quiz/${quiz1.body.quizId}?token=${person1.body.token}`,
+        {}
+      );
+      expect(result1.status).toBe(OK);
+      expect(result1.body).toStrictEqual({
+        //STUFF HERE!!!
+      });
+    });
+  });
 });

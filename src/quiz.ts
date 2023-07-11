@@ -1,4 +1,4 @@
-import { getData, setData, QuizIds } from './dataStore';
+import { getData, setData, QuizIds, Quiz } from './dataStore';
 
 interface ErrorObject {
   error: string;
@@ -16,13 +16,13 @@ interface QuizList {
   quizzes: QuizIds[]
 }
 
-interface QuizInfo {
-  quizId: number,
-  name: string,
-  timeCreated: number,
-  timeLastEdited: number,
-  description: string
-}
+// interface QuizInfo {
+//   quizId: number;
+//   name: string;
+//   timeCreated: number;
+//   timeLastEdited: number;
+//   description: string;
+// }
 
 /**
  * This function provides a list of all the quizzes owned by the currently
@@ -108,7 +108,8 @@ function adminQuizCreate(authUserId: number, name: string, description: string):
     timeLastEdited: currentTime,
     description: description,
     numQuestions: 0,
-    questions: []
+    questions: [],
+    duration: 0
   });
 
   setData(data);
@@ -168,7 +169,7 @@ function adminQuizRemove(authUserId: number, quizId: number): Record<string, nev
  *  description: string,
  * }
  */
-function adminQuizInfo(authUserId: number, quizId: number): QuizInfo | ErrorObject {//can't interface type just be Quiz from dataStore?
+function adminQuizInfo(authUserId: number, quizId: number): Quiz | ErrorObject {
   const data = getData();
 
   // Save the selected user to be used for error checking & return values
@@ -190,6 +191,9 @@ function adminQuizInfo(authUserId: number, quizId: number): QuizInfo | ErrorObje
     timeCreated: selected.timeCreated,
     timeLastEdited: selected.timeLastEdited,
     description: selected.description,
+    numQuestions: selected.numQuestions,
+    questions: selected.questions,
+    duration: selected.duration //this might need to be coded
   };
 }
 

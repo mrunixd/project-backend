@@ -143,6 +143,28 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   }
 
   const response = adminQuizRemove(userId, quizid);
+  if ('error' in response) {
+    return res.status(400).json(response);
+  }
+  return res.json(response);
+});
+
+app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const quizid = parseInt(req.params.quizid);
+  const token = (req.query.token).toString();
+
+  if (token.length !== 5 || /\d/.test(token) === false) {
+    return res.status(401).json({ error: 'token has invalid structure' })
+  }
+  const userId = sessionIdtoUserId(token);
+  if (userId === -1) {
+    return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' })
+  }
+
+  const response = adminQuizInfo(userId, quizid);
+  if ('error' in response) {
+    return res.status(400).json(response);
+  }
   return res.json(response);
 });
 // ====================================================================

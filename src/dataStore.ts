@@ -38,6 +38,7 @@ export interface Quiz {
   description: string;
   numQuestions: number;
   questions: Question[];
+  duration: number;
 }
 
 export interface DataStore {
