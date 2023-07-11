@@ -168,6 +168,7 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   if (token.length !== 5 || /\d/.test(token) === false) {
     return res.status(401).json({ error: 'token has invalid structure' })
   }
+
   const userId = sessionIdtoUserId(token);
   if (userId === -1) {
     return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' })
@@ -183,19 +184,18 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
 app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const { token, name } = req.body;
-  
-  // Status 401
-  const sessionId = parseInt(token);
-
-  if (isNaN(sessionId) || sessionId.length < 10000 || sessionId > 99999) {
-    return res.status(401).json({ error: 'token has invalid structure' });
-  }
 
   // Status 403
-  const userId = sessionIdtoUserId(sessionId);
   if (userId === -1) {
     return res.status(403).json({ error: 'Provided token is valid structure, but is not for a currently logged in session' })
   }
+
+  // Status 401
+  if (token.length !== 5 || /\d/.test(token) === false) {
+    return res.status(401).json({ error: 'token has invalid structure' })
+  }
+
+  const userId = sessionIdtoUserId(token);
 
   // Status 400
   const response = adminQuizNameUpdate(userId, quizId, name);

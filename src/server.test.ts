@@ -29,7 +29,7 @@ function deleteRequest(route: string, qs: any) {
   };
 }
 
-function putRequest(route: string, qs: any) {
+function putRequest(route: string, json: any) {
   const res = request('PUT', `${SERVER_URL}${route}`, { json: json });
 
   return {
@@ -52,6 +52,8 @@ let result2: any;
 let person1: any;
 let person2: any;
 let quiz1: any;
+let quiz2: any;
+let quiz3: any;
 let quizQuestion: any;
 
 beforeEach(() => {
@@ -397,7 +399,7 @@ describe('////////TESTING /v1/admin/user/details////////', () => {
   });
 });
 
-describe('////////Testing v1/admin/quiz////////', () => {
+describe('//////// Testing v1/admin/quiz/ ////////', () => {
   beforeEach(() => {
     person1 = postRequest('/v1/admin/auth/register', {
       email: 'aarnavsample@gmail.com',
@@ -550,17 +552,17 @@ describe('TESTING v1/admin/quiz/list', () => {
     });
 
     test('Successful Multiple quiz display', () => {
-      const quiz1 = postRequest('/v1/admin/quiz', {
+      quiz1 = postRequest('/v1/admin/quiz', {
         token: person1.body.token,
         name: 'first quiz',
         description: 'first quiz being tested',
       });
-      const quiz2 = postRequest('/v1/admin/quiz', {
+      quiz2 = postRequest('/v1/admin/quiz', {
         token: person1.body.token,
         name: 'second quiz',
         description: 'second quiz being tested',
       });
-      const quiz3 = postRequest('/v1/admin/quiz', {
+      quiz3 = postRequest('/v1/admin/quiz', {
         token: person1.body.token,
         name: 'third quiz',
         description: 'third quiz being tested',
@@ -1042,31 +1044,32 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
   });
 
   describe('/////// Testing v1/admin/quiz/name success', () => {
-  // Tests if adminQuizNameUpdate runs successfully.
-  test('CASE: Successful adminQuizNameUpdate', () => {})
-    result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
-      token: person1.body.token,
-      name: 'newQuizName'
-    });
+    // Tests if adminQuizNameUpdate runs successfully.
+    test('CASE: Successful adminQuizNameUpdate', () => {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizid}/name`, {
+        token: person1.body.token,
+        name: 'newQuizName'
+      });
+  
+      expect(result1.body).toStrictEqual({ name: 'newQuizName'});
+      expect(result1.status).toBe(OK);
+  
+      // Verifying that the quiz name has changed. 
+      result2 = getRequest('v1/admin/quiz/list', {
+        token: `${person1.body.token}`
+      });
+  
+      expect(result2.body).toStrictEqual({
+        quizzes: [
+          {
+            quizId: quiz1.body.quizId,
+            name: 'newQuizName',
+          },
+        ],
+      });
+      expect(result2.status).toBe(OK);
 
-    expect(result1.body).toStrictEqual({ name: 'newQuizName'});
-    expect(result1.status).toBe(OK);
-
-    // Verifying that the quiz name has changed. 
-    result2 = getRequest('v1/admin/quiz/list', {
-      token: `${person1.body.token}`
-    });
-
-    expect(result2.body).toStrictEqual({
-      quizzes: [
-        {
-          quizId: quiz1.body.quizId,
-          name: 'newQuizName',
-        },
-      ],
-    });
-    expect(result2.status).toBe(OK);
-
+    })
   });
 
   // Tests if adminQuizNameUpdate returns an error.
@@ -1078,7 +1081,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         name: 'newQuizName'
       });     
 
-      expect(result1.body).toBe({ error: expect.any(String) });
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
 
     });
@@ -1096,7 +1099,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         name: 'newQuizName'
       }); 
 
-      expect(result1.body).toBe({ error: expect.any(String) });
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
       
     });
@@ -1134,6 +1137,21 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: Name is already used in the current logged in user for another quiz', () => {
+      // already created a quiz with the name 'first quiz' 
+      // create another quiz named 'second quiz' and try to name it to 'first quiz'
+      // expect 400 and error string
+      quiz2 = postRequest('/v1/admin/quiz', {
+        token: person1.body.token,
+        name: 'existingQuiz',
+        description: 'A pre-existing quiz with the name "existingQuiz".'
+      })
+
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizid}/name`, {
+        token: person1.body.token,
+        name: 'existingQuiz'
+      })
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
 
     });
@@ -1145,7 +1163,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         name: 'newQuizName'
       });
 
-      expect(result1.body).toBe({ error: expect.any(String) });
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(401);
     });
 
@@ -1155,7 +1173,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         name: 'newQuizName'
       });
 
-      expect(result1.body).toBe({ error: expect.any(String) });
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(401);
     });
 
