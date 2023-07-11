@@ -441,7 +441,7 @@ function adminQuizQuestionMove(
   quizId: number,
   questionId: number,
   newPosition: number
-): {} | ErrorObject {
+): Record<string, never> | ErrorObject {
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
@@ -462,7 +462,7 @@ function adminQuizQuestionMove(
     return {
       error: 'Question Id does not refer to a valid question within this quiz',
     };
-  } else if (newPosition < 0 || newPosition > currentQuiz.questions.length - 1) { 
+  } else if (newPosition < 0 || newPosition > currentQuiz.questions.length - 1) {
     return {
       error: 'NewPosition is less than 0, or NewPosition is greater than n-1 where n is the number of questions',
     };
