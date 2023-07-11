@@ -73,6 +73,7 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
     numSuccessfulLogins: 1,
     numFailedPasswordsSinceLastLogin: 0,
     quizIds: [],
+    trash: []
   });
 
   // Generates a unique 5 digit number for the new sessionId

@@ -13,6 +13,7 @@ export interface User {
   numSuccessfulLogins: number;
   numFailedPasswordsSinceLastLogin: number;
   quizIds: QuizIds[];
+  trash: QuizIds[];
 }
 
 export interface Answer {
