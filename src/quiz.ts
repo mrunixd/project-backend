@@ -426,6 +426,68 @@ function adminQuizQuestion(
 }
 
 /**
+ * This function moves a question to a specificed position
+ *
+ * @param {number} authUserId
+ * @param {number} quizId
+ * @param {number} questionId
+ * @param {number} newPosition
+ *
+ * @returns {{}}
+ *
+ */
+function adminQuizQuestionMove(
+  authUserId: number,
+  quizId: number,
+  questionId: number,
+  newPosition: number
+): {} | ErrorObject {
+  const data = getData();
+
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
+
+  // Error checking block
+  if (user === undefined) {
+    return { error: 'AuthUserId is not a valid user' };
+  } else if (currentQuiz === undefined) {
+    return { error: 'Quiz ID does not refer to a valid quiz' };
+  } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
+    return { error: 'Quiz ID does not refer to a quiz that this user owns' };
+  } else if (
+    !currentQuiz.questions.some(
+      (question) => question.questionId === questionId
+    )
+  ) {
+    return {
+      error: 'Question Id does not refer to a valid question within this quiz',
+    };
+  } else if (newPosition < 0 || newPosition > currentQuiz.questions.length - 1) { 
+    return {
+      error: 'NewPosition is less than 0, or NewPosition is greater than n-1 where n is the number of questions',
+    };
+  }
+  const sourceQuestion = currentQuiz.questions.find(
+    (question) => question.questionId === questionId
+  );
+  const currentPosition = currentQuiz.questions.indexOf(sourceQuestion);
+  if (currentPosition === newPosition) {
+    return { error: 'NewPosition is the position of the current question' };
+  }
+
+  // Create a copy 'newQuestion': splice to correct index and then remove old one
+  const newQuestion = { ...sourceQuestion };
+  currentQuiz.questions.splice(newPosition + 1, 0, newQuestion);
+  currentQuiz.questions.splice(currentPosition, 1);
+
+  // Update values for currentQuiz: timeLastEdited
+  currentQuiz.timeLastEdited = Math.floor(Date.now() / 1000);
+
+  setData(data);
+  return {};
+}
+
+/**
  * This function duplicates a question and adds it directly afterwards.
  *
  * @param {number} authUserId
@@ -506,6 +568,7 @@ export {
   adminQuizNameUpdate,
   adminQuizRemove,
   adminQuizQuestion,
+  adminQuizQuestionMove,
   adminQuizQuestionDuplicate,
   adminQuizTrash
 };
