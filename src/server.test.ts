@@ -1450,12 +1450,35 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
       });
 
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
-        token: 1424,
+        token: '1424',
         name: 'newQuizName',
       });
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(401);
+      expect(result1.status).toBe(UNAUTHORISED);
+    });
+
+    test('CASE: Token is not a valid structure - non-numeric characters', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'aarnavsample@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'aarnav',
+        nameLast: 'sheth',
+      });
+
+      quiz1 = postRequest('/v1/admin/quiz', {
+        token: `${person1.body.token}`,
+        name: 'first quiz',
+        description: 'first quiz being tested',
+      });
+
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
+        token: 'SP@!$',
+        name: 'newQuizName',
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(UNAUTHORISED);
     });
 
     test('CASE: Token is not a valid structure - too long', () => {
@@ -1473,12 +1496,12 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
       });
 
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
-        token: 142423,
+        token: '142423',
         name: 'newQuizName',
       });
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(401);
+      expect(result1.status).toBe(UNAUTHORISED);
     });
 
     test('CASE: Provided token is valid structure, but is not for a currently logged in session', () => {
