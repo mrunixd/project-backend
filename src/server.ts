@@ -15,6 +15,7 @@ import {
   adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
   adminQuizQuestion,
+  adminQuizTransfer,
   adminQuizQuestionMove,
   adminQuizQuestionDuplicate,
   adminQuizTrash,
@@ -241,6 +242,29 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   // Status 200
   return res.status(200).json(response);
 });
+
+app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const { token, userEmail } = req.body;
+
+  if (!checkValidToken(token)) {
+    return res.status(401).json({ error: 'token has invalid structure' });
+  }
+  const userId = sessionIdtoUserId(token);
+  if (userId === -1) {
+    return res.status(403).json({
+      error:
+        'Provided token is valid structure, but is not for a currently logged in session',
+    });
+  }
+
+  const response = adminQuizTransfer(userId, quizId, userEmail);
+  if ('error' in response) {
+    return res.status(400).json(response);
+  }
+  return res.json(response);
+});
+
 
 app.put('/v1/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
