@@ -4,9 +4,7 @@ interface ErrorObject {
   error: string;
 }
 
-interface EmptyObject {
-
-}
+interface EmptyObject {}
 
 interface QuizId {
   quizId: number;
@@ -461,14 +459,19 @@ function adminQuizTransfer(
     return { error: 'userEmail is not a real user' };
   } else if (currentUser.email === userEmail) {
     return { error: 'userEmail is the current logged in user' };
-  } else if (targetUser.quizIds.some((quiz) => quiz.name === currentQuiz.name)) {
-    return { error: 'Quiz ID refers to a quiz that has a name that is already used by the target user' };
+  } else if (
+    targetUser.quizIds.some((quiz) => quiz.name === currentQuiz.name)
+  ) {
+    return {
+      error:
+        'Quiz ID refers to a quiz that has a name that is already used by the target user',
+    };
   }
 
   const newQuiz = { ...currentQuiz };
   targetUser.quizIds.push({
     quizId: newQuiz.quizId,
-    name: newQuiz.name
+    name: newQuiz.name,
   });
   const currentPosition = currentUser.quizIds.indexOf(currentQuiz);
   currentUser.quizIds.splice(currentPosition, 1);
@@ -542,7 +545,6 @@ function adminQuizQuestionMove(
   setData(data);
   return {};
 }
-
 
 /**
  * This function duplicates a question and adds it directly afterwards.
@@ -698,5 +700,5 @@ export {
   adminQuizQuestionDuplicate,
   adminQuizTrash,
   adminQuizRestore,
-  adminQuizTrashEmpty
+  adminQuizTrashEmpty,
 };
