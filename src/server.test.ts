@@ -44,7 +44,6 @@ let quiz2: any;
 let quizQuestion1: any;
 let quizQuestion2: any;
 
-
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
   result1 = undefined;
@@ -55,7 +54,6 @@ beforeEach(() => {
   quiz2 = undefined;
   quizQuestion1 = undefined;
   quizQuestion2 = undefined;
-
 });
 
 describe('////////TESTING v1/admin/auth/register////////', () => {
@@ -735,35 +733,35 @@ describe('///////Testing /v1/admin/quiz/delete////////', () => {
 
 describe('///////Testing /v1/admin/quiz/ info////////', () => {
   const quizQuestion1Body = {
-    question: "Who is the Monarch of England?",
+    question: 'Who is the Monarch of England?',
     duration: 4,
     points: 5,
     answers: [
       {
-        answer: "Prince Charles",
+        answer: 'Prince Charles',
         correct: false
       },
       {
-        answer: "King Charles",
+        answer: 'King Charles',
         correct: true
       }
     ]
-  }
+  };
   const quizQuestion2Body = {
-    question: "second question?",
+    question: 'second question?',
     duration: 2,
     points: 3,
     answers: [
       {
-        answer: "second answer",
+        answer: 'second answer',
         correct: false
       },
       {
-        answer: "second real answer",
+        answer: 'second real answer',
         correct: true
       }
     ]
-  }
+  };
   describe('Testing /v1/admin/quiz/ info success cases', () => {
     test('Success info 1 person 1 quiz 0 questions', () => {
       person1 = postRequest('/v1/admin/auth/register', {
@@ -830,18 +828,18 @@ describe('///////Testing /v1/admin/quiz/ info////////', () => {
         numQuestions: 0,
         questions: [{
           questionId: quizQuestion1.body.questionId,
-          question: "Who is the Monarch of England?",
+          question: 'Who is the Monarch of England?',
           duration: 4,
           points: 5,
           answers: [
             {
-              answer: "Prince Charles",
+              answer: 'Prince Charles',
               answerId: expect.any(Number),
               colour: expect.any(String),
               correct: false
             },
             {
-              answer: "King Charles",
+              answer: 'King Charles',
               answerId: expect.any(Number),
               colour: expect.any(String),
               correct: true
@@ -849,25 +847,25 @@ describe('///////Testing /v1/admin/quiz/ info////////', () => {
           ]
         }, {
           questionId: quizQuestion2.body.questionId,
-          question: "second question?",
+          question: 'second question?',
           duration: 2,
           points: 3,
           answers: [
             {
-              answer: "second answer",
+              answer: 'second answer',
               answerId: expect.any(Number),
               colour: expect.any(String),
               correct: false
             },
             {
-              answer: "second real answer",
+              answer: 'second real answer',
               answerId: expect.any(Number),
               colour: expect.any(String),
               correct: true
             }
           ]
         }
-      ],
+        ],
         duration: 6
       });
     });
@@ -886,7 +884,7 @@ describe('///////Testing /v1/admin/quiz/ info////////', () => {
         description: 'first quiz being tested',
       });
     });
-    
+
     test('CASE (401): Token is not a valid structure - too short', () => {
       result1 = getRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}?token=${1}`,
@@ -955,20 +953,20 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
       description: 'first quiz being tested',
     });
     quizQuestion1 = {
-      question: "Who is the Monarch of England?",
+      question: 'Who is the Monarch of England?',
       duration: 4,
       points: 5,
       answers: [
         {
-          answer: "Prince Charles",
+          answer: 'Prince Charles',
           correct: false
         },
         {
-          answer: "King Charles",
+          answer: 'King Charles',
           correct: true
         }
       ]
-    }
+    };
   });
 
   describe('Testing /v1/admin/quiz/{quizid}/question success cases', () => {
@@ -1036,16 +1034,16 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
     });
     test('CASE: question string is less than 5 or more than 50 characters', () => {
       quizQuestion1 = {
-        question: "Who?",
+        question: 'Who?',
         duration: 4,
         points: 5,
         answers: [
           {
-            answer: "Prince Charles",
+            answer: 'Prince Charles',
             correct: false
           },
           {
-            answer: "King Charles",
+            answer: 'King Charles',
             correct: true
           }
         ]
@@ -1060,12 +1058,12 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
 
     test('CASE: question string is less than 5 or more than 50 characters', () => {
       quizQuestion1 = {
-        question: "Who?",
+        question: 'Who?',
         duration: 4,
         points: 5,
         answers: [
           {
-            answer: "King Charles",
+            answer: 'King Charles',
             correct: true
           }
         ]
@@ -1080,20 +1078,20 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
 
     test('CASE: duration is not a positive number', () => {
       quizQuestion1 = {
-        question: "Who is the monarch of England?",
+        question: 'Who is the monarch of England?',
         duration: -1,
         points: 5,
         answers: [
           {
-            answer: "Prince Charles",
+            answer: 'Prince Charles',
             correct: false
           },
           {
-            answer: "King Charles",
+            answer: 'King Charles',
             correct: true
           }
         ]
-      }
+      };
       result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion1,
@@ -1104,20 +1102,20 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
 
     test('CASE: total duration is more than 3 minutes', () => {
       quizQuestion1 = {
-        question: "Who is the monarch of England?",
+        question: 'Who is the monarch of England?',
         duration: 181,
         points: 5,
         answers: [
           {
-            answer: "Prince Charles",
+            answer: 'Prince Charles',
             correct: false
           },
           {
-            answer: "King Charles",
+            answer: 'King Charles',
             correct: true
           }
         ]
-      }
+      };
       result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion1,
@@ -1128,20 +1126,20 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
 
     test('CASE: points awarded are more than 10 or less than 1', () => {
       quizQuestion1 = {
-        question: "Who is the monarch of England?",
+        question: 'Who is the monarch of England?',
         duration: 13,
         points: 11,
         answers: [
           {
-            answer: "Prince Charles",
+            answer: 'Prince Charles',
             correct: false
           },
           {
-            answer: "King Charles",
+            answer: 'King Charles',
             correct: true
           }
         ]
-      }
+      };
       result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion1,
@@ -1152,20 +1150,20 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
 
     test('CASE: answer strings are less than 1 or greater than 30', () => {
       quizQuestion1 = {
-        question: "Who is the monarch of England?",
+        question: 'Who is the monarch of England?',
         duration: 13,
         points: 9,
         answers: [
           {
-            answer: "this is meant to be more than 30 characters long and i think it is",
+            answer: 'this is meant to be more than 30 characters long and i think it is',
             correct: false
           },
           {
-            answer: "King Charles",
+            answer: 'King Charles',
             correct: true
           }
         ]
-      }
+      };
       result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion1,
@@ -1176,20 +1174,20 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
 
     test('CASE: duplicate answers', () => {
       quizQuestion1 = {
-        question: "Who is the monarch of England?",
+        question: 'Who is the monarch of England?',
         duration: 13,
         points: 8,
         answers: [
           {
-            answer: "King Charles",
+            answer: 'King Charles',
             correct: false
           },
           {
-            answer: "King Charles",
+            answer: 'King Charles',
             correct: true
           }
         ]
-      }
+      };
       result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion1,
@@ -1199,20 +1197,20 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
     });
     test('CASE: no correct answers', () => {
       quizQuestion1 = {
-        question: "Who is the monarch of England?",
+        question: 'Who is the monarch of England?',
         duration: 13,
         points: 8,
         answers: [
           {
-            answer: "King Charless",
+            answer: 'King Charless',
             correct: false
           },
           {
-            answer: "Prince Charles",
+            answer: 'Prince Charles',
             correct: false
           }
         ]
-      }
+      };
       result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person1.body.token}`,
         questionBody: quizQuestion1,
