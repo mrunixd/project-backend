@@ -63,6 +63,7 @@ beforeEach(() => {
   person1 = undefined;
   person2 = undefined;
   quiz1 = undefined;
+  quiz2 = undefined;
   quizQuestion = undefined;
 });
 
@@ -1027,35 +1028,32 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
 //////////////////////////// NAME UPDATE ///////////////////////////
 
 describe('/////// TESTING v1/admin/quiz/name ///////', () => {
-  // Creates a user and a quiz.
-  beforeEach(() => {
-    person1 = postRequest('/v1/admin/auth/register', {
-      email: 'aarnavsample@gmail.com',
-      password: 'Abcd12345',
-      nameFirst: 'aarnav',
-      nameLast: 'sheth',
-    });
-
-    quiz1 = postRequest('/v1/admin/quiz', {
-      token: person1.body.token,
-      name: 'first quiz',
-      description: 'first quiz being tested',
-    });  
-  });
-
   describe('/////// Testing v1/admin/quiz/name success', () => {
     // Tests if adminQuizNameUpdate runs successfully.
     test('CASE: Successful adminQuizNameUpdate', () => {
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizid}/name`, {
-        token: person1.body.token,
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'aarnavsample@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'aarnav',
+        nameLast: 'sheth'
+      });
+  
+      quiz1 = postRequest('/v1/admin/quiz', {
+        token: `${person1.body.token}`,
+        name: 'first quiz',
+        description: 'first quiz being tested'
+      });
+
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
+        token: `${person1.body.token}`,
         name: 'newQuizName'
       });
   
-      expect(result1.body).toStrictEqual({ name: 'newQuizName'});
+      expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
   
       // Verifying that the quiz name has changed. 
-      result2 = getRequest('v1/admin/quiz/list', {
+      result2 = getRequest('/v1/admin/quiz/list', {
         token: `${person1.body.token}`
       });
   
@@ -1076,6 +1074,19 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
   describe('/////// Testing v1/admin/quiz/name error', () => {
     // Status 400
     test('CASE: quizId does not refer to a valid quiz', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'aarnavsample@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'aarnav',
+        nameLast: 'sheth',
+      });
+  
+      quiz1 = postRequest('/v1/admin/quiz', {
+        token: `${person1.body.token}`,
+        name: 'first quiz',
+        description: 'first quiz being tested'
+      });
+
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId + 1}/name`, {
         token: person1.body.token,
         name: 'newQuizName'
@@ -1087,6 +1098,19 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: quizId does not refer to a quiz that this user owns', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'aarnavsample@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'aarnav',
+        nameLast: 'sheth',
+      });
+  
+      quiz1 = postRequest('/v1/admin/quiz', {
+        token: `${person1.body.token}`,
+        name: 'first quiz',
+        description: 'first quiz being tested'
+      });
+
       person2 = postRequest('/v1/admin/auth/register', {
         email: 'zhizhao@gmail.com',
         password: 'Abcd12345',
@@ -1105,6 +1129,19 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: Name contains invalid characters', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'aarnavsample@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'aarnav',
+        nameLast: 'sheth',
+      });
+  
+      quiz1 = postRequest('/v1/admin/quiz', {
+        token: `${person1.body.token}`,
+        name: 'first quiz',
+        description: 'first quiz being tested'
+      });
+
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
         token: person1.body.token,
         name: '%!@#!%'
@@ -1115,6 +1152,19 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: Name is less than 3 characters long', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'aarnavsample@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'aarnav',
+        nameLast: 'sheth',
+      });
+  
+      quiz1 = postRequest('/v1/admin/quiz', {
+        token: `${person1.body.token}`,
+        name: 'first quiz',
+        description: 'first quiz being tested'
+      });
+
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
         token: person1.body.token,
         name: 'zh'
@@ -1126,6 +1176,19 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: Name is more than 30 characters long', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'aarnavsample@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'aarnav',
+        nameLast: 'sheth',
+      });
+  
+      quiz1 = postRequest('/v1/admin/quiz', {
+        token: `${person1.body.token}`,
+        name: 'first quiz',
+        description: 'first quiz being tested'
+      });
+
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
         token: person1.body.token,
         name: 'zhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzh'
@@ -1137,9 +1200,19 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: Name is already used in the current logged in user for another quiz', () => {
-      // already created a quiz with the name 'first quiz' 
-      // create another quiz named 'second quiz' and try to name it to 'first quiz'
-      // expect 400 and error string
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'aarnavsample@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'aarnav',
+        nameLast: 'sheth',
+      });
+  
+      quiz1 = postRequest('/v1/admin/quiz', {
+        token: `${person1.body.token}`,
+        name: 'first quiz',
+        description: 'first quiz being tested'
+      });
+
       quiz2 = postRequest('/v1/admin/quiz', {
         token: person1.body.token,
         name: 'existingQuiz',
@@ -1158,6 +1231,19 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
       
     // Status 401
     test('CASE: Token is not a valid structure - too short', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'aarnavsample@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'aarnav',
+        nameLast: 'sheth',
+      });
+  
+      quiz1 = postRequest('/v1/admin/quiz', {
+        token: `${person1.body.token}`,
+        name: 'first quiz',
+        description: 'first quiz being tested'
+      });
+
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
         token: 1424,
         name: 'newQuizName'
@@ -1168,6 +1254,19 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: Token is not a valid structure - too long', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'aarnavsample@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'aarnav',
+        nameLast: 'sheth',
+      });
+  
+      quiz1 = postRequest('/v1/admin/quiz', {
+        token: `${person1.body.token}`,
+        name: 'first quiz',
+        description: 'first quiz being tested'
+      });
+
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
         token: 142423,
         name: 'newQuizName'
