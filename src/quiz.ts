@@ -618,6 +618,7 @@ function adminQuizTrash(
   }
   return { quizzes: user.trash };
 }
+
 function adminQuizRestore(
   authUserId: number,
   quizId: number

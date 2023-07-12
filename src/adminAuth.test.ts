@@ -1,4 +1,4 @@
-import { adminAuthRegister, adminAuthLogin, adminUserDetails } from './auth';
+import { adminAuthRegister, adminAuthLogin, adminAuthLogout, adminUserDetails } from './auth';
 import { clear } from './other';
 
 let result1: any;
