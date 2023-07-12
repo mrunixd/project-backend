@@ -4,6 +4,8 @@ interface ErrorObject {
   error: string;
 }
 
+interface EmptyObject {}
+
 interface QuizId {
   quizId: number;
 }
@@ -457,14 +459,19 @@ function adminQuizTransfer(
     return { error: 'userEmail is not a real user' };
   } else if (currentUser.email === userEmail) {
     return { error: 'userEmail is the current logged in user' };
-  } else if (targetUser.quizIds.some((quiz) => quiz.name === currentQuiz.name)) {
-    return { error: 'Quiz ID refers to a quiz that has a name that is already used by the target user' };
+  } else if (
+    targetUser.quizIds.some((quiz) => quiz.name === currentQuiz.name)
+  ) {
+    return {
+      error:
+        'Quiz ID refers to a quiz that has a name that is already used by the target user',
+    };
   }
 
   const newQuiz = { ...currentQuiz };
   targetUser.quizIds.push({
     quizId: newQuiz.quizId,
-    name: newQuiz.name
+    name: newQuiz.name,
   });
   const currentPosition = currentUser.quizIds.indexOf(currentQuiz);
   currentUser.quizIds.splice(currentPosition, 1);
@@ -611,11 +618,10 @@ function adminQuizTrash(
   }
   return { quizzes: user.trash };
 }
-
 function adminQuizRestore(
   authUserId: number,
   quizId: number
-): Record<string, never> | ErrorObject {
+): EmptyObject | ErrorObject {
   const data = getData();
   const user = data.users.find((user) => user.authUserId === authUserId);
   if (user === undefined) {
@@ -634,10 +640,49 @@ function adminQuizRestore(
     };
   } else if (restoredQuiz === undefined) {
     return { error: 'Quiz id refers to a quiz that is not currently in trash' };
+  } else {
+    const [movingQuiz] = user.trash.splice(index, 1);
+    user.quizIds.push(movingQuiz);
+    quizzes.timeLastEdited = Math.floor(Date.now() / 1000);
+    setData(data);
+    return {};
   }
-  const [movingQuiz] = user.trash.splice(index, 1);
-  user.trash.push(movingQuiz);
-  quizzes.timeLastEdited = Math.floor(Date.now() / 1000);
+}
+
+function adminQuizTrashEmpty(
+  array: string[],
+  userId: number
+): EmptyObject | ErrorObject {
+  const data = getData();
+  const user = data.users.find((user) => user.authUserId === userId);
+  if (user === undefined) {
+    return { error: 'AuthUserId is not a valid user' };
+  }
+  // error checking array
+  for (const string of array) {
+    let quizId = parseInt(string);
+    const quizzes = data.quizzes.find((quiz) => quiz.quizId === quizId);
+    const trashQuiz = user.trash.find((quiz) => quiz.quizId === quizId);
+    const workingQuizzes = user.quizIds.find((quiz) => quiz.quizId === quizId);
+    if (quizzes === undefined) {
+      return { error: 'One or more of the Quiz Ids is not a valid quiz' };
+    } else if (trashQuiz === undefined && workingQuizzes === undefined) {
+      return {
+        error:
+          'One or more of the Quiz IDs refers to a quiz that this current user does not own',
+      };
+    } else if (trashQuiz === undefined) {
+      return {
+        error: 'One or more of the Quiz IDs is not currently in the trash',
+      };
+    }
+  }
+
+  for (const string of array) {
+    let quizId = parseInt(string);
+    const quizIndex = user.trash.findIndex((quiz) => quiz.quizId === quizId);
+    user.trash.splice(quizIndex, 1);
+  }
   setData(data);
   return {};
 }
@@ -655,4 +700,5 @@ export {
   adminQuizQuestionDuplicate,
   adminQuizTrash,
   adminQuizRestore,
+  adminQuizTrashEmpty,
 };
