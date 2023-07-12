@@ -3107,8 +3107,6 @@ describe('////////Testing /v1/admin/quiz/trash/empty', () => {
   });
 });
 
-///////////////////////
-
 describe('/////// /v1/admin/auth/logout ///////', () => {
   describe('/////// /v1/admin/auth/logout successful ///////', () => {
     test('CASE: Logout successful', () => {
@@ -3129,8 +3127,6 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
     });
   });
 
-  ////
-
   describe('/////// /v1/admin/auth/logout error occurred ///////', () => {
     test('CASE(401): Token has invalid structure - too short', () => {
       person1 = postRequest('/v1/admin/auth/register', {
@@ -3141,7 +3137,7 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
       });
 
       result1 = postRequest('/v1/admin/auth/logout', {
-        token: `1234`
+        token: '1234'
       });
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3180,10 +3176,7 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
-    ////
-
-    test.only('CASE(403): The token is for a user who has already logged out', () => {
-      // create person1, this returns a token 
+    test('CASE(403): The token is for a user who has already logged out', () => {
       person1 = postRequest('/v1/admin/auth/register', {
         email: 'zhizhao@gmail.com',
         password: 'Abcd12345',
@@ -3191,10 +3184,8 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
         nameLast: 'Zhao',
       });
 
-      // const tempToken = `${person1.body.token}`
-
       result1 = postRequest('/v1/admin/auth/logout', {
-        token: `${person1.body.token}`,
+        token: `${person1.body.token}`
       });
 
       expect(result1.body).toStrictEqual({});
@@ -3206,9 +3197,6 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
 
       expect(result2.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(FORBIDDEN);
-      // create copy of token
-      // sign out
-      // attempt to sign out with the same token that person1 had.
     });
   });
 });
