@@ -3365,7 +3365,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
       expect(result1.status).toBe(FORBIDDEN);
     });
 
-    test.only('CASE: quiz does not exist', () => {
+    test('CASE: quiz does not exist', () => {
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId + 1}/question/${quizQuestion1.body.questionId}`, {
         token: `${person1.body.token}`,
         questionBody: question1,
