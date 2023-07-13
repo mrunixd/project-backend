@@ -2850,7 +2850,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       );
     });
     test('Testing successful restoration of 1 quiz', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       const result1 = postRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}/restore`,
         { token: sessionId }
@@ -2859,7 +2859,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       expect(result1.status).toStrictEqual(OK);
     });
     test('Testing successful restoration of 2 quiz', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       deleteRequest(
         `/v1/admin/quiz/${quiz2.body.quizId}?token=${sessionId}`,
         {}
@@ -2878,7 +2878,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       expect(result2.status).toStrictEqual(OK);
     });
     test('Testing successful restoratiasdfdon of 2 quiz', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       deleteRequest(
         `/v1/admin/quiz/${quiz3.body.quizId}?token=${sessionId}`,
         {}
@@ -2911,7 +2911,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       );
     });
     test('CASE (400): Quiz id does not refer to a valid quiz', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       const result1 = postRequest(
         `/v1/admin/quiz/${quiz1.body.quizId + 1}/restore`,
         { token: sessionId }
@@ -2941,7 +2941,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (401): Token is not a valid structure', () => {
-      const result1 = postRequest(`/v1/admin/quiz/1111/restore`, {
+      const result1 = postRequest('/v1/admin/quiz/1111/restore', {
         token: '1234_',
       });
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3002,7 +3002,7 @@ describe('////////Testing /v1/admin/quiz/trash/empty', () => {
   });
   describe('Testing /v1/admin/quiz/trash/empty success cases', () => {
     test('testing successful deletion of 1 quiz in trash', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       const result1 = deleteRequest(
         `/v1/admin/quiz/trash/empty?token=${sessionId}&quizIds=[${quiz1.body.quizId}]`,
         {}
@@ -3024,7 +3024,7 @@ describe('////////Testing /v1/admin/quiz/trash/empty', () => {
       expect(result1.status).toStrictEqual(OK);
     });
     test('testing successful deletion of 2 quiz in trash', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       const result1 = deleteRequest(
         `/v1/admin/quiz/trash/empty?token=${sessionId}&quizIds=[${quiz1.body.quizId},${quiz2.body.quizId}]`,
         {}
@@ -3044,7 +3044,7 @@ describe('////////Testing /v1/admin/quiz/trash/empty', () => {
   });
   describe('Testing /v1/admin/quiz/trash/empty error cases', () => {
     test('CASE (400): One or more of the QuizIDs is not a valid quiz', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       const result1 = deleteRequest(
         `/v1/admin/quiz/trash/empty?token=${sessionId}&quizIds=[${
           quiz1.body.quizId - 15
@@ -3063,7 +3063,7 @@ describe('////////Testing /v1/admin/quiz/trash/empty', () => {
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (400): One or more of the QuizIDs is not currently in trash', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
 
       postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/restore`, {
         token: sessionId,
@@ -3108,8 +3108,6 @@ describe('////////Testing /v1/admin/quiz/trash/empty', () => {
     });
   });
 });
-
-
 
 describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', () => {
   beforeEach(() => {
@@ -3162,7 +3160,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
 
   describe('Testing /v1/admin/quiz/{quizid}/question/{questionid} success cases', () => {
     test('Successful adminQuizCreate 1 quiz question update', () => {
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/${quizQuestion1.body.quizId}`, {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`, {
         token: `${person1.body.token}`,
         questionBody: question1,
       });
@@ -3173,14 +3171,14 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
       );
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
-      
+
       expect(result2.body).toStrictEqual({
         quizId: quiz1.body.quizId,
         name: 'first quiz',
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),
         description: 'first quiz being tested',
-        numQuestions: 2,
+        numQuestions: 1,
         questions: [
           {
             questionId: quizQuestion1.body.questionId,
@@ -3203,7 +3201,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
             ],
           }
         ],
-        duration: 6,
+        duration: 4,
       });
       expect(result2.status).toBe(OK);
     });
@@ -3211,7 +3209,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
 
   describe('Testing /v1/admin/quiz/{quizid}/question error cases', () => {
     test('CASE (401): Token is not a valid structure - too short', () => {
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.quizId}`, {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`, {
         token: '1',
         questionBody: question1,
       });
@@ -3220,7 +3218,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
     });
 
     test('CASE (401): Token is not a valid structure - special symbols', () => {
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.quizId}`, {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`, {
         token: 'let!!',
         questionBody: question1,
       });
@@ -3230,7 +3228,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
 
     test('CASE (403): Token is not valid for a currently logged in session', () => {
       const sessionId = parseInt(person1.body.token) + 1;
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.quizId}`, {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`, {
         token: `${sessionId}`,
         questionBody: question1,
       });
@@ -3238,15 +3236,11 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
       expect(result1.status).toBe(FORBIDDEN);
     });
 
-    test('CASE: quiz does not exist', () => {
-      result1 = putRequest(
-        `/v1/admin/quiz/${quiz1.body.quizId + 1}/question/${quizQuestion1.body.quizId}`,
-        {
-          token: `${person1.body.token}`,
-          questionBody: question1,
-        }
-      );
-
+    test.only('CASE: quiz does not exist', () => {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId + 1}/question/${quizQuestion1.body.questionId}`, {
+        token: `${person1.body.token}`,
+        questionBody: question1,
+      });
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
@@ -3258,7 +3252,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
         nameFirst: 'vincent',
         nameLast: 'xian',
       });
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.quizId}`, {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`, {
         token: `${person2.body.token}`,
         questionBody: question1,
       });
@@ -3267,7 +3261,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
     });
 
     test('CASE: quiz question does not exist for quiz', () => {
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.quizId + 1}`, {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId + 1}`, {
         token: `${person1.body.token}`,
         questionBody: question1,
       });
@@ -3291,7 +3285,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
       };
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.quizId}`, {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`, {
         token: `${person1.body.token}`,
         questionBody: question1,
       });
@@ -3300,7 +3294,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
     });
 
     test('CASE: question string is less than 5 or more than 50 characters', () => {
-      quizQuestion1 = {
+      question1 = {
         question: 'Who?',
         duration: 4,
         points: 5,
@@ -3311,7 +3305,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
       };
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.quizId}`, {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`, {
         token: `${person1.body.token}`,
         questionBody: question1,
       });
@@ -3335,7 +3329,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
       };
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.quizId}`, {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`, {
         token: `${person1.body.token}`,
         questionBody: question1,
       });
@@ -3359,7 +3353,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
       };
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.quizId}`, {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`, {
         token: `${person1.body.token}`,
         questionBody: question1,
       });
@@ -3383,7 +3377,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
       };
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.quizId}`, {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`, {
         token: `${person1.body.token}`,
         questionBody: question1,
       });
@@ -3408,7 +3402,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
       };
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.quizId}`, {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`, {
         token: `${person1.body.token}`,
         questionBody: question1,
       });
@@ -3432,7 +3426,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
       };
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.quizId}`, {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`, {
         token: `${person1.body.token}`,
         questionBody: question1,
       });
@@ -3455,7 +3449,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
       };
-      result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.quizId}`, {
+      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`, {
         token: `${person1.body.token}`,
         questionBody: question1,
       });

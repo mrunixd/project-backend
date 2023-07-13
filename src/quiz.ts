@@ -660,7 +660,7 @@ function adminQuizTrashEmpty(
   }
   // error checking array
   for (const string of array) {
-    let quizId = parseInt(string);
+    const quizId = parseInt(string);
     const quizzes = data.quizzes.find((quiz) => quiz.quizId === quizId);
     const trashQuiz = user.trash.find((quiz) => quiz.quizId === quizId);
     const workingQuizzes = user.quizIds.find((quiz) => quiz.quizId === quizId);
@@ -679,11 +679,80 @@ function adminQuizTrashEmpty(
   }
 
   for (const string of array) {
-    let quizId = parseInt(string);
+    const quizId = parseInt(string);
     const quizIndex = user.trash.findIndex((quiz) => quiz.quizId === quizId);
     user.trash.splice(quizIndex, 1);
   }
   setData(data);
+  return {};
+}
+
+function adminQuizQuestionUpdate(authUserId: number, quizId: number, questionId: number, questionBody: questionInput): EmptyObject | ErrorObject {
+  const data = getData();
+
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
+
+  if (user === undefined) {
+    return { error: 'AuthUserId is not a valid user' };
+  } else if (currentQuiz === undefined) {
+    return { error: 'Quiz ID does not refer to a valid quiz' };
+  }
+  const currentQuestion = currentQuiz.questions.find((question) => question.questionId === questionId);
+
+  if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
+    return { error: 'Quiz ID does not refer to a quiz that this user owns' };
+  } else if (currentQuestion === undefined) {
+    return { error: 'Question ID does not refer to a valid question in this quiz' };
+  } else if (questionBody.question.length < 5 || questionBody.question.length > 50) {
+    return { error: 'Question string is less than 5 characters in length or greater than 50 characters in length' };
+  } else if (questionBody.answers.length < 2 || questionBody.answers.length > 6) {
+    return { error: 'The question has more than 6 answers or less than 2 answers' };
+  } else if (questionBody.duration < 0) {
+    return { error: 'The question duration is not a positive number' };
+  } else if (
+    currentQuiz.questions.reduce((accumulator, currentItem) => accumulator + currentItem.duration, 0) +
+      questionBody.duration >
+    180
+  ) {
+    return { error: 'The sum of the question durations in the quiz exceeds 3 minutes' };
+  } else if (questionBody.points > 10 || questionBody.points < 1) {
+    return { error: 'The points awarded for the question are less than 1 or greater than 10' };
+  } else if (
+    questionBody.answers.some((answer) => answer.answer.length < 1 || answer.answer.length > 30)
+  ) {
+    return { error: 'Answer strings should be between 1 and 30 characters long' };
+  } else if (
+    questionBody.answers.some(
+      (answer, index, answers) =>
+        answers.findIndex((a) => a.answer === answer.answer) !== index
+    )
+  ) {
+    return { error: 'Answer strings should not contain duplicates within the same question' };
+  } else if (!questionBody.answers.some((answer) => answer.correct)) {
+    return { error: 'Question must have at least one correct answer' };
+  }
+
+  const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
+    const colour = answer.correct ? 'green' : 'red';
+    return {
+      answerId: index,
+      answer: answer.answer,
+      colour: colour,
+      correct: answer.correct,
+    };
+  });
+
+  currentQuestion.questionId = questionId,
+  currentQuestion.question = questionBody.question,
+  currentQuestion.duration = questionBody.duration,
+  currentQuestion.points = questionBody.points,
+  currentQuestion.answers = newAnswers,
+
+  // Update the timeLastEdited for the quiz
+  currentQuiz.timeLastEdited = Math.floor(Date.now() / 1000);
+  setData(data);
+
   return {};
 }
 
@@ -701,4 +770,5 @@ export {
   adminQuizTrash,
   adminQuizRestore,
   adminQuizTrashEmpty,
+  adminQuizQuestionUpdate
 };
