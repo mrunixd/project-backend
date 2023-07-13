@@ -114,45 +114,18 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
 function adminAuthLogin(email: string, password: string): SessionId | ErrorObject {
   const data = getData();
 
-  // Error in finding user with matching email; returns error if email not found
-  if (
-    !data.users.some(
-      (users) => users.email.toLowerCase() === email.toLowerCase()
-    )
-  ) {
-    return {
-      error: 'Email address does not exist',
-    };
+  const selectedUser = data.users.find(user => user.email.toLowerCase() === email.toLowerCase());
+  if (selectedUser === undefined) {
+    return {error: 'Email address does not exist'};
   }
-
-  const userEmail = data.users.find(
-    (users) => users.email.toLowerCase() === email.toLowerCase()
-  );
-  if (userEmail === undefined) {
-    // Increment numFailedPasswordsSinceLastLogin if password & email incorrect
-    return {
-      error: 'Password is incorrect',
-    };
+  if (selectedUser.password !== password) {
+    selectedUser.numFailedPasswordsSinceLastLogin++;
+    return {error: 'Password is incorrect'};
   }
-  userEmail.numFailedPasswordsSinceLastLogin++;
-
-  // By this point, inputs must be valid
-  // Find index of user to return their respective authUserId
-  const user = data.users.find(
-    (users) =>
-      users.email.toLowerCase() === email.toLowerCase() &&
-      users.password === password
-  );
-
-  if (user === undefined) {
-    // Increment numFailedPasswordsSinceLastLogin if password & email incorrect
-    return {
-      error: 'Email Address does not exist.',
-    };
-  }
+  
   // Increment numSuccesfulLogins && reset numFailedPasswordsSinceLastLogin
-  user.numSuccessfulLogins++;
-  user.numFailedPasswordsSinceLastLogin = 0;
+  selectedUser.numSuccessfulLogins++;
+  selectedUser.numFailedPasswordsSinceLastLogin = 0;
 
   // Generates a unique 5 digit number for the new sessionId
   let uniqueNumberFlag = false;
@@ -168,7 +141,7 @@ function adminAuthLogin(email: string, password: string): SessionId | ErrorObjec
 
   data.tokens.push({
     sessionId: sessionId,
-    authUserId: user.authUserId
+    authUserId: selectedUser.authUserId
   });
   setData(data);
 
