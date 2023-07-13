@@ -21,6 +21,7 @@ import {
   adminQuizTrash,
   adminQuizRestore,
   adminQuizTrashEmpty,
+  adminQuizQuestionUpdate,
 } from './quiz';
 import { clear, sessionIdtoUserId, checkValidToken } from './other';
 
@@ -227,6 +228,38 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   return res.json(response);
 });
 
+// question update
+app.put(
+  '/v1/admin/quiz/:quizid/question/:questionid',
+  (req: Request, res: Response) => {
+    const quizId = parseInt(req.params.quizid);
+    const questionId = parseInt(req.params.questionid);
+    const { token, questionBody } = req.body;
+
+    if (!checkValidToken(token)) {
+      return res.status(401).json({ error: 'token has invalid structure' });
+    }
+    const userId = sessionIdtoUserId(token);
+    if (userId === -1) {
+      return res.status(403).json({
+        error:
+          'Provided token is valid structure, but is not for a currently logged in session',
+      });
+    }
+
+    const response = adminQuizQuestionUpdate(
+      userId,
+      quizId,
+      questionId,
+      questionBody
+    );
+    if ('error' in response) {
+      return res.status(400).json(response);
+    }
+    return res.json(response);
+  }
+);
+
 app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const { token, name } = req.body;
@@ -354,6 +387,37 @@ app.put(
     return res.json(response);
   }
 );
+
+// app.put(
+//   '/v1/admin/quiz/:quizid/question/:questionid/move',
+//   (req: Request, res: Response) => {
+//     const quizId = parseInt(req.params.quizid);
+//     const questionId = parseInt(req.params.questionid);
+//     const { token, newPosition } = req.body;
+
+//     if (!checkValidToken(token)) {
+//       return res.status(401).json({ error: 'token has invalid structure' });
+//     }
+//     const userId = sessionIdtoUserId(token);
+//     if (userId === -1) {
+//       return res.status(403).json({
+//         error:
+//           'Provided token is valid structure, but is not for a currently logged in session',
+//       });
+//     }
+
+//     const response = adminQuizQuestionMove(
+//       userId,
+//       quizId,
+//       questionId,
+//       newPosition
+//     );
+//     if ('error' in response) {
+//       return res.status(400).json(response);
+//     }
+//     return res.json(response);
+//   }
+// );
 
 app.post(
   '/v1/admin/quiz/:quizid/question/:questionid/duplicate',
