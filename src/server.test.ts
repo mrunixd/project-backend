@@ -3580,6 +3580,270 @@ describe('/////// /v1/admin/user/details //////', () => {
   });
 });
 
+describe('/////// /v1/admin/user/password ///////', () => {
+  describe('/////// /v1/admin/user/password runs ///////', () => {
+    test('CASE(200): adminAuthUpdatePassword runs successfully', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest('/v1/admin/user/password', {
+        token: `${person1.body.token}`,
+        oldPassword: 'Abcd12345',
+        newPassword: 'Bcde12345'
+      });
+
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toBe(OK);
+
+      result2 = postRequest('/v1/admin/auth/logout', {
+        token: `${person1.body.token}`,
+      });
+
+      expect(result2.body).toStrictEqual({});
+      expect(result2.status).toBe(OK);
+
+      result3 = postRequest('/v1/admin/auth/login', {
+        email: 'zhizhao@gmail.com',
+        password: 'Bcde12345'
+      });
+
+      expect(result3.body).toStrictEqual({ token: expect.any(String) });
+      expect(result3.status).toBe(OK);
+    });
+  });
+
+  describe('/////// /v1/admin/user/password error ///////', () => {
+    test('CASE(400): New password is not the correct old password', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao'
+      });
+
+      result1 = putRequest('/v1/admin/user/password', {
+        token: `${person1.body.token}`,
+        oldPassword: 'Abcd12345',
+        newPassword: 'Abcd12345'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(400): New password has already been used before by this user - initial password', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao'
+      });
+
+      result1 = putRequest('/v1/admin/user/password', {
+        token: `${person1.body.token}`,
+        oldPassword: 'Abcd12345',
+        newPassword: 'Bcde12345'
+      });
+
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toBe(OK);
+
+      result2 = putRequest('/v1/admin/user/password', {
+        token: `${person1.body.token}`,
+        oldPassword: 'Bcde12345',
+        newPassword: 'Abcd12345'
+      });
+
+      expect(result2.body).toStrictEqual({ error: expect.any(String) });
+      expect(result2.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(400): New password has already been used before by this user - update password repeatedly', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao'
+      });
+
+      result1 = putRequest('/v1/admin/user/password', {
+        token: `${person1.body.token}`,
+        oldPassword: 'Abcd12345',
+        newPassword: 'Bcde12345'
+      });
+
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toBe(OK);
+
+      result2 = putRequest('/v1/admin/user/password', {
+        token: `${person1.body.token}`,
+        oldPassword: 'Bcde12345',
+        newPassword: 'Cdef12345'
+      });
+
+      expect(result2.body).toStrictEqual({});
+      expect(result2.status).toBe(OK);
+
+      result3 = putRequest('/v1/admin/user/password', {
+        token: `${person1.body.token}`,
+        oldPassword: 'Cdef12345',
+        newPassword: 'Bcde12345'
+      });
+
+      expect(result3.body).toStrictEqual({ error: expect.any(String) });
+      expect(result3.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(400): New password is less than 8 characters', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao'
+      });
+
+      result1 = putRequest('/v1/admin/user/password', {
+        token: `${person1.body.token}`,
+        oldPassword: 'Abcd12345',
+        newPassword: 'Bcde123'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(400): New password does not contain at least one number and at least one letter - all letters', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao'
+      });
+
+      result1 = putRequest('/v1/admin/user/password', {
+        token: `${person1.body.token}`,
+        oldPassword: 'Abcd12345',
+        newPassword: 'aBcDeFgHi'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(400): New password does not contain at least one number and at least one letter - all numbers', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao'
+      });
+
+      result1 = putRequest('/v1/admin/user/password', {
+        token: `${person1.body.token}`,
+        oldPassword: 'Abcd12345',
+        newPassword: '123456789'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(400): New password does not contain at least one number and at least one letter - non-alphanumeric characters', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao'
+      });
+
+      result1 = putRequest('/v1/admin/user/password', {
+        token: `${person1.body.token}`,
+        oldPassword: 'Abcd12345',
+        newPassword: '!@#$%^&*('
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(401): Token is not a valid structure - too short', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao'
+      });
+
+      result1 = putRequest('/v1/admin/user/password', {
+        token: '1234',
+        oldPassword: 'Abcd12345',
+        newPassword: 'Bcde12345'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(UNAUTHORISED);
+    });
+
+    test('CASE(401): Token is not a valid structure - too long', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao'
+      });
+
+      result1 = putRequest('/v1/admin/user/password', {
+        token: '123456',
+        oldPassword: 'Abcd12345',
+        newPassword: 'Bcde12345'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(UNAUTHORISED);
+    });
+
+    test('CASE(401): Token is not a valid structure - special characters', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao'
+      });
+
+      result1 = putRequest('/v1/admin/user/password', {
+        token: '!@#$%',
+        oldPassword: 'Abcd12345',
+        newPassword: 'Bcde12345'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(UNAUTHORISED);
+    });
+
+    test('CASE(403): Provided token is valid structure, but it not for a currently logged in session', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao'
+      });
+
+      result1 = putRequest('/v1/admin/user/password', {
+        token: '12345',
+        oldPassword: 'Abcd12345',
+        newPassword: 'Bcde12345'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(FORBIDDEN);
+    });
+  });
+});
+
 describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', () => {
   beforeEach(() => {
     person1 = postRequest('/v1/admin/auth/register', {
@@ -4183,269 +4447,5 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
     );
     expect(result1.body).toStrictEqual({ error: expect.any(String) });
     expect(result1.status).toBe(INPUT_ERROR);
-  });
-});
-
-describe('/////// /v1/admin/user/password ///////', () => {
-  describe('/////// /v1/admin/user/password runs ///////', () => {
-    test('CASE(200): adminAuthUpdatePassword runs successfully', () => {
-      person1 = postRequest('/v1/admin/auth/register', {
-        email: 'zhizhao@gmail.com',
-        password: 'Abcd12345',
-        nameFirst: 'Zhi',
-        nameLast: 'Zhao',
-      });
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde12345'
-      });
-
-      expect(result1.body).toStrictEqual({});
-      expect(result1.status).toBe(OK);
-
-      result2 = postRequest('/v1/admin/auth/logout', {
-        token: `${person1.body.token}`,
-      });
-
-      expect(result2.body).toStrictEqual({});
-      expect(result2.status).toBe(OK);
-
-      result3 = postRequest('/v1/admin/auth/login', {
-        email: 'zhizhao@gmail.com',
-        password: 'Bcde12345'
-      });
-
-      expect(result3.body).toStrictEqual({ token: expect.any(string) });
-      expect(result3.status).toBe(OK);
-    })
-  })
-
-  describe('/////// /v1/admin/user/password error ///////', () => {
-    test('CASE(400): New password is not the correct old password', () => {
-      person1 = postRequest('/v1/admin/auth/register', {
-        email: 'zhizhao@gmail.com',
-        password: 'Abcd12345',
-        nameFirst: 'Zhi',
-        nameLast: 'Zhao'
-      });
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'Abcd12345'
-      });
-
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(INPUT_ERROR);
-    });
-
-    test('CASE(400): New password has already been used before by this user - initial password', () => {
-      person1 = postRequest('/v1/admin/auth/register', {
-        email: 'zhizhao@gmail.com',
-        password: 'Abcd12345',
-        nameFirst: 'Zhi',
-        nameLast: 'Zhao'
-      });
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde12345'
-      });
-
-      expect(result1.body).toStrictEqual({});
-      expect(result1.status).toBe(OK);
-      
-      result2 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Bcde12345',
-        newPassword: 'Abcd12345'
-      });
-
-      expect(result2.body).toStrictEqual({ error: expect.any(String) });
-      expect(result2.status).toBe(INPUT_ERROR);
-    });
-
-    test('CASE(400): New password has already been used before by this user - update password repeatedly', () => {
-      person1 = postRequest('/v1/admin/auth/register', {
-        email: 'zhizhao@gmail.com',
-        password: 'Abcd12345',
-        nameFirst: 'Zhi',
-        nameLast: 'Zhao'
-      });
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde12345'
-      });
-
-      expect(result1.body).toStrictEqual({});
-      expect(result1.status).toBe(OK);
-      
-      result2 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Bcde12345',
-        newPassword: 'Cdef12345'
-      });
-
-      expect(result2.body).toStrictEqual({});
-      expect(result2.status).toBe(OK);
-
-      result3 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Cdef12345',
-        newPassword: 'Bcde12345'
-      });
-
-      expect(result3.body).toStrictEqual({ error: expect.any(string) });
-      expect(result3.status).toBe(INPUT_ERROR);
-    });
-
-    test('CASE(400): New password is less than 8 characters', () => {
-      person1 = postRequest('/v1/admin/auth/register', {
-        email: 'zhizhao@gmail.com',
-        password: 'Abcd12345',
-        nameFirst: 'Zhi',
-        nameLast: 'Zhao'
-      });  
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde123'
-      });
-
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(INPUT_ERROR);
-    });
-
-    test('CASE(400): New password does not contain at least one number and at least one letter - all letters', () => {
-      person1 = postRequest('/v1/admin/auth/register', {
-        email: 'zhizhao@gmail.com',
-        password: 'Abcd12345',
-        nameFirst: 'Zhi',
-        nameLast: 'Zhao'
-      });   
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'aBcDeFgHi'
-      });
-
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(INPUT_ERROR);
-    });
-
-    test('CASE(400): New password does not contain at least one number and at least one letter - all numbers', () => {
-      person1 = postRequest('/v1/admin/auth/register', {
-        email: 'zhizhao@gmail.com',
-        password: 'Abcd12345',
-        nameFirst: 'Zhi',
-        nameLast: 'Zhao'
-      });   
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: '123456789'
-      });
-
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(INPUT_ERROR);
-    });
-
-    test('CASE(400): New password does not contain at least one number and at least one letter - non-alphanumeric characters', () => {
-      person1 = postRequest('/v1/admin/auth/register', {
-        email: 'zhizhao@gmail.com',
-        password: 'Abcd12345',
-        nameFirst: 'Zhi',
-        nameLast: 'Zhao'
-      });   
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: '!@#$%^&*('
-      });
-
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(INPUT_ERROR);
-    });
-
-    test('CASE(401): Token is not a valid structure - too short', () => {
-      person1 = postRequest('/v1/admin/auth/register', {
-        email: 'zhizhao@gmail.com',
-        password: 'Abcd12345',
-        nameFirst: 'Zhi',
-        nameLast: 'Zhao'
-      });
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `1234`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde12345'
-      });
-
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
-
-    test('CASE(401): Token is not a valid structure - too long', () => {
-      person1 = postRequest('/v1/admin/auth/register', {
-        email: 'zhizhao@gmail.com',
-        password: 'Abcd12345',
-        nameFirst: 'Zhi',
-        nameLast: 'Zhao'
-      });
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `123456`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde12345'
-      });
-
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
-
-    test('CASE(401): Token is not a valid structure - special characters', () => {
-      person1 = postRequest('/v1/admin/auth/register', {
-        email: 'zhizhao@gmail.com',
-        password: 'Abcd12345',
-        nameFirst: 'Zhi',
-        nameLast: 'Zhao'
-      });
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `!@#$%`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde12345'
-      });
-
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
-
-    test('CASE(403): Provided token is valid structure, but it not for a currently logged in session', () => {
-      person1 = postRequest('/v1/admin/auth/register', {
-        email: 'zhizhao@gmail.com',
-        password: 'Abcd12345',
-        nameFirst: 'Zhi',
-        nameLast: 'Zhao'
-      });
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `12345`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde12345'
-      });
-
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(FORBIDDEN);
-    });
   });
 });
