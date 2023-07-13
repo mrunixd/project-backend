@@ -276,4 +276,32 @@ function adminAuthUpdateDetails(userId: number, email: string, nameFirst: string
   return {};
 }
 
-export { adminAuthRegister, adminAuthLogin, adminAuthLogout, adminUserDetails, adminAuthUpdateDetails };
+function adminAuthUpdatePassword(userId: number, oldPassword: string, newPassword: string): Record<string, never> | ErrorObject {
+  const data = getData();
+
+  const user = data.users.find(user => user.authUserId === userId);
+  user.pastPasswords.push(oldPassword);
+
+  if (newPassword === oldPassword) {
+    return { error: 'New password must not be the correct old password' };
+  }
+
+  for (const password of data.users.pastPasswords) {
+    if (newPassword === password) {
+      return { error: 'New password has already been used before by this user' };
+    }
+  }
+
+  if (newPassword.length < 8) {
+    return { error: 'New password is less than 8 characters'};
+  }
+
+  if (/\d/.test(newPassword) && /[a-zA-Z]/.test(newPassword)) {
+    return { error: 'New password does not contain at least one number and at least one letter' };
+  }
+
+  setData(data);
+  return {};
+}
+
+export { adminAuthRegister, adminAuthLogin, adminAuthLogout, adminUserDetails, adminAuthUpdateDetails, adminAuthUpdatePassword };
