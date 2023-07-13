@@ -38,6 +38,14 @@ interface NewQuestionId {
   newQuestionId: number;
 }
 
+enum Colours {
+  red = 'red',
+  blue = 'blue',
+  green = 'green',
+  yellow = 'yellow',
+  purple = 'purple',
+  orange = 'orange'
+}
 /**
  * This function provides a list of all the quizzes owned by the currently
  * logged in user.
@@ -113,9 +121,10 @@ function adminQuizCreate(
     return { error: 'Description is more than 100 characters' };
   }
 
-  const quizId = data.quizzes.length;
+  const quizId = data.quizCounter;
   const currentTime = Math.floor(Date.now() / 1000);
-
+  
+  data.quizCounter++;
   // Adds quiz to the quizIds array in this user's object.
   user.quizIds.push({
     quizId: quizId,
@@ -397,7 +406,14 @@ function adminQuizQuestion(
   }
 
   const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
-    const colour = answer.correct ? 'green' : 'red';
+    
+    const numbers = [0, 1, 2, 3, 4, 5];
+    const randomIndex = Math.floor(Math.random() * numbers.length);
+    const pickedNumber = numbers[randomIndex];
+    // Remove the picked number from the array
+    numbers.splice(randomIndex, 1);
+    
+    const colour: string = Object.values(Colours)[randomIndex];
     return {
       answerId: index,
       answer: answer.answer,
@@ -740,7 +756,14 @@ function adminQuizQuestionUpdate(authUserId: number, quizId: number, questionId:
   }
 
   const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
-    const colour = answer.correct ? 'green' : 'red';
+    
+    const numbers = [0, 1, 2, 3, 4, 5];
+    const randomIndex = Math.floor(Math.random() * numbers.length);
+    const pickedNumber = numbers[randomIndex];
+    // Remove the picked number from the array
+    numbers.splice(randomIndex, 1);
+    
+    const colour = Object.values(Colours)[randomIndex];
     return {
       answerId: index,
       answer: answer.answer,
