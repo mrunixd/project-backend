@@ -489,10 +489,10 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
   }
   return res.json(response);
 });
-
-app.delete('/v1/admin/quiz/:quizid/question/:question', (req: Request, res: Response) => {
-  const quizid = parseInt(req.params.quizid);
-  const questionid = parseInt(req.params.questionid);
+//question delete
+app.delete('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
   const token = req.query.token.toString();
 
   if (!checkValidToken(token)) {
@@ -505,12 +505,13 @@ app.delete('/v1/admin/quiz/:quizid/question/:question', (req: Request, res: Resp
         'Provided token is valid structure, but is not for a currently logged in session',
     });
   }
-  const response = adminQuizQuestionDelete(userId, quizid, questionid);
+  const response = adminQuizQuestionDelete(userId, quizId, questionId);
   if ('error' in response) {
     return res.status(400).json(response);
   }
   return res.json(response);
 });
+
 
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
