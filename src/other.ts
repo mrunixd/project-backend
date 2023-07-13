@@ -14,6 +14,7 @@ function clear() {
     quizzes: [],
     tokens: [],
     unclaimedQuestionId: 0,
+    quizCounter: 0,
   };
   setData(clearData);
   return {};
