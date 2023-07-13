@@ -105,7 +105,8 @@ function adminQuizCreate(
   } else if (
     user.quizIds &&
     Array.isArray(user.quizIds) &&
-    user.quizIds.some((quiz) => quiz.name === name)
+    user.quizIds.some((quiz) => quiz.name === name) ||
+    (user.trash.some((quiz) => quiz.name === name))
   ) {
     return { error: 'Name is already used for another quiz' };
   } else if (description.length > 100) {
@@ -207,7 +208,10 @@ function adminQuizInfo(authUserId: number, quizId: number): Quiz | ErrorObject {
     return { error: 'AuthUserId is not a valid user' };
   } else if (selected === undefined) {
     return { error: 'Quiz Id does not refer to a valid quiz' };
-  } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
+  } else if (
+    !(user.quizIds.some((quiz) => quiz.quizId === quizId)) &&
+    !(user.trash.some((quiz) => quiz.quizId === quizId))
+  ) {
     return { error: 'Quiz Id does not refer to a quiz that this user owns' };
   }
 
