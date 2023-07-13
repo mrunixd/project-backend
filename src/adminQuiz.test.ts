@@ -1,36 +1,3 @@
-import {
-  adminQuizCreate,
-  adminQuizList,
-  adminQuizInfo,
-  adminQuizRemove,
-  adminQuizNameUpdate,
-  adminQuizDescriptionUpdate,
-  adminQuizQuestion
-} from './quiz';
-import { adminAuthRegister, adminAuthLogin } from './auth';
-import { clear, sessionIdtoUserId } from './other';
-
-let result1: any;
-let result2: any;
-let person1: any;
-let person2: any;
-let quiz1: any;
-let quiz2: any;
-let person1authUserId: any;
-let quizQuestion: any;
-
-beforeEach(() => {
-  clear();
-  result1 = undefined;
-  result2 = undefined;
-  person1 = undefined;
-  person2 = undefined;
-  quiz1 = undefined;
-  quiz2 = undefined;
-  person1authUserId = undefined;
-  quizQuestion = undefined;
-});
-
 // ====================================================================
 //  == TESTS ARE NO LONGER BLACKBOX AS THEY AREN'T TESTED FOR ITER2 ==
 // ====================================================================
