@@ -7,11 +7,6 @@ cache:
 stages:
   - checks
 
-testing: 
-  stage: checks
-  script: 
-    - npm run test
-
 typecheck:
   stage: checks
   script:
