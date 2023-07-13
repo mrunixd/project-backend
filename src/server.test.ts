@@ -131,7 +131,7 @@ describe('////////TESTING v1/admin/auth/register////////', () => {
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
-    test('CASE: First name is is invalid', () => {
+    test('CASE: First name is invalid', () => {
       result1 = postRequest('/v1/admin/auth/register', {
         email: 'vincentxian@gmail.com',
         password: 'vincentpassword1',
@@ -153,7 +153,7 @@ describe('////////TESTING v1/admin/auth/register////////', () => {
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
-    test('CASE: Last name is is invalid', () => {
+    test('CASE: Last name is invalid', () => {
       result1 = postRequest('/v1/admin/auth/register', {
         email: 'vincentxian@gmail.com',
         password: 'vincentpassword1',
@@ -3231,6 +3231,347 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
 
       expect(result2.body).toStrictEqual({ error: expect.any(String) });
       expect(result2.status).toBe(INPUT_ERROR);
+    });
+  });
+});
+
+describe('/////// /v1/admin/user/details //////', () => {
+  describe('////// adminAuthUpdateDetails runs ///////', () => {
+    test('CASE(200): Updated details successfully', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `${person1.body.token}`,
+        email: 'newEmail@gmail.com',
+        nameFirst: 'Vincent',
+        nameLast: 'Xian'
+      });
+
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toBe(OK);
+
+      result2 = getRequest('/v1/admin/user/details', {
+        token: `${person1.body.token}`
+      });
+
+      expect(result2.body).toMatchObject({ user: {
+        name: 'Vincent Xian',
+        email: 'newEmail@gmail.com',
+        numFailedPasswordsSinceLastLogin: expect.any(Number),
+        numSuccessfulLogins: expect.any(Number),
+        userId: expect.any(Number)
+      }});
+      expect(result2.status).toBe(OK);
+    });
+
+    test('CASE(200): Email is unchanged, other details change', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      person2 = postRequest('/v1/admin/auth/register', {
+        email: 'vincentxian@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Vincent',
+        nameLast: 'Xian',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `${person1.body.token}`,
+        email: 'zhizhao@gmail.com',
+        nameFirst: 'Vincent',
+        nameLast: 'Xian'
+      });
+
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toBe(OK);
+
+      result2 = getRequest('/v1/admin/user/details', {
+        token: `${person1.body.token}`
+      });
+
+      expect(result2.body).toMatchObject({ user: {
+        name: 'Vincent Xian',
+        email: 'zhizhao@gmail.com',
+        numFailedPasswordsSinceLastLogin: expect.any(Number),
+        numSuccessfulLogins: expect.any(Number),
+        userId: expect.any(Number)
+      }});
+      expect(result2.status).toBe(OK);
+    });
+  });
+
+  describe('////// adminAuthUpdateDetails errors ///////', () => {
+    test('CASE(400): Email is currently used for another user', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      person2 = postRequest('/v1/admin/auth/register', {
+        email: 'vincentxian@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Vincent',
+        nameLast: 'Xian',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `${person1.body.token}`,
+        email: 'vincentxian@gmail.com',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(400): Email is invalid', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `${person1.body.token}`,
+        email: 'invalidemail',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(400): First name contains forbidden characters - numbers', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `${person1.body.token}`,
+        email: 'vincentxian@gmail.com',
+        nameFirst: '12345',
+        nameLast: 'Zhao'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(400): First name contains forbidden characters - special characters/symbols', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `${person1.body.token}`,
+        email: 'vincentxian@gmail.com',
+        nameFirst: '!@#$%',
+        nameLast: 'Zhao'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(400): First name is either less than 2 characters or more than 20 characters long - too short', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `${person1.body.token}`,
+        email: 'vincentxian@gmail.com',
+        nameFirst: 'V',
+        nameLast: 'Zhao'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(400): First name is either less than 2 characters or more than 20 characters long - too long', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `${person1.body.token}`,
+        email: 'vincentxian@gmail.com',
+        nameFirst: 'VincentVincentVincent',
+        nameLast: 'Zhao'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(400): Last name contains forbidden characters - numbers', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `${person1.body.token}`,
+        email: 'vincentxian@gmail.com',
+        nameFirst: 'Zhi',
+        nameLast: '12345'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(400): Last name contains forbidden characters - special characters/symbols', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `${person1.body.token}`,
+        email: 'vincentxian@gmail.com',
+        nameFirst: 'Zhi',
+        nameLast: '!@#$%'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(400): Last name is either less than 2 characters or more than 20 characters long - too short', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `${person1.body.token}`,
+        email: 'vincentxian@gmail.com',
+        nameFirst: 'Zhi',
+        nameLast: 'Z'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(400): Last name is either less than 2 characters or more than 20 characters long - too long', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `${person1.body.token}`,
+        email: 'vincentxian@gmail.com',
+        nameFirst: 'Zhi',
+        nameLast: 'ZhaoZhaoZhaoZhaoZhaoZ'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE(401): Token is invalid structure - too short', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `1234`,
+        email: 'vincentxian@gmail.com',
+        nameFirst: 'Vincent',
+        nameLast: 'Xian'
+      });
+    });
+
+    test('CASE(401): Token is invalid structure - too long', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `123456`,
+        email: 'vincentxian@gmail.com',
+        nameFirst: 'Vincent',
+        nameLast: 'Xian'
+      });
+    });
+
+    test('CASE(401): Token is invalid structure - special characters', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `!@#$%`,
+        email: 'vincentxian@gmail.com',
+        nameFirst: 'Vincent',
+        nameLast: 'Xian'
+      });
+    });
+
+    test('CASE(403): Provided token is valid structure, but is not for a currently logged in session', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = putRequest('/v1/admin/user/details', {
+        token: `12345`,
+        email: 'vincentxian@gmail.com',
+        nameFirst: 'Vincent',
+        nameLast: 'Xian'
+      });
+
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(FORBIDDEN);
     });
   });
 });
