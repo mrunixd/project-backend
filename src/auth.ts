@@ -73,6 +73,7 @@ function adminAuthRegister(
   data.users.push({
     email: email,
     password: password,
+    pastPasswords: [],
     name: name,
     authUserId: authUserId,
     numSuccessfulLogins: 1,
@@ -276,6 +277,15 @@ function adminAuthUpdateDetails(userId: number, email: string, nameFirst: string
   return {};
 }
 
+/** Given a userId, the correct password, and a new password, this function updates the password of that
+ * specific user.
+ *
+ * @param {number} userId
+ * @param {string} oldPassword
+ * @param {string} newPassword
+ *
+ * @returns {}
+ */
 function adminAuthUpdatePassword(userId: number, oldPassword: string, newPassword: string): Record<string, never> | ErrorObject {
   const data = getData();
 
@@ -286,19 +296,21 @@ function adminAuthUpdatePassword(userId: number, oldPassword: string, newPasswor
     return { error: 'New password must not be the correct old password' };
   }
 
-  for (const password of data.users.pastPasswords) {
+  for (const password of user.pastPasswords) {
     if (newPassword === password) {
       return { error: 'New password has already been used before by this user' };
     }
   }
 
   if (newPassword.length < 8) {
-    return { error: 'New password is less than 8 characters'};
+    return { error: 'New password is less than 8 characters' };
   }
 
-  if (/\d/.test(newPassword) && /[a-zA-Z]/.test(newPassword)) {
+  if (/\d/.test(newPassword) === false || /[a-zA-Z]/.test(newPassword) === false) {
     return { error: 'New password does not contain at least one number and at least one letter' };
   }
+
+  user.password = newPassword;
 
   setData(data);
   return {};
