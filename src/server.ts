@@ -6,7 +6,7 @@ import cors from 'cors';
 import YAML from 'yaml';
 import sui from 'swagger-ui-express';
 import fs from 'fs';
-import { adminAuthRegister, adminAuthLogin, adminUserDetails, adminAuthLogout } from './auth';
+import { adminAuthRegister, adminAuthLogin, adminUserDetails, adminAuthLogout, adminAuthUpdateDetails } from './auth';
 import {
   adminQuizCreate,
   adminQuizList,
@@ -317,6 +317,29 @@ app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
   const userId = sessionIdtoUserId(token);
 
   const response = adminAuthLogout(userId);
+  if ('error' in response) {
+    return res.status(400).json(response);
+  }
+
+  return res.status(200).json(response);
+});
+
+app.put('/v1/admin/user/details', (req: Request, res: Response) => {
+  const { token, email, nameFirst, nameLast } = req.body;
+
+  if (!checkValidToken(token)) {
+    return res.status(401).json({ error: 'token has invalid structure' });
+  }
+
+  const userId = sessionIdtoUserId(token);
+  if (userId === -1) {
+    return res.status(403).json({
+      error:
+        'Provided token is valid structure, but is not for a currently logged in session',
+    });
+  }
+
+  const response = adminAuthUpdateDetails(userId, email, nameFirst, nameLast);
   if ('error' in response) {
     return res.status(400).json(response);
   }

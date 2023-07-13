@@ -50,7 +50,7 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
     return { error: 'Last name is invalid' };
   } else if (nameLast.length < 2 || nameLast.length > 20) {
     return {
-      error: 'Last name is less than 2 characters or more than 20 characters',
+      error: 'Last name is less than 2 characters or more than 20 characters'
     };
   } else if (password.length < 8) {
     return { error: 'Password is less than 8 characters' };
@@ -246,4 +246,51 @@ function adminUserDetails(authUserId: number): User | ErrorObject {
   };
 }
 
-export { adminAuthRegister, adminAuthLogin, adminAuthLogout, adminUserDetails };
+/** This function updates the non-password details of an existing user.
+ * 
+ * @param {number} userId 
+ * @param {string} email 
+ * @param {string} nameFirst 
+ * @param {string} nameLast 
+ * 
+ * @returns {}
+ */
+
+function adminAuthUpdateDetails(userId: number, email: string, nameFirst: string, nameLast: string): EmptyObject | ErrorObject {
+  const data = getData();
+
+  // This regex is used to test the validity of the first and last name.
+  const acceptedCharacters = /^[a-zA-Z' -]+$/;
+
+  // Checks if the selected user's email is the same as the email to be changed to.
+  const selected = data.users.find((users) => users.authUserId === userId);
+  if (selected.email !== email) {
+    if (data.users.find((user) => user.email === email)) {
+      return { error: 'Email is currently used by another user (excluding the current authorised user)' }
+    }
+  }
+
+  if (validator.isEmail(email) === false) {
+    return { error: 'Email address is not valid' };
+  } else if (acceptedCharacters.test(nameFirst) === false) {
+    return { error: 'First name is invalid' };
+  } else if (nameFirst.length < 2 || nameFirst.length > 20) {
+    return {
+      error: 'First name is less than 2 characters or more than 20 characters'
+    };
+  } else if (acceptedCharacters.test(nameLast) === false) {
+    return { error: 'Last name is invalid' };
+  } else if (nameLast.length < 2 || nameLast.length > 20) {
+    return {
+      error: 'Last name is less than 2 characters or more than 20 characters',
+    };
+  };
+
+  selected.email = email;
+  selected.name = nameFirst.concat(' ',nameLast);
+
+  setData(data);
+  return {};
+}
+
+export { adminAuthRegister, adminAuthLogin, adminAuthLogout, adminUserDetails, adminAuthUpdateDetails };
