@@ -618,6 +618,7 @@ function adminQuizTrash(
   }
   return { quizzes: user.trash };
 }
+
 function adminQuizRestore(
   authUserId: number,
   quizId: number
@@ -686,6 +687,7 @@ function adminQuizTrashEmpty(
   setData(data);
   return {};
 }
+
 
 function adminQuizQuestionUpdate(authUserId: number, quizId: number, questionId: number, questionBody: questionInput): EmptyObject | ErrorObject {
   const data = getData();
