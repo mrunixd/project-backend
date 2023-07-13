@@ -9,9 +9,6 @@ stages:
 
 tests:
   stage: checks
-  only:
-    - master
-    - merge_requests
   script:
     - SERVER_LOG=$(mktemp)
     - npm run start >& $SERVER_LOG &
