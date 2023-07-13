@@ -11,6 +11,8 @@ interface User {
   },
 }
 
+interface EmptyObject {}
+
 /**
  * This function registers a new user into Toohak: requires an email password
  * and first & last name to create a valid user, will then generate and return
@@ -176,6 +178,33 @@ function adminAuthLogin(email: string, password: string): SessionId | ErrorObjec
 }
 
 /**
+ * This function intakes a token and logs out the corresponding user, then
+ * resets their sessionId to undefined.
+ *
+ * @param {number} token
+ *
+ * @returns {}
+ */
+function adminAuthLogout(authUserId: number): EmptyObject | ErrorObject {
+  const data = getData();
+
+  // If the sessionId does not exist, the function sessionIdtoUserId returns -1.
+  if (authUserId === -1) {
+    return { error: 'This token is for a user who has already logged out.' };
+  }
+
+  // Finds the relevant token.
+  const userToken = data.tokens.find((token) => token.authUserId === authUserId);
+
+  // Resets the sessionId to undefined, where calling adminAuthLogin will generate
+  // another randomised sessionId.
+  userToken.sessionId = undefined;
+  setData(data);
+
+  return {};
+}
+
+/**
  * Given an admin user's authUserId, return details about the user.
  * "name" is the first and last name concatenated with a single space between them
  *
@@ -217,4 +246,4 @@ function adminUserDetails(authUserId: number): User | ErrorObject {
   };
 }
 
-export { adminAuthRegister, adminAuthLogin, adminUserDetails };
+export { adminAuthRegister, adminAuthLogin, adminAuthLogout, adminUserDetails };

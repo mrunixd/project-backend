@@ -618,6 +618,7 @@ function adminQuizTrash(
   }
   return { quizzes: user.trash };
 }
+
 function adminQuizRestore(
   authUserId: number,
   quizId: number
@@ -660,7 +661,7 @@ function adminQuizTrashEmpty(
   }
   // error checking array
   for (const string of array) {
-    let quizId = parseInt(string);
+    const quizId = parseInt(string);
     const quizzes = data.quizzes.find((quiz) => quiz.quizId === quizId);
     const trashQuiz = user.trash.find((quiz) => quiz.quizId === quizId);
     const workingQuizzes = user.quizIds.find((quiz) => quiz.quizId === quizId);
@@ -679,7 +680,7 @@ function adminQuizTrashEmpty(
   }
 
   for (const string of array) {
-    let quizId = parseInt(string);
+    const quizId = parseInt(string);
     const quizIndex = user.trash.findIndex((quiz) => quiz.quizId === quizId);
     user.trash.splice(quizIndex, 1);
   }
