@@ -11,8 +11,6 @@ interface User {
   };
 }
 
-interface EmptyObject {}
-
 /**
  * This function registers a new user into Toohak: requires an email password
  * and first & last name to create a valid user, will then generate and return
@@ -168,7 +166,7 @@ function adminAuthLogin(
  *
  * @returns {}
  */
-function adminAuthLogout(authUserId: number): EmptyObject | ErrorObject {
+function adminAuthLogout(authUserId: number): Record<string, never> | ErrorObject {
   const data = getData();
 
   // If the sessionId does not exist, the function sessionIdtoUserId returns -1.
@@ -232,16 +230,16 @@ function adminUserDetails(authUserId: number): User | ErrorObject {
 }
 
 /** This function updates the non-password details of an existing user.
- * 
- * @param {number} userId 
- * @param {string} email 
- * @param {string} nameFirst 
- * @param {string} nameLast 
- * 
+ *
+ * @param {number} userId
+ * @param {string} email
+ * @param {string} nameFirst
+ * @param {string} nameLast
+ *
  * @returns {}
  */
 
-function adminAuthUpdateDetails(userId: number, email: string, nameFirst: string, nameLast: string): EmptyObject | ErrorObject {
+function adminAuthUpdateDetails(userId: number, email: string, nameFirst: string, nameLast: string): Record<string, never> | ErrorObject {
   const data = getData();
 
   // This regex is used to test the validity of the first and last name.
@@ -251,7 +249,7 @@ function adminAuthUpdateDetails(userId: number, email: string, nameFirst: string
   const selected = data.users.find((users) => users.authUserId === userId);
   if (selected.email !== email) {
     if (data.users.find((user) => user.email === email)) {
-      return { error: 'Email is currently used by another user (excluding the current authorised user)' }
+      return { error: 'Email is currently used by another user (excluding the current authorised user)' };
     }
   }
 
@@ -269,10 +267,10 @@ function adminAuthUpdateDetails(userId: number, email: string, nameFirst: string
     return {
       error: 'Last name is less than 2 characters or more than 20 characters',
     };
-  };
+  }
 
   selected.email = email;
-  selected.name = nameFirst.concat(' ',nameLast);
+  selected.name = nameFirst.concat(' ', nameLast);
 
   setData(data);
   return {};

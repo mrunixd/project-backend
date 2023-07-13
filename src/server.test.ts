@@ -3259,13 +3259,15 @@ describe('/////// /v1/admin/user/details //////', () => {
         token: `${person1.body.token}`
       });
 
-      expect(result2.body).toMatchObject({ user: {
-        name: 'Vincent Xian',
-        email: 'newEmail@gmail.com',
-        numFailedPasswordsSinceLastLogin: expect.any(Number),
-        numSuccessfulLogins: expect.any(Number),
-        userId: expect.any(Number)
-      }});
+      expect(result2.body).toMatchObject({
+        user: {
+          name: 'Vincent Xian',
+          email: 'newEmail@gmail.com',
+          numFailedPasswordsSinceLastLogin: expect.any(Number),
+          numSuccessfulLogins: expect.any(Number),
+          userId: expect.any(Number)
+        }
+      });
       expect(result2.status).toBe(OK);
     });
 
@@ -3298,13 +3300,15 @@ describe('/////// /v1/admin/user/details //////', () => {
         token: `${person1.body.token}`
       });
 
-      expect(result2.body).toMatchObject({ user: {
-        name: 'Vincent Xian',
-        email: 'zhizhao@gmail.com',
-        numFailedPasswordsSinceLastLogin: expect.any(Number),
-        numSuccessfulLogins: expect.any(Number),
-        userId: expect.any(Number)
-      }});
+      expect(result2.body).toMatchObject({
+        user: {
+          name: 'Vincent Xian',
+          email: 'zhizhao@gmail.com',
+          numFailedPasswordsSinceLastLogin: expect.any(Number),
+          numSuccessfulLogins: expect.any(Number),
+          userId: expect.any(Number)
+        }
+      });
       expect(result2.status).toBe(OK);
     });
   });
@@ -3516,7 +3520,7 @@ describe('/////// /v1/admin/user/details //////', () => {
       });
 
       result1 = putRequest('/v1/admin/user/details', {
-        token: `1234`,
+        token: '1234',
         email: 'vincentxian@gmail.com',
         nameFirst: 'Vincent',
         nameLast: 'Xian'
@@ -3532,7 +3536,7 @@ describe('/////// /v1/admin/user/details //////', () => {
       });
 
       result1 = putRequest('/v1/admin/user/details', {
-        token: `123456`,
+        token: '123456',
         email: 'vincentxian@gmail.com',
         nameFirst: 'Vincent',
         nameLast: 'Xian'
@@ -3548,7 +3552,7 @@ describe('/////// /v1/admin/user/details //////', () => {
       });
 
       result1 = putRequest('/v1/admin/user/details', {
-        token: `!@#$%`,
+        token: '!@#$%',
         email: 'vincentxian@gmail.com',
         nameFirst: 'Vincent',
         nameLast: 'Xian'
@@ -3564,7 +3568,7 @@ describe('/////// /v1/admin/user/details //////', () => {
       });
 
       result1 = putRequest('/v1/admin/user/details', {
-        token: `12345`,
+        token: '12345',
         email: 'vincentxian@gmail.com',
         nameFirst: 'Vincent',
         nameLast: 'Xian'
@@ -3575,7 +3579,6 @@ describe('/////// /v1/admin/user/details //////', () => {
     });
   });
 });
-
 
 describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', () => {
   beforeEach(() => {

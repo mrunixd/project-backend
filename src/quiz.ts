@@ -4,8 +4,6 @@ interface ErrorObject {
   error: string;
 }
 
-interface EmptyObject {}
-
 interface QuizId {
   quizId: number;
 }
@@ -641,7 +639,7 @@ function adminQuizTrash(
 function adminQuizRestore(
   authUserId: number,
   quizId: number
-): EmptyObject | ErrorObject {
+): Record<string, never> | ErrorObject {
   const data = getData();
   const user = data.users.find((user) => user.authUserId === authUserId);
   if (user === undefined) {
@@ -672,7 +670,7 @@ function adminQuizRestore(
 function adminQuizTrashEmpty(
   array: string[],
   userId: number
-): EmptyObject | ErrorObject {
+): Record<string, never> | ErrorObject {
   const data = getData();
   const user = data.users.find((user) => user.authUserId === userId);
   if (user === undefined) {
@@ -712,7 +710,7 @@ function adminQuizQuestionUpdate(
   quizId: number,
   questionId: number,
   questionBody: questionInput
-): EmptyObject | ErrorObject {
+): Record<string, never> | ErrorObject {
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
@@ -824,7 +822,7 @@ function adminQuizQuestionDelete(
   authUserId: number,
   quizId: number,
   questionId: number
-): EmptyObject | ErrorObject {
+): Record<string, never> | ErrorObject {
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);

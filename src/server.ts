@@ -7,12 +7,12 @@ import YAML from 'yaml';
 import sui from 'swagger-ui-express';
 import fs from 'fs';
 
-import { 
-  adminAuthRegister, 
-  adminAuthLogin, 
-  adminUserDetails, 
-  adminAuthLogout, 
-  adminAuthUpdateDetails 
+import {
+  adminAuthRegister,
+  adminAuthLogin,
+  adminUserDetails,
+  adminAuthLogout,
+  adminAuthUpdateDetails
 } from './auth';
 
 import {
