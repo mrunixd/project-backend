@@ -7,10 +7,12 @@ cache:
 stages:
   - checks
 
-testing: 
+tests:
   stage: checks
-  script: 
-    - npm run test
+  only:
+    - master
+    - merge_requests
+  script:
     - SERVER_LOG=$(mktemp)
     - npm run start >& $SERVER_LOG &
     - timeout 10s grep -q "⚡️ Server started on port" <(tail -f $SERVER_LOG) || exit 1
@@ -31,4 +33,3 @@ linting:
 
 before_script:
   - npm install
-
