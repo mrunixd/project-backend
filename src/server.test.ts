@@ -3623,24 +3623,27 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
   });
 
   test('CASE: Successful delete 1 quiz question', () => {
-      result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}?token=${person1.body.token}`, {});
-      expect(result1.body).toStrictEqual({});
-      expect(result1.status).toBe(OK)
-      result2 = getRequest(
-        `/v1/admin/quiz/${quiz1.body.quizId}?token=${person1.body.token}`,
-        {}
-      );
+    
+    result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}?token=${person1.body.token}`, {});
 
-      expect(result1.body).toStrictEqual({
-        quizId: quiz1.body.quizId,
-        name: 'first quiz',
-        timeCreated: expect.any(Number),
-        timeLastEdited: expect.any(Number),
-        description: 'first quiz being tested',
-        numQuestions: 0,
-        questions: [],
-        duration: 0,
-      });
+    expect(result1.body).toStrictEqual({});
+    expect(result1.status).toBe(OK)
+    
+    result2 = getRequest(
+      `/v1/admin/quiz/${quiz1.body.quizId}?token=${person1.body.token}`,
+      {}
+    );
+
+     expect(result2.body).toStrictEqual({
+      quizId: quiz1.body.quizId,
+      name: 'first quiz',
+      timeCreated: expect.any(Number),
+      timeLastEdited: expect.any(Number),
+      description: 'first quiz being tested',
+      numQuestions: 0,
+      questions: [],
+      duration: 0,
+    });
   });
 
   test('CASE: Successful delete 1 out of 2 questions', () => {
@@ -3659,7 +3662,7 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
         },
       ],
     };
-    postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
+    const quizQuestion2 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
       token: `${person1.body.token}`,
       questionBody: quizQuestion2Body,
     });
@@ -3702,55 +3705,54 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
       ],
       duration: 2,
     });
-});
+  });
 
+  test('CASE (401): Token is not a valid structure - too short', () => {
+    result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}?token=${1}`, {});
+    expect(result1.body).toStrictEqual({ error: expect.any(String) });
+    expect(result1.status).toBe(UNAUTHORISED);
+  });
 
-  describe('Testing /v1/admin/quiz/{quizid}/question error cases', () => {
-    test('CASE (401): Token is not a valid structure - too short', () => {
-      result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}?token=${1}`, {});
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
+  test('CASE (401): Token is not a valid structure - special symbols', () => {
+    result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}?token=${11_11}`, {});  
+    expect(result1.body).toStrictEqual({ error: expect.any(String) });
+    expect(result1.status).toBe(UNAUTHORISED);
+  });
 
-    test('CASE (401): Token is not a valid structure - special symbols', () => {
-      result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}?token=${lett!}`, {});  
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
+  test('CASE (403): Token is not valid for a currently logged in session', () => {
+    const sessionId = parseInt(person1.body.token) + 1;
+    result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}?token=${sessionId}`, {});
+    expect(result1.body).toStrictEqual({ error: expect.any(String) });
+    expect(result1.status).toBe(FORBIDDEN);
+  });
 
-    test('CASE (403): Token is not valid for a currently logged in session', () => {
-      const sessionId = parseInt(person1.body.token) + 1;
-      result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}?token=${sessionId}`, {});
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(FORBIDDEN);
-    });
+  test('CASE: Quiz ID does not exist', () => {
+    result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId + 1}/question/${quizQuestion1.body.questionId}?token=${person1.body.token}`, {});
 
-    test('CASE: Quiz ID does not exist', () => {
-      result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId + 1}/question/${quizQuestion1.body.questionId}?token=${person1.body.token}`, {});
-
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(INPUT_ERROR);
-    });
+    expect(result1.body).toStrictEqual({ error: expect.any(String) });
+    expect(result1.status).toBe(INPUT_ERROR);
+  });
   
-    test('CASE: Quiz ID does not refer to a quiz that this user owns', () => {
-      person2 = postRequest('/v1/admin/auth/register', {
-        email: 'vincent@gmail.com',
-        password: 'password1',
-        nameFirst: 'vincent',
-        nameLast: 'xian',
-      });
-      result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}?token=${person2.body.token}`, {});
+  test('CASE: Quiz ID does not refer to a quiz that this user owns', () => {
+    person2 = postRequest('/v1/admin/auth/register', {
+      email: 'vincent@gmail.com',
+      password: 'password1',
+      nameFirst: 'vincent',
+      nameLast: 'xian',
+    });
+    result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}?token=${person2.body.token}`, {});
 
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(INPUT_ERROR);
-    });
+    expect(result1.body).toStrictEqual({ error: expect.any(String) });
+    expect(result1.status).toBe(INPUT_ERROR);
+  });
     
-    test('CASE: Question ID does not refer to a valid quesion within this quiz', () => {
-      result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId + 1}`, {
-        token: `${person1.body.token}`,
-      });
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(INPUT_ERROR);
+  test('CASE: Question ID does not refer to a valid quesion within this quiz', () => {
+    result1 = deleteRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId + 1}`, {
+      token: `${person1.body.token}`,
     });
+    expect(result1.body).toStrictEqual({ error: expect.any(String) });
+    expect(result1.status).toBe(INPUT_ERROR);
   });
 });
+
+
