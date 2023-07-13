@@ -178,7 +178,7 @@ function adminAuthLogin(email: string, password: string): SessionId | ErrorObjec
 }
 
 /**
- * This function intakes a token and logs out the corresponding user, then 
+ * This function intakes a token and logs out the corresponding user, then
  * resets their sessionId to undefined.
  *
  * @param {number} token
@@ -195,12 +195,12 @@ function adminAuthLogout(authUserId: number): EmptyObject | ErrorObject {
 
   // Finds the relevant token.
   const userToken = data.tokens.find((token) => token.authUserId === authUserId);
-  
-  // Resets the sessionId to undefined, where calling adminAuthLogin will generate 
+
+  // Resets the sessionId to undefined, where calling adminAuthLogin will generate
   // another randomised sessionId.
   userToken.sessionId = undefined;
   setData(data);
-  
+
   return {};
 }
 

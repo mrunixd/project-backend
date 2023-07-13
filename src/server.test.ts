@@ -2850,7 +2850,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       );
     });
     test('Testing successful restoration of 1 quiz', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       const result1 = postRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}/restore`,
         { token: sessionId }
@@ -2859,7 +2859,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       expect(result1.status).toStrictEqual(OK);
     });
     test('Testing successful restoration of 2 quiz', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       deleteRequest(
         `/v1/admin/quiz/${quiz2.body.quizId}?token=${sessionId}`,
         {}
@@ -2878,7 +2878,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       expect(result2.status).toStrictEqual(OK);
     });
     test('Testing successful restoratiasdfdon of 2 quiz', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       deleteRequest(
         `/v1/admin/quiz/${quiz3.body.quizId}?token=${sessionId}`,
         {}
@@ -2911,7 +2911,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       );
     });
     test('CASE (400): Quiz id does not refer to a valid quiz', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       const result1 = postRequest(
         `/v1/admin/quiz/${quiz1.body.quizId + 1}/restore`,
         { token: sessionId }
@@ -2941,7 +2941,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (401): Token is not a valid structure', () => {
-      const result1 = postRequest(`/v1/admin/quiz/1111/restore`, {
+      const result1 = postRequest('/v1/admin/quiz/1111/restore', {
         token: '1234_',
       });
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3002,7 +3002,7 @@ describe('////////Testing /v1/admin/quiz/trash/empty', () => {
   });
   describe('Testing /v1/admin/quiz/trash/empty success cases', () => {
     test('testing successful deletion of 1 quiz in trash', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       const result1 = deleteRequest(
         `/v1/admin/quiz/trash/empty?token=${sessionId}&quizIds=[${quiz1.body.quizId}]`,
         {}
@@ -3024,7 +3024,7 @@ describe('////////Testing /v1/admin/quiz/trash/empty', () => {
       expect(result1.status).toStrictEqual(OK);
     });
     test('testing successful deletion of 2 quiz in trash', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       const result1 = deleteRequest(
         `/v1/admin/quiz/trash/empty?token=${sessionId}&quizIds=[${quiz1.body.quizId},${quiz2.body.quizId}]`,
         {}
@@ -3044,7 +3044,7 @@ describe('////////Testing /v1/admin/quiz/trash/empty', () => {
   });
   describe('Testing /v1/admin/quiz/trash/empty error cases', () => {
     test('CASE (400): One or more of the QuizIDs is not a valid quiz', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
       const result1 = deleteRequest(
         `/v1/admin/quiz/trash/empty?token=${sessionId}&quizIds=[${
           quiz1.body.quizId - 15
@@ -3063,7 +3063,7 @@ describe('////////Testing /v1/admin/quiz/trash/empty', () => {
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (400): One or more of the QuizIDs is not currently in trash', () => {
-      let sessionId = person1.body.token;
+      const sessionId = person1.body.token;
 
       postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/restore`, {
         token: sessionId,
@@ -3125,7 +3125,6 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
-
     });
 
     test('CASE: Login, logout, login, logout success', () => {
@@ -3148,7 +3147,7 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
         password: 'Abcd12345'
       });
 
-      expect(result2.body).toStrictEqual({ 
+      expect(result2.body).toStrictEqual({
         token: expect.any(String)
       });
       expect(result2.status).toBe(OK);
@@ -3188,7 +3187,7 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
       });
 
       result1 = postRequest('/v1/admin/auth/logout', {
-        token: `123456`
+        token: '123456'
       });
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3204,7 +3203,7 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
       });
 
       result1 = postRequest('/v1/admin/auth/logout', {
-        token: `SP!@#`
+        token: 'SP!@#'
       });
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
