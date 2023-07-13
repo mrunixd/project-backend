@@ -22,6 +22,7 @@ import {
   adminQuizRestore,
   adminQuizTrashEmpty,
   adminQuizQuestionUpdate,
+  adminQuizQuestionDelete
 } from './quiz';
 import { clear, sessionIdtoUserId, checkValidToken } from './other';
 
@@ -488,6 +489,29 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
   }
   return res.json(response);
 });
+
+app.delete('/v1/admin/quiz/:quizid/question/:question', (req: Request, res: Response) => {
+  const quizid = parseInt(req.params.quizid);
+  const questionid = parseInt(req.params.questionid);
+  const token = req.query.token.toString();
+
+  if (!checkValidToken(token)) {
+    return res.status(401).json({ error: 'token has invalid structure' });
+  }
+  const userId = sessionIdtoUserId(token);
+  if (userId === -1) {
+    return res.status(403).json({
+      error:
+        'Provided token is valid structure, but is not for a currently logged in session',
+    });
+  }
+  const response = adminQuizQuestionDelete(userId, quizid, questionid);
+  if ('error' in response) {
+    return res.status(400).json(response);
+  }
+  return res.json(response);
+});
+
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================
