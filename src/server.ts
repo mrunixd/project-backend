@@ -6,7 +6,15 @@ import cors from 'cors';
 import YAML from 'yaml';
 import sui from 'swagger-ui-express';
 import fs from 'fs';
-import { adminAuthRegister, adminAuthLogin, adminUserDetails, adminAuthLogout, adminAuthUpdateDetails } from './auth';
+
+import { 
+  adminAuthRegister, 
+  adminAuthLogin, 
+  adminUserDetails, 
+  adminAuthLogout, 
+  adminAuthUpdateDetails 
+} from './auth';
+
 import {
   adminQuizCreate,
   adminQuizList,
@@ -21,8 +29,11 @@ import {
   adminQuizTrash,
   adminQuizRestore,
   adminQuizTrashEmpty,
+  adminQuizQuestionUpdate,
+  adminQuizQuestionDelete,
 } from './quiz';
 import { clear, sessionIdtoUserId, checkValidToken } from './other';
+import { getData, setData } from './dataStore';
 
 // Set up web app
 const app = express();
@@ -49,9 +60,9 @@ const HOST: string = process.env.IP || 'localhost';
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
-
-// setData(getDataGlobal());
-// setInterval(function() {setDataGlobal()}, 1000);
+const data = getData();
+data.tokens = [];
+setData(data);
 
 // Example get request
 app.get('/echo', (req: Request, res: Response) => {
@@ -227,6 +238,38 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   return res.json(response);
 });
 
+// question update
+app.put(
+  '/v1/admin/quiz/:quizid/question/:questionid',
+  (req: Request, res: Response) => {
+    const quizId = parseInt(req.params.quizid);
+    const questionId = parseInt(req.params.questionid);
+    const { token, questionBody } = req.body;
+
+    if (!checkValidToken(token)) {
+      return res.status(401).json({ error: 'token has invalid structure' });
+    }
+    const userId = sessionIdtoUserId(token);
+    if (userId === -1) {
+      return res.status(403).json({
+        error:
+          'Provided token is valid structure, but is not for a currently logged in session',
+      });
+    }
+
+    const response = adminQuizQuestionUpdate(
+      userId,
+      quizId,
+      questionId,
+      questionBody
+    );
+    if ('error' in response) {
+      return res.status(400).json(response);
+    }
+    return res.json(response);
+  }
+);
+
 app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const { token, name } = req.body;
@@ -378,6 +421,37 @@ app.put(
   }
 );
 
+// app.put(
+//   '/v1/admin/quiz/:quizid/question/:questionid/move',
+//   (req: Request, res: Response) => {
+//     const quizId = parseInt(req.params.quizid);
+//     const questionId = parseInt(req.params.questionid);
+//     const { token, newPosition } = req.body;
+
+//     if (!checkValidToken(token)) {
+//       return res.status(401).json({ error: 'token has invalid structure' });
+//     }
+//     const userId = sessionIdtoUserId(token);
+//     if (userId === -1) {
+//       return res.status(403).json({
+//         error:
+//           'Provided token is valid structure, but is not for a currently logged in session',
+//       });
+//     }
+
+//     const response = adminQuizQuestionMove(
+//       userId,
+//       quizId,
+//       questionId,
+//       newPosition
+//     );
+//     if ('error' in response) {
+//       return res.status(400).json(response);
+//     }
+//     return res.json(response);
+//   }
+// );
+
 app.post(
   '/v1/admin/quiz/:quizid/question/:questionid/duplicate',
   (req: Request, res: Response) => {
@@ -447,6 +521,32 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
   }
   return res.json(response);
 });
+// question delete
+app.delete(
+  '/v1/admin/quiz/:quizid/question/:questionid',
+  (req: Request, res: Response) => {
+    const quizId = parseInt(req.params.quizid);
+    const questionId = parseInt(req.params.questionid);
+    const token = req.query.token.toString();
+
+    if (!checkValidToken(token)) {
+      return res.status(401).json({ error: 'token has invalid structure' });
+    }
+    const userId = sessionIdtoUserId(token);
+    if (userId === -1) {
+      return res.status(403).json({
+        error:
+          'Provided token is valid structure, but is not for a currently logged in session',
+      });
+    }
+    const response = adminQuizQuestionDelete(userId, quizId, questionId);
+    if ('error' in response) {
+      return res.status(400).json(response);
+    }
+    return res.json(response);
+  }
+);
+
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================

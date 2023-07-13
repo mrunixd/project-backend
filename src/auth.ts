@@ -8,7 +8,7 @@ interface User {
     email: string;
     numSuccessfulLogins: number;
     numFailedPasswordsSinceLastLogin: number;
-  },
+  };
 }
 
 interface EmptyObject {}
@@ -25,7 +25,12 @@ interface EmptyObject {}
  *
  * @returns {authUserId: integer}
  */
-function adminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string): SessionId | ErrorObject {
+function adminAuthRegister(
+  email: string,
+  password: string,
+  nameFirst: string,
+  nameLast: string
+): SessionId | ErrorObject {
   const data = getData();
   // These regexes are needed to check for valid characters in names & password
   const acceptedCharacters = /^[a-zA-Z0-9' -]+$/;
@@ -75,7 +80,7 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
     numSuccessfulLogins: 1,
     numFailedPasswordsSinceLastLogin: 0,
     quizIds: [],
-    trash: []
+    trash: [],
   });
 
   // Generates a unique 5 digit number for the new sessionId
@@ -92,12 +97,12 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
 
   data.tokens.push({
     sessionId: sessionId,
-    authUserId: authUserId
+    authUserId: authUserId,
   });
   setData(data);
 
   return {
-    token: sessionId
+    token: sessionId,
   };
 }
 
@@ -111,48 +116,26 @@ function adminAuthRegister(email: string, password: string, nameFirst: string, n
  *
  * @returns {authUserId: integer}
  */
-function adminAuthLogin(email: string, password: string): SessionId | ErrorObject {
+function adminAuthLogin(
+  email: string,
+  password: string
+): SessionId | ErrorObject {
   const data = getData();
 
-  // Error in finding user with matching email; returns error if email not found
-  if (
-    !data.users.some(
-      (users) => users.email.toLowerCase() === email.toLowerCase()
-    )
-  ) {
-    return {
-      error: 'Email address does not exist',
-    };
-  }
-
-  const userEmail = data.users.find(
-    (users) => users.email.toLowerCase() === email.toLowerCase()
+  const selectedUser = data.users.find(
+    (user) => user.email.toLowerCase() === email.toLowerCase()
   );
-  if (userEmail === undefined) {
-    // Increment numFailedPasswordsSinceLastLogin if password & email incorrect
-    return {
-      error: 'Password is incorrect',
-    };
+  if (selectedUser === undefined) {
+    return { error: 'Email address does not exist' };
   }
-  userEmail.numFailedPasswordsSinceLastLogin++;
-
-  // By this point, inputs must be valid
-  // Find index of user to return their respective authUserId
-  const user = data.users.find(
-    (users) =>
-      users.email.toLowerCase() === email.toLowerCase() &&
-      users.password === password
-  );
-
-  if (user === undefined) {
-    // Increment numFailedPasswordsSinceLastLogin if password & email incorrect
-    return {
-      error: 'Email Address does not exist.',
-    };
+  if (selectedUser.password !== password) {
+    selectedUser.numFailedPasswordsSinceLastLogin++;
+    return { error: 'Password is incorrect' };
   }
+
   // Increment numSuccesfulLogins && reset numFailedPasswordsSinceLastLogin
-  user.numSuccessfulLogins++;
-  user.numFailedPasswordsSinceLastLogin = 0;
+  selectedUser.numSuccessfulLogins++;
+  selectedUser.numFailedPasswordsSinceLastLogin = 0;
 
   // Generates a unique 5 digit number for the new sessionId
   let uniqueNumberFlag = false;
@@ -168,12 +151,12 @@ function adminAuthLogin(email: string, password: string): SessionId | ErrorObjec
 
   data.tokens.push({
     sessionId: sessionId,
-    authUserId: user.authUserId
+    authUserId: selectedUser.authUserId,
   });
   setData(data);
 
   return {
-    token: sessionId
+    token: sessionId,
   };
 }
 
@@ -194,7 +177,9 @@ function adminAuthLogout(authUserId: number): EmptyObject | ErrorObject {
   }
 
   // Finds the relevant token.
-  const userToken = data.tokens.find((token) => token.authUserId === authUserId);
+  const userToken = data.tokens.find(
+    (token) => token.authUserId === authUserId
+  );
 
   // Resets the sessionId to undefined, where calling adminAuthLogin will generate
   // another randomised sessionId.
@@ -232,7 +217,7 @@ function adminUserDetails(authUserId: number): User | ErrorObject {
   const user = data.users.find((users) => users.authUserId === authUserId);
   if (user === undefined) {
     return {
-      error: 'AuthUserId is not a valid user'
+      error: 'AuthUserId is not a valid user',
     };
   }
   return {

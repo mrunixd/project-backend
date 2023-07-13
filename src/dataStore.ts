@@ -52,6 +52,7 @@ export interface DataStore {
   quizzes: Quiz[];
   tokens: Token[];
   unclaimedQuestionId: number;
+  quizCounter: number;
 }
 
 export interface SessionId {
