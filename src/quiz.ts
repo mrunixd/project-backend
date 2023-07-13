@@ -406,7 +406,7 @@ function adminQuizQuestion(
     };
   });
   const questionId = data.unclaimedQuestionId;
-  // const questionId = currentQuiz.questions.length;
+
   const newQuestion: Question = {
     questionId: questionId,
     question: questionBody.question,
@@ -755,10 +755,45 @@ function adminQuizQuestionUpdate(authUserId: number, quizId: number, questionId:
   currentQuestion.points = questionBody.points,
   currentQuestion.answers = newAnswers,
 
-  // Update the timeLastEdited for the quiz
+  // Update the timeLastEdited for the quiz and duration
+  currentQuiz.duration = currentQuiz.questions.reduce((total, question) => total + question.duration, 0);
   currentQuiz.timeLastEdited = Math.floor(Date.now() / 1000);
   setData(data);
 
+  return {};
+}
+
+function adminQuizQuestionDelete(authUserId: number, quizId: number, questionId: number): EmptyObject | ErrorObject {
+  const data = getData();
+
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
+
+  if (user === undefined) {
+    return { error: 'AuthUserId is not a valid user' };
+  } else if (currentQuiz === undefined) {
+    return { error: 'Quiz ID does not refer to a valid quiz' };
+  }
+  const currentQuestion = currentQuiz.questions.find((question) => question.questionId === questionId);
+
+  if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
+    return { error: 'Quiz ID does not refer to a quiz that this user owns' };
+  } else if (currentQuestion === undefined) {
+    return { error: 'Question ID does not refer to a valid question in this quiz' };
+  }
+
+  const indexQuestion = currentQuiz.questions.findIndex((id) => id.questionId === questionId);
+  currentQuiz.questions.splice(indexQuestion, 1);
+
+
+  //update quiz properties after removing the question
+  currentQuiz.timeLastEdited = Math.floor(Date.now() / 1000);
+
+  currentQuiz.duration = currentQuiz.questions.reduce((total, question) => total + question.duration, 0);
+  
+  currentQuiz.numQuestions--;
+
+  setData(data);
   return {};
 }
 
@@ -776,5 +811,6 @@ export {
   adminQuizTrash,
   adminQuizRestore,
   adminQuizTrashEmpty,
-  adminQuizQuestionUpdate
+  adminQuizQuestionUpdate,
+  adminQuizQuestionDelete
 };
