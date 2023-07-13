@@ -6,7 +6,7 @@ import cors from 'cors';
 import YAML from 'yaml';
 import sui from 'swagger-ui-express';
 import fs from 'fs';
-import { adminAuthRegister, adminAuthLogin, adminUserDetails } from './auth';
+import { adminAuthRegister, adminAuthLogin, adminUserDetails, adminAuthLogout } from './auth';
 import {
   adminQuizCreate,
   adminQuizList,
@@ -337,6 +337,23 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   }
 
   // Status 200
+  return res.status(200).json(response);
+});
+
+app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
+  const { token } = req.body;
+
+  if (!checkValidToken(token)) {
+    return res.status(401).json({ error: 'token has invalid structure' });
+  }
+
+  const userId = sessionIdtoUserId(token);
+
+  const response = adminAuthLogout(userId);
+  if ('error' in response) {
+    return res.status(400).json(response);
+  }
+
   return res.status(200).json(response);
 });
 
