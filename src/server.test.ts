@@ -46,6 +46,7 @@ function getRequest(route: string, qs: any) {
 
 let result1: any;
 let result2: any;
+let result3: any;
 let person1: any;
 let person2: any;
 let quiz1: any;
@@ -58,6 +59,7 @@ beforeEach(() => {
   deleteRequest('/v1/clear', {});
   result1 = undefined;
   result2 = undefined;
+  result3 = undefined;
   person1 = undefined;
   person2 = undefined;
   quiz1 = undefined;
@@ -3125,6 +3127,39 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
       expect(result1.status).toBe(OK);
 
     });
+
+    test('CASE: Login, logout, login, logout success', () => {
+      person1 = postRequest('/v1/admin/auth/register', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345',
+        nameFirst: 'Zhi',
+        nameLast: 'Zhao',
+      });
+
+      result1 = postRequest('/v1/admin/auth/logout', {
+        token: `${person1.body.token}`
+      });
+
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toBe(OK);
+
+      result2 = postRequest('/v1/admin/auth/login', {
+        email: 'zhizhao@gmail.com',
+        password: 'Abcd12345'
+      });
+
+      expect(result2.body).toStrictEqual({ 
+        token: expect.any(String)
+      });
+      expect(result2.status).toBe(OK);
+
+      result3 = postRequest('/v1/admin/auth/logout', {
+        token: `${result2.body.token}`
+      });
+
+      expect(result3.body).toStrictEqual({});
+      expect(result3.status).toBe(OK);
+    });
   });
 
   describe('/////// /v1/admin/auth/logout error occurred ///////', () => {
@@ -3141,7 +3176,7 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
       });
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(INPUT_ERROR);
+      expect(result1.status).toBe(UNAUTHORISED);
     });
 
     test('CASE(401): Token has invalid structure - too long', () => {
@@ -3157,7 +3192,7 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
       });
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(INPUT_ERROR);
+      expect(result1.status).toBe(UNAUTHORISED);
     });
 
     test('CASE(401): Token has invalid structure - non-numeric characters', () => {
@@ -3173,7 +3208,7 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
       });
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(INPUT_ERROR);
+      expect(result1.status).toBe(UNAUTHORISED);
     });
 
     test('CASE(403): The token is for a user who has already logged out', () => {
@@ -3196,7 +3231,7 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
       });
 
       expect(result2.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(FORBIDDEN);
+      expect(result2.status).toBe(INPUT_ERROR);
     });
   });
 });

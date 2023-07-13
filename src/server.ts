@@ -311,14 +311,14 @@ app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
   const { token } = req.body;
 
   if (!checkValidToken(token)) {
-    return res.status(400).json({ error: 'token has invalid structure' });
+    return res.status(401).json({ error: 'token has invalid structure' });
   }
-
+  
   const userId = sessionIdtoUserId(token);
   
   const response = adminAuthLogout(userId);
   if ('error' in response) {
-    return res.status(401).json(response);
+    return res.status(400).json(response);
   } 
 
   return res.status(200).json(response);

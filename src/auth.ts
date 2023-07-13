@@ -187,13 +187,17 @@ function adminAuthLogin(email: string, password: string): SessionId | ErrorObjec
  */
 function adminAuthLogout(authUserId: number): EmptyObject | ErrorObject {
   const data = getData();
-  const userToken = data.tokens.find((token) => token.authUserId === authUserId);
 
-  // userToken.sessionId cannot be read?
-  if (userToken.sessionId === '0') {
-    return { error: 'This token is for a user who has already logged out.'};
+  // If the sessionId does not exist, the function sessionIdtoUserId returns -1.
+  if (authUserId === -1) {
+    return { error: 'This token is for a user who has already logged out.' };
   }
+
+  // Finds the relevant token.
+  const userToken = data.tokens.find((token) => token.authUserId === authUserId);
   
+  // Resets the sessionId to undefined, where calling adminAuthLogin will generate 
+  // another randomised sessionId.
   userToken.sessionId = undefined;
   setData(data);
   
