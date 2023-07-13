@@ -755,7 +755,8 @@ function adminQuizQuestionUpdate(authUserId: number, quizId: number, questionId:
   currentQuestion.points = questionBody.points,
   currentQuestion.answers = newAnswers,
 
-  // Update the timeLastEdited for the quiz
+  // Update the timeLastEdited for the quiz and duration
+  currentQuiz.duration = currentQuiz.questions.reduce((total, question) => total + question.duration, 0);
   currentQuiz.timeLastEdited = Math.floor(Date.now() / 1000);
   setData(data);
 
