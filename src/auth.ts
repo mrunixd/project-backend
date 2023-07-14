@@ -21,7 +21,7 @@ interface User {
  * @param {string} nameFirst
  * @param {string} nameLast
  *
- * @returns {authUserId: integer}
+ * @returns {token: string}
  */
 function adminAuthRegister(
   email: string,
@@ -113,7 +113,7 @@ function adminAuthRegister(
  * @param {string} email
  * @param {string} password
  *
- * @returns {authUserId: integer}
+ * @returns {token: string}
  */
 function adminAuthLogin(
   email: string,
@@ -160,35 +160,6 @@ function adminAuthLogin(
 }
 
 /**
- * This function intakes a token and logs out the corresponding user, then
- * resets their sessionId to undefined.
- *
- * @param {number} token
- *
- * @returns {}
- */
-function adminAuthLogout(authUserId: number): Record<string, never> | ErrorObject {
-  const data = getData();
-
-  // If the sessionId does not exist, the function sessionIdtoUserId returns -1.
-  if (authUserId === -1) {
-    return { error: 'This token is for a user who has already logged out.' };
-  }
-
-  // Finds the relevant token.
-  const userToken = data.tokens.find(
-    (token) => token.authUserId === authUserId
-  );
-
-  // Resets the sessionId to undefined, where calling adminAuthLogin will generate
-  // another randomised sessionId.
-  userToken.sessionId = undefined;
-  setData(data);
-
-  return {};
-}
-
-/**
  * Given an admin user's authUserId, return details about the user.
  * "name" is the first and last name concatenated with a single space between them
  *
@@ -228,6 +199,35 @@ function adminUserDetails(authUserId: number): User | ErrorObject {
       numFailedPasswordsSinceLastLogin: user.numFailedPasswordsSinceLastLogin,
     },
   };
+}
+
+/**
+ * This function intakes a token and logs out the corresponding user, then
+ * resets their sessionId to undefined.
+ *
+ * @param {number} token
+ *
+ * @returns {}
+ */
+function adminAuthLogout(authUserId: number): Record<string, never> | ErrorObject {
+  const data = getData();
+
+  // If the sessionId does not exist, the function sessionIdtoUserId returns -1.
+  if (authUserId === -1) {
+    return { error: 'This token is for a user who has already logged out.' };
+  }
+
+  // Finds the relevant token.
+  const userToken = data.tokens.find(
+    (token) => token.authUserId === authUserId
+  );
+
+  // Resets the sessionId to undefined, where calling adminAuthLogin will generate
+  // another randomised sessionId.
+  userToken.sessionId = undefined;
+  setData(data);
+
+  return {};
 }
 
 /** This function updates the non-password details of an existing user.

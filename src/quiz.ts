@@ -109,10 +109,10 @@ function adminQuizCreate(
 
     // Checks if 'quizIds' exists as an array & that it has the correct quiz 'name
   } else if (
-    (user.quizIds &&
-      Array.isArray(user.quizIds) &&
-      user.quizIds.some((quiz) => quiz.name === name)) ||
-    user.trash.some((quiz) => quiz.name === name)
+    // (user.quizIds &&
+    // Array.isArray(user.quizIds)) &&
+    (user.quizIds.some((quiz) => quiz.name === name) ||
+    user.trash.some((quiz) => quiz.name === name))
   ) {
     return { error: 'Name is already used for another quiz' };
   } else if (description.length > 100) {
