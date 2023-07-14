@@ -667,16 +667,10 @@ function adminQuizQuestionMove(
     return { error: 'NewPosition is the position of the current question' };
   }
 
-  // Create a copy 'newQuestion': splice to correct index and then remove old one
+  // Create a copy 'newQuestion': remove old one and then insert at correct index
   const newQuestion = { ...sourceQuestion };
-  if (newPosition > currentPosition) {
-    currentQuiz.questions.splice(newPosition + 1, 0, newQuestion);
-  } else {
-    currentQuiz.questions.splice(newPosition, 0, newQuestion);
-  }
   currentQuiz.questions.splice(currentPosition, 1);
-
-  // Update values for currentQuiz: timeLastEdited
+  currentQuiz.questions = [...currentQuiz.questions.slice(0, newPosition), newQuestion, ...currentQuiz.questions.slice(newPosition)];
   currentQuiz.timeLastEdited = Math.floor(Date.now() / 1000);
 
   setData(data);
