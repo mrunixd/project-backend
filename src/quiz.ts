@@ -1,5 +1,19 @@
 import { getData, setData, QuizIds, Quiz, Question, Answer } from './dataStore';
 
+// defining all magic numbers
+const MAXNAME = 30;
+const MINNAME = 3;
+const MAXDESCRIPTION = 100;
+const MAXQUESTIONLENGTH = 50;
+const MINQUESTIONLENGTH = 5;
+const MINANSWERS = 2;
+const MAXANSWERS = 6;
+const MAXPOINTS = 10;
+const MINPOINTS = 1;
+const MINANSWERLENGTH = 1;
+const MAXANSWERLENGTH = 30;
+const MAXDURATION = 180;
+
 interface ErrorObject {
   error: string;
 }
@@ -104,7 +118,7 @@ function adminQuizCreate(
     return { error: 'AuthUserId is not a valid user' };
   } else if (!acceptedCharacters.test(name)) {
     return { error: 'Name contains invalid characters' };
-  } else if (name.length > 30 || name.length < 3) {
+  } else if (name.length > MAXNAME || name.length < MINNAME) {
     return { error: 'Name is less than 3 or more than 30 characters' };
 
     // Checks if 'quizIds' exists as an array & that it has the correct quiz 'name
@@ -113,7 +127,7 @@ function adminQuizCreate(
     user.trash.some((quiz) => quiz.name === name))
   ) {
     return { error: 'Name is already used for another quiz' };
-  } else if (description.length > 100) {
+  } else if (description.length > MAXDESCRIPTION) {
     return { error: 'Description is more than 100 characters' };
   }
 
@@ -201,7 +215,6 @@ function adminQuizRemove(
  * }
  */
 function adminQuizInfo(authUserId: number, quizId: number): Quiz | ErrorObject {
-  // can't interface type just be Quiz from dataStore?
   const data = getData();
 
   // Save the selected user to be used for error checking & return values
@@ -261,7 +274,7 @@ function adminQuizNameUpdate(
       error:
         'Name contains any characters that are not alphanumeric or are spaces',
     };
-  } else if (name.length < 3 || name.length > 30) {
+  } else if (name.length < MINNAME || name.length > MAXNAME) {
     return {
       error:
         'Name is either less than 3 characters long or more than 30 characters long',
@@ -318,7 +331,7 @@ function adminQuizDescriptionUpdate(
     return { error: 'Quiz Id does not refer to a valid quiz' };
   } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
     return { error: 'Quiz Id does not refer to a quiz that this user owns' };
-  } else if (description.length > 100) {
+  } else if (description.length > MAXDESCRIPTION) {
     return { error: 'Description is more than 100 characters in length' };
   }
 
@@ -464,16 +477,16 @@ function adminQuizQuestion(
   } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
     return { error: 'Quiz ID does not refer to a quiz that this user owns' };
   } else if (
-    questionBody.question.length < 5 ||
-    questionBody.question.length > 50
+    questionBody.question.length < MINQUESTIONLENGTH ||
+    questionBody.question.length > MAXQUESTIONLENGTH
   ) {
     return {
       error:
         'Question string is less than 5 characters in length or greater than 50 characters in length',
     };
   } else if (
-    questionBody.answers.length < 2 ||
-    questionBody.answers.length > 6
+    questionBody.answers.length < MINANSWERS ||
+    questionBody.answers.length > MAXANSWERS
   ) {
     return {
       error: 'The question has more than 6 answers or less than 2 answers',
@@ -486,19 +499,19 @@ function adminQuizQuestion(
       0
     ) +
       questionBody.duration >
-    180
+    MAXDURATION
   ) {
     return {
       error: 'The sum of the question durations in the quiz exceeds 3 minutes',
     };
-  } else if (questionBody.points > 10 || questionBody.points < 1) {
+  } else if (questionBody.points > MAXPOINTS || questionBody.points < MINPOINTS) {
     return {
       error:
         'The points awarded for the question are less than 1 or greater than 10',
     };
   } else if (
     questionBody.answers.some(
-      (answer) => answer.answer.length < 1 || answer.answer.length > 30
+      (answer) => answer.answer.length < MINANSWERLENGTH || answer.answer.length > MAXANSWERLENGTH
     )
   ) {
     return {
@@ -777,16 +790,16 @@ function adminQuizQuestionUpdate(
       error: 'Question ID does not refer to a valid question in this quiz',
     };
   } else if (
-    questionBody.question.length < 5 ||
-    questionBody.question.length > 50
+    questionBody.question.length < MINQUESTIONLENGTH ||
+    questionBody.question.length > MAXQUESTIONLENGTH
   ) {
     return {
       error:
         'Question string is less than 5 characters in length or greater than 50 characters in length',
     };
   } else if (
-    questionBody.answers.length < 2 ||
-    questionBody.answers.length > 6
+    questionBody.answers.length < MINANSWERS ||
+    questionBody.answers.length > MAXANSWERS
   ) {
     return {
       error: 'The question has more than 6 answers or less than 2 answers',
@@ -799,19 +812,19 @@ function adminQuizQuestionUpdate(
       0
     ) +
       questionBody.duration >
-    180
+    MAXDURATION
   ) {
     return {
       error: 'The sum of the question durations in the quiz exceeds 3 minutes',
     };
-  } else if (questionBody.points > 10 || questionBody.points < 1) {
+  } else if (questionBody.points > MAXPOINTS || questionBody.points < MINPOINTS) {
     return {
       error:
         'The points awarded for the question are less than 1 or greater than 10',
     };
   } else if (
     questionBody.answers.some(
-      (answer) => answer.answer.length < 1 || answer.answer.length > 30
+      (answer) => answer.answer.length < MINANSWERLENGTH || answer.answer.length > MAXANSWERLENGTH
     )
   ) {
     return {

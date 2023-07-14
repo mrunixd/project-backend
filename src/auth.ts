@@ -1,6 +1,10 @@
 import validator from 'validator';
 import { getData, setData, SessionId, ErrorObject } from './dataStore';
 
+const MAXNAMELENGTH = 20;
+const MINNAMELENGTH = 2;
+const MINPASSWORD = 8;
+
 interface User {
   user: {
     userId: number;
@@ -45,17 +49,17 @@ function adminAuthRegister(
     return { error: 'Email address is not valid' };
   } else if (acceptedCharacters.test(nameFirst) === false) {
     return { error: 'First name is invalid' };
-  } else if (nameFirst.length < 2 || nameFirst.length > 20) {
+  } else if (nameFirst.length < MINNAMELENGTH || nameFirst.length > MAXNAMELENGTH) {
     return {
       error: 'First name is less than 2 characters or more than 20 characters',
     };
   } else if (acceptedCharacters.test(nameLast) === false) {
     return { error: 'Last name is invalid' };
-  } else if (nameLast.length < 2 || nameLast.length > 20) {
+  } else if (nameLast.length < MINNAMELENGTH || nameLast.length > MAXNAMELENGTH) {
     return {
       error: 'Last name is less than 2 characters or more than 20 characters'
     };
-  } else if (password.length < 8) {
+  } else if (password.length < MINPASSWORD) {
     return { error: 'Password is less than 8 characters' };
   } else if (
     numbers.test(password) === false ||
@@ -258,13 +262,13 @@ function adminAuthUpdateDetails(userId: number, email: string, nameFirst: string
     return { error: 'Email address is not valid' };
   } else if (acceptedCharacters.test(nameFirst) === false) {
     return { error: 'First name is invalid' };
-  } else if (nameFirst.length < 2 || nameFirst.length > 20) {
+  } else if (nameFirst.length < MINNAMELENGTH || nameFirst.length > MAXNAMELENGTH) {
     return {
       error: 'First name is less than 2 characters or more than 20 characters'
     };
   } else if (acceptedCharacters.test(nameLast) === false) {
     return { error: 'Last name is invalid' };
-  } else if (nameLast.length < 2 || nameLast.length > 20) {
+  } else if (nameLast.length < MINNAMELENGTH || nameLast.length > MAXNAMELENGTH) {
     return {
       error: 'Last name is less than 2 characters or more than 20 characters',
     };
@@ -302,7 +306,7 @@ function adminAuthUpdatePassword(userId: number, oldPassword: string, newPasswor
     }
   }
 
-  if (newPassword.length < 8) {
+  if (newPassword.length < MINPASSWORD) {
     return { error: 'New password is less than 8 characters' };
   }
 
