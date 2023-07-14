@@ -34,7 +34,6 @@ import {
   adminQuizQuestionDelete,
 } from './quiz';
 import { clear, sessionIdtoUserId, checkValidToken } from './other';
-import { getData, setData } from './dataStore';
 
 // Set up web app
 const app = express();
@@ -61,9 +60,6 @@ const HOST: string = process.env.IP || 'localhost';
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
-const data = getData();
-data.tokens = [];
-setData(data);
 
 // Example get request
 app.get('/echo', (req: Request, res: Response) => {

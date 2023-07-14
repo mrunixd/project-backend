@@ -52,7 +52,36 @@ let quiz2: any;
 let quiz3: any;
 let quizQuestion1: any;
 let quizQuestion2: any;
-let question1: any;
+const quizQuestion1Body = {
+  question: 'Who is the Monarch of England?',
+  duration: 4,
+  points: 5,
+  answers: [
+    {
+      answer: 'Prince Charles',
+      correct: false,
+    },
+    {
+      answer: 'King Charles',
+      correct: true,
+    },
+  ],
+};
+const quizQuestion2Body = {
+  question: 'second question?',
+  duration: 2,
+  points: 3,
+  answers: [
+    {
+      answer: 'second answer',
+      correct: false,
+    },
+    {
+      answer: 'second real answer',
+      correct: true,
+    },
+  ],
+};
 
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
@@ -66,7 +95,6 @@ beforeEach(() => {
   quiz3 = undefined;
   quizQuestion1 = undefined;
   quizQuestion2 = undefined;
-  question1 = undefined;
 });
 
 describe('////////TESTING v1/clear////////', () => {
@@ -743,36 +771,6 @@ describe('///////Testing /v1/admin/quiz/delete////////', () => {
 });
 
 describe('///////Testing /v1/admin/quiz/ info////////', () => {
-  const quizQuestion1Body = {
-    question: 'Who is the Monarch of England?',
-    duration: 4,
-    points: 5,
-    answers: [
-      {
-        answer: 'Prince Charles',
-        correct: false,
-      },
-      {
-        answer: 'King Charles',
-        correct: true,
-      },
-    ],
-  };
-  const quizQuestion2Body = {
-    question: 'second question?',
-    duration: 2,
-    points: 3,
-    answers: [
-      {
-        answer: 'second answer',
-        correct: false,
-      },
-      {
-        answer: 'second real answer',
-        correct: true,
-      },
-    ],
-  };
   describe('Testing /v1/admin/quiz/ info success cases', () => {
     test('Success info 1 person 1 quiz 0 questions', () => {
       person1 = postRequest('/v1/admin/auth/register', {
@@ -2631,37 +2629,6 @@ describe('////////Testing /v1/admin/quiz/trash/empty', () => {
 });
 
 describe('///////Testing /v1/admin/quiz/transfer////////', () => {
-  const quizQuestion1Body = {
-    question: 'Who is the Monarch of England?',
-    duration: 4,
-    points: 5,
-    answers: [
-      {
-        answer: 'Prince Charles',
-        correct: false,
-      },
-      {
-        answer: 'King Charles',
-        correct: true,
-      },
-    ],
-  };
-  const quizQuestion2Body = {
-    question: 'second question?',
-    duration: 2,
-    points: 3,
-    answers: [
-      {
-        answer: 'second answer',
-        correct: false,
-      },
-      {
-        answer: 'second real answer',
-        correct: true,
-      },
-    ],
-  };
-
   beforeEach(() => {
     person1 = postRequest('/v1/admin/auth/register', {
       email: 'vincentxian@gmail.com',
@@ -3241,52 +3208,37 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
       name: 'first quiz',
       description: 'first quiz being tested',
     });
-    question1 = {
-      question: 'Who is the Monarch of England?',
-      duration: 4,
-      points: 5,
-      answers: [
-        {
-          answer: 'Prince Charles',
-          correct: false,
-        },
-        {
-          answer: 'King Charles',
-          correct: true,
-        },
-      ],
-    };
     quizQuestion1 = postRequest(
       `/v1/admin/quiz/${quiz1.body.quizId}/question`,
       {
         token: `${person1.body.token}`,
-        questionBody: question1,
+        questionBody: quizQuestion1Body,
       }
     );
-    question1 = {
-      question: 'Who was the Monarch of England?',
-      duration: 4,
-      points: 5,
-      answers: [
-        {
-          answer: 'Prince Charles',
-          correct: false,
-        },
-        {
-          answer: 'King Charles',
-          correct: true,
-        },
-      ],
-    };
   });
 
   describe('Testing /v1/admin/quiz/{quizid}/question/{questionid} success cases', () => {
     test('Successful adminQuizCreate 1 quiz question update', () => {
+      const quizQuestion3Body = {
+        question: 'Who was the Monarch of England?',
+        duration: 4,
+        points: 5,
+        answers: [
+          {
+            answer: 'Prince Charles',
+            correct: false,
+          },
+          {
+            answer: 'King Charles',
+            correct: true,
+          },
+        ],
+      };
       result1 = putRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`,
         {
           token: `${person1.body.token}`,
-          questionBody: question1,
+          questionBody: quizQuestion3Body,
         }
       );
 
@@ -3338,7 +3290,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`,
         {
           token: '1',
-          questionBody: question1,
+          questionBody: quizQuestion1Body,
         }
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3350,7 +3302,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`,
         {
           token: 'let!!',
-          questionBody: question1,
+          questionBody: quizQuestion1Body,
         }
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3363,7 +3315,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`,
         {
           token: `${sessionId}`,
-          questionBody: question1,
+          questionBody: quizQuestion1Body,
         }
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3377,7 +3329,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
         }`,
         {
           token: `${person1.body.token}`,
-          questionBody: question1,
+          questionBody: quizQuestion1Body,
         }
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3395,7 +3347,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`,
         {
           token: `${person2.body.token}`,
-          questionBody: question1,
+          questionBody: quizQuestion1Body,
         }
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3409,7 +3361,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
         }`,
         {
           token: `${person1.body.token}`,
-          questionBody: question1,
+          questionBody: quizQuestion1Body,
         }
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3417,7 +3369,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
     });
 
     test('CASE: question string is less than 5 or more than 50 characters', () => {
-      question1 = {
+      const quizQuestion3Body = {
         question: 'Who?',
         duration: 4,
         points: 5,
@@ -3436,7 +3388,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`,
         {
           token: `${person1.body.token}`,
-          questionBody: question1,
+          questionBody: quizQuestion3Body,
         }
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3444,7 +3396,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
     });
 
     test('CASE: question string is less than 5 or more than 50 characters', () => {
-      question1 = {
+      const quizQuestion3Body = {
         question: 'Who?',
         duration: 4,
         points: 5,
@@ -3459,7 +3411,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`,
         {
           token: `${person1.body.token}`,
-          questionBody: question1,
+          questionBody: quizQuestion3Body,
         }
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3467,7 +3419,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
     });
 
     test('CASE: duration is not a positive number', () => {
-      question1 = {
+      const quizQuestion3Body = {
         question: 'Who is the monarch of England?',
         duration: -1,
         points: 5,
@@ -3486,7 +3438,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`,
         {
           token: `${person1.body.token}`,
-          questionBody: question1,
+          questionBody: quizQuestion3Body,
         }
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3494,7 +3446,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
     });
 
     test('CASE: total duration is more than 3 minutes', () => {
-      question1 = {
+      const quizQuestion3Body = {
         question: 'Who is the monarch of England?',
         duration: 181,
         points: 5,
@@ -3513,7 +3465,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`,
         {
           token: `${person1.body.token}`,
-          questionBody: question1,
+          questionBody: quizQuestion3Body,
         }
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3521,7 +3473,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
     });
 
     test('CASE: points awarded are more than 10 or less than 1', () => {
-      question1 = {
+      const quizQuestion3Body = {
         question: 'Who is the monarch of England?',
         duration: 13,
         points: 11,
@@ -3540,7 +3492,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`,
         {
           token: `${person1.body.token}`,
-          questionBody: question1,
+          questionBody: quizQuestion3Body,
         }
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3548,7 +3500,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
     });
 
     test('CASE: answer strings are less than 1 or greater than 30', () => {
-      question1 = {
+      const quizQuestion3Body = {
         question: 'Who is the monarch of England?',
         duration: 13,
         points: 9,
@@ -3568,7 +3520,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`,
         {
           token: `${person1.body.token}`,
-          questionBody: question1,
+          questionBody: quizQuestion3Body,
         }
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3576,7 +3528,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
     });
 
     test('CASE: duplicate answers', () => {
-      question1 = {
+      const quizQuestion3Body = {
         question: 'Who is the monarch of England?',
         duration: 13,
         points: 8,
@@ -3595,14 +3547,14 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`,
         {
           token: `${person1.body.token}`,
-          questionBody: question1,
+          questionBody: quizQuestion3Body,
         }
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
     test('CASE: no correct answers', () => {
-      question1 = {
+      const quizQuestion3Body = {
         question: 'Who is the monarch of England?',
         duration: 13,
         points: 8,
@@ -3621,7 +3573,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`,
         {
           token: `${person1.body.token}`,
-          questionBody: question1,
+          questionBody: quizQuestion3Body,
         }
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -3643,26 +3595,11 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
       name: 'first quiz',
       description: 'first quiz being tested',
     });
-    question1 = {
-      question: 'Who is the Monarch of England?',
-      duration: 4,
-      points: 5,
-      answers: [
-        {
-          answer: 'Prince Charles',
-          correct: false,
-        },
-        {
-          answer: 'King Charles',
-          correct: true,
-        },
-      ],
-    };
     quizQuestion1 = postRequest(
       `/v1/admin/quiz/${quiz1.body.quizId}/question`,
       {
         token: `${person1.body.token}`,
-        questionBody: question1,
+        questionBody: quizQuestion1Body,
       }
     );
   });
@@ -3694,21 +3631,6 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
   });
 
   test('CASE: Successful delete 1 out of 2 questions', () => {
-    const quizQuestion2Body = {
-      question: 'second question?',
-      duration: 2,
-      points: 3,
-      answers: [
-        {
-          answer: 'second answer',
-          correct: false,
-        },
-        {
-          answer: 'second real answer',
-          correct: true,
-        },
-      ],
-    };
     const quizQuestion2 = postRequest(
       `/v1/admin/quiz/${quiz1.body.quizId}/question`,
       {
@@ -3835,37 +3757,6 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
 });
 
 describe('///////Testing /v1/admin/quiz/question/move////////', () => {
-  const quizQuestion1Body = {
-    question: 'Who is the Monarch of England?',
-    duration: 4,
-    points: 5,
-    answers: [
-      {
-        answer: 'Prince Charles',
-        correct: false,
-      },
-      {
-        answer: 'King Charles',
-        correct: true,
-      },
-    ],
-  };
-  const quizQuestion2Body = {
-    question: 'second question?',
-    duration: 2,
-    points: 3,
-    answers: [
-      {
-        answer: 'second answer',
-        correct: false,
-      },
-      {
-        answer: 'second real answer',
-        correct: true,
-      },
-    ],
-  };
-
   beforeEach(() => {
     person1 = postRequest('/v1/admin/auth/register', {
       email: 'vincentxian@gmail.com',
@@ -4126,37 +4017,6 @@ describe('///////Testing /v1/admin/quiz/question/move////////', () => {
 });
 
 describe('///////Testing /v1/admin/quiz/question/duplicate////////', () => {
-  const quizQuestion1Body = {
-    question: 'Who is the Monarch of England?',
-    duration: 4,
-    points: 5,
-    answers: [
-      {
-        answer: 'Prince Charles',
-        correct: false,
-      },
-      {
-        answer: 'King Charles',
-        correct: true,
-      },
-    ],
-  };
-  const quizQuestion2Body = {
-    question: 'second question?',
-    duration: 2,
-    points: 3,
-    answers: [
-      {
-        answer: 'second answer',
-        correct: false,
-      },
-      {
-        answer: 'second real answer',
-        correct: true,
-      },
-    ],
-  };
-
   beforeEach(() => {
     person1 = postRequest('/v1/admin/auth/register', {
       email: 'vincentxian@gmail.com',
