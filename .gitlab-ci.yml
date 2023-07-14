@@ -36,3 +36,4 @@ linting:
 
 before_script:
   - npm install
+
