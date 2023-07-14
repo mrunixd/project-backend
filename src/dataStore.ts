@@ -8,6 +8,7 @@ export interface QuizIds {
 export interface User {
   email: string;
   password: string;
+  pastPasswords: string[];
   name: string;
   authUserId: number;
   numSuccessfulLogins: number;
