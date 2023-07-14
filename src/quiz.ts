@@ -48,12 +48,12 @@ enum Colours {
  * This function provides a list of all the quizzes owned by the currently
  * logged in user.
  *
- * @param {integer} authUserId
+ * @param {number} authUserId
  *
  * @returns {
  *  quizzes: [
  *      {
- *          quizId: integer,
+ *          quizId: number,
  *          name: string
  *      }
  *  ]
@@ -109,10 +109,8 @@ function adminQuizCreate(
 
     // Checks if 'quizIds' exists as an array & that it has the correct quiz 'name
   } else if (
-    (user.quizIds &&
-      Array.isArray(user.quizIds) &&
-      user.quizIds.some((quiz) => quiz.name === name)) ||
-    user.trash.some((quiz) => quiz.name === name)
+    (user.quizIds.some((quiz) => quiz.name === name) ||
+    user.trash.some((quiz) => quiz.name === name))
   ) {
     return { error: 'Name is already used for another quiz' };
   } else if (description.length > 100) {
@@ -151,8 +149,8 @@ function adminQuizCreate(
  * This function is given a particular quiz and then permanently removes
  * and deletes the quiz.
  *
- * @param {integer} authUserId
- * @param {integer} quizId
+ * @param {number} authUserId
+ * @param {number} quizId
  *
  * @returns {}
  */
@@ -191,14 +189,14 @@ function adminQuizRemove(
  * This function returns all the relevant information
  * about the given quiz.
  *
- * @param {integer} authUserId
- * @param {integer} quizId
+ * @param {number} authUserId
+ * @param {number} quizId
  *
  * @returns {
- *  quizId: integer,
+ *  quizId: number,
  *  name: string,
- *  timeCreated: integer,
- *  timeLastEdited: integer,
+ *  timeCreated: number,
+ *  timeLastEdited: number,
  *  description: string,
  * }
  */
@@ -237,8 +235,8 @@ function adminQuizInfo(authUserId: number, quizId: number): Quiz | ErrorObject {
 /**
  * Function to update the name of the given quiz.
  *
- * @param {integer} authUserId
- * @param {integer} quizId
+ * @param {number} authUserId
+ * @param {number} quizId
  * @param {string} name
  *
  * @returns {}
@@ -296,8 +294,8 @@ function adminQuizNameUpdate(
 /**
  * This function updates the description of the relevant quiz.
  *
- * @param {integer} authUserId
- * @param {integer} quizId
+ * @param {number} authUserId
+ * @param {number} quizId
  * @param {string} description
  *
  * @returns {}
@@ -332,6 +330,122 @@ function adminQuizDescriptionUpdate(
   return {};
 }
 
+/**
+ * This function views all the quizzes in the trash and returns them as an array.
+ *
+ * @param {number} authUserId
+ *
+ * @returns {EmptyQuizList | QuizList}
+ *
+ */
+function adminQuizTrash(
+  authUserId: number
+): EmptyQuizList | QuizList | ErrorObject {
+  const data = getData();
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  if (user === undefined) {
+    return { error: 'AuthUserId is not a valid' };
+  }
+  return { quizzes: user.trash };
+}
+
+/**
+ * This function restores a specific quiz from the trash
+ *
+ * @param {number} authUserId
+ * @param {number} quizId
+ *
+ * @returns {}
+ *
+ */
+function adminQuizRestore(
+  authUserId: number,
+  quizId: number
+): Record<string, never> | ErrorObject {
+  const data = getData();
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  if (user === undefined) {
+    return { error: 'AuthUserId is not a valid user' };
+  }
+  const quizzes = data.quizzes.find((quiz) => quiz.quizId === quizId);
+  const restoredQuiz = user.trash.find((quiz) => quiz.quizId === quizId);
+  const checkQuizzes = user.quizIds.find((quiz) => quiz.quizId === quizId);
+  const index = user.trash.findIndex((trash) => trash.quizId === quizId);
+
+  if (quizzes === undefined) {
+    return { error: 'Quiz id does not refer to a valid quiz' };
+  } else if (checkQuizzes === undefined && restoredQuiz === undefined) {
+    return {
+      error: 'Quiz id does not refer to a valid quiz that this user owns',
+    };
+  } else if (restoredQuiz === undefined) {
+    return { error: 'Quiz id refers to a quiz that is not currently in trash' };
+  } else {
+    const [movingQuiz] = user.trash.splice(index, 1);
+    user.quizIds.push(movingQuiz);
+    quizzes.timeLastEdited = Math.floor(Date.now() / 1000);
+    setData(data);
+    return {};
+  }
+}
+
+/**
+ * This function restores a specific quiz from the trash
+ *
+ * @param {string[]} array
+ * @param {number} userId
+ *
+ * @returns {}
+ *
+ */
+function adminQuizTrashEmpty(
+  array: string[],
+  userId: number
+): Record<string, never> | ErrorObject {
+  const data = getData();
+  const user = data.users.find((user) => user.authUserId === userId);
+  if (user === undefined) {
+    return { error: 'AuthUserId is not a valid user' };
+  }
+  // error checking array
+  for (const string of array) {
+    const quizId = parseInt(string);
+    const quizzes = data.quizzes.find((quiz) => quiz.quizId === quizId);
+    const trashQuiz = user.trash.find((quiz) => quiz.quizId === quizId);
+    const workingQuizzes = user.quizIds.find((quiz) => quiz.quizId === quizId);
+    if (quizzes === undefined) {
+      return { error: 'One or more of the Quiz Ids is not a valid quiz' };
+    } else if (trashQuiz === undefined && workingQuizzes === undefined) {
+      return {
+        error:
+          'One or more of the Quiz IDs refers to a quiz that this current user does not own',
+      };
+    } else if (trashQuiz === undefined) {
+      return {
+        error: 'One or more of the Quiz IDs is not currently in the trash',
+      };
+    }
+  }
+
+  for (const string of array) {
+    const quizId = parseInt(string);
+    const quizIndex = user.trash.findIndex((quiz) => quiz.quizId === quizId);
+    user.trash.splice(quizIndex, 1);
+  }
+  setData(data);
+  return {};
+}
+
+/**
+ * This function creates a new question provided a quizId and a question body.
+ *
+ * @param {number} authUserId
+ * @param {number} quizId
+ * @param {questionInput} questionBody
+ *
+ * @returns {QuestionId}
+ *
+ */
 function adminQuizQuestion(
   authUserId: number,
   quizId: number,
@@ -342,6 +456,7 @@ function adminQuizQuestion(
   const user = data.users.find((user) => user.authUserId === authUserId);
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
 
+  // Error-checking block
   if (user === undefined) {
     return { error: 'AuthUserId is not a valid user' };
   } else if (currentQuiz === undefined) {
@@ -403,6 +518,7 @@ function adminQuizQuestion(
     return { error: 'Question must have at least one correct answer' };
   }
 
+  // Create a new answer array: this generates a random colour based on a random index
   const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
     const numbers = [0, 1, 2, 3, 4, 5];
     const randomIndex = Math.floor(Math.random() * numbers.length);
@@ -418,8 +534,9 @@ function adminQuizQuestion(
       correct: answer.correct,
     };
   });
-  const questionId = data.unclaimedQuestionId;
 
+  // Assign new questionId and push question into the quiz
+  const questionId = data.unclaimedQuestionId;
   const newQuestion: Question = {
     questionId: questionId,
     question: questionBody.question,
@@ -440,7 +557,6 @@ function adminQuizQuestion(
   currentQuiz.numQuestions++;
 
   setData(data);
-  // Return the questionId of the newly added question
   return { questionId: questionId };
 }
 
@@ -551,12 +667,10 @@ function adminQuizQuestionMove(
     return { error: 'NewPosition is the position of the current question' };
   }
 
-  // Create a copy 'newQuestion': splice to correct index and then remove old one
+  // Create a copy 'newQuestion': remove old one and then insert at correct index
   const newQuestion = { ...sourceQuestion };
-  currentQuiz.questions.splice(newPosition + 1, 0, newQuestion);
   currentQuiz.questions.splice(currentPosition, 1);
-
-  // Update values for currentQuiz: timeLastEdited
+  currentQuiz.questions = [...currentQuiz.questions.slice(0, newPosition), newQuestion, ...currentQuiz.questions.slice(newPosition)];
   currentQuiz.timeLastEdited = Math.floor(Date.now() / 1000);
 
   setData(data);
@@ -625,86 +739,17 @@ function adminQuizQuestionDuplicate(
   return { newQuestionId: newQuestion.questionId };
 }
 
-function adminQuizTrash(
-  authUserId: number
-): EmptyQuizList | QuizList | ErrorObject {
-  const data = getData();
-  const user = data.users.find((user) => user.authUserId === authUserId);
-  if (user === undefined) {
-    return { error: 'AuthUserId is not a valid' };
-  }
-  return { quizzes: user.trash };
-}
-
-function adminQuizRestore(
-  authUserId: number,
-  quizId: number
-): Record<string, never> | ErrorObject {
-  const data = getData();
-  const user = data.users.find((user) => user.authUserId === authUserId);
-  if (user === undefined) {
-    return { error: 'AuthUserId is not a valid user' };
-  }
-  const quizzes = data.quizzes.find((quiz) => quiz.quizId === quizId);
-  const restoredQuiz = user.trash.find((quiz) => quiz.quizId === quizId);
-  const checkQuizzes = user.quizIds.find((quiz) => quiz.quizId === quizId);
-  const index = user.trash.findIndex((trash) => trash.quizId === quizId);
-
-  if (quizzes === undefined) {
-    return { error: 'Quiz id does not refer to a valid quiz' };
-  } else if (checkQuizzes === undefined && restoredQuiz === undefined) {
-    return {
-      error: 'Quiz id does not refer to a valid quiz that this user owns',
-    };
-  } else if (restoredQuiz === undefined) {
-    return { error: 'Quiz id refers to a quiz that is not currently in trash' };
-  } else {
-    const [movingQuiz] = user.trash.splice(index, 1);
-    user.quizIds.push(movingQuiz);
-    quizzes.timeLastEdited = Math.floor(Date.now() / 1000);
-    setData(data);
-    return {};
-  }
-}
-
-function adminQuizTrashEmpty(
-  array: string[],
-  userId: number
-): Record<string, never> | ErrorObject {
-  const data = getData();
-  const user = data.users.find((user) => user.authUserId === userId);
-  if (user === undefined) {
-    return { error: 'AuthUserId is not a valid user' };
-  }
-  // error checking array
-  for (const string of array) {
-    const quizId = parseInt(string);
-    const quizzes = data.quizzes.find((quiz) => quiz.quizId === quizId);
-    const trashQuiz = user.trash.find((quiz) => quiz.quizId === quizId);
-    const workingQuizzes = user.quizIds.find((quiz) => quiz.quizId === quizId);
-    if (quizzes === undefined) {
-      return { error: 'One or more of the Quiz Ids is not a valid quiz' };
-    } else if (trashQuiz === undefined && workingQuizzes === undefined) {
-      return {
-        error:
-          'One or more of the Quiz IDs refers to a quiz that this current user does not own',
-      };
-    } else if (trashQuiz === undefined) {
-      return {
-        error: 'One or more of the Quiz IDs is not currently in the trash',
-      };
-    }
-  }
-
-  for (const string of array) {
-    const quizId = parseInt(string);
-    const quizIndex = user.trash.findIndex((quiz) => quiz.quizId === quizId);
-    user.trash.splice(quizIndex, 1);
-  }
-  setData(data);
-  return {};
-}
-
+/**
+ * This function updates the body of the question
+ *
+ * @param {number} authUserId
+ * @param {number} quizId
+ * @param {number} questionId
+ * @param {questionInput} questionBody
+ *
+ * @returns {}
+ *
+ */
 function adminQuizQuestionUpdate(
   authUserId: number,
   quizId: number,
@@ -818,6 +863,16 @@ function adminQuizQuestionUpdate(
   return {};
 }
 
+/**
+ * This function deletes a specified question
+ *
+ * @param {number} authUserId
+ * @param {number} quizId
+ * @param {number} questionId
+ *
+ * @returns {}
+ *
+ */
 function adminQuizQuestionDelete(
   authUserId: number,
   quizId: number,

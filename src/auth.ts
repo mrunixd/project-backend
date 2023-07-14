@@ -21,7 +21,7 @@ interface User {
  * @param {string} nameFirst
  * @param {string} nameLast
  *
- * @returns {authUserId: integer}
+ * @returns {token: string}
  */
 function adminAuthRegister(
   email: string,
@@ -73,6 +73,7 @@ function adminAuthRegister(
   data.users.push({
     email: email,
     password: password,
+    pastPasswords: [],
     name: name,
     authUserId: authUserId,
     numSuccessfulLogins: 1,
@@ -112,7 +113,7 @@ function adminAuthRegister(
  * @param {string} email
  * @param {string} password
  *
- * @returns {authUserId: integer}
+ * @returns {token: string}
  */
 function adminAuthLogin(
   email: string,
@@ -159,47 +160,18 @@ function adminAuthLogin(
 }
 
 /**
- * This function intakes a token and logs out the corresponding user, then
- * resets their sessionId to undefined.
- *
- * @param {number} token
- *
- * @returns {}
- */
-function adminAuthLogout(authUserId: number): Record<string, never> | ErrorObject {
-  const data = getData();
-
-  // If the sessionId does not exist, the function sessionIdtoUserId returns -1.
-  if (authUserId === -1) {
-    return { error: 'This token is for a user who has already logged out.' };
-  }
-
-  // Finds the relevant token.
-  const userToken = data.tokens.find(
-    (token) => token.authUserId === authUserId
-  );
-
-  // Resets the sessionId to undefined, where calling adminAuthLogin will generate
-  // another randomised sessionId.
-  userToken.sessionId = undefined;
-  setData(data);
-
-  return {};
-}
-
-/**
  * Given an admin user's authUserId, return details about the user.
  * "name" is the first and last name concatenated with a single space between them
  *
- * @param {integer} authUserId
+ * @param {number} authUserId
  *
  * @returns { user:
  *  {
- *      userId: integer,
+ *      userId: number,
  *      name: string,
  *      email: string,
- *      numSuccessfulLogins: integer,
- *      numFailedPasswordsSinceLastLogin: integer
+ *      numSuccessfulLogins: number,
+ *      numFailedPasswordsSinceLastLogin: number
  *  }
  * }
  */
@@ -227,6 +199,35 @@ function adminUserDetails(authUserId: number): User | ErrorObject {
       numFailedPasswordsSinceLastLogin: user.numFailedPasswordsSinceLastLogin,
     },
   };
+}
+
+/**
+ * This function intakes a token and logs out the corresponding user, then
+ * resets their sessionId to undefined.
+ *
+ * @param {number} token
+ *
+ * @returns {}
+ */
+function adminAuthLogout(authUserId: number): Record<string, never> | ErrorObject {
+  const data = getData();
+
+  // If the sessionId does not exist, the function sessionIdtoUserId returns -1.
+  if (authUserId === -1) {
+    return { error: 'This token is for a user who has already logged out.' };
+  }
+
+  // Finds the relevant token.
+  const userToken = data.tokens.find(
+    (token) => token.authUserId === authUserId
+  );
+
+  // Resets the sessionId to undefined, where calling adminAuthLogin will generate
+  // another randomised sessionId.
+  userToken.sessionId = undefined;
+  setData(data);
+
+  return {};
 }
 
 /** This function updates the non-password details of an existing user.
@@ -276,4 +277,43 @@ function adminAuthUpdateDetails(userId: number, email: string, nameFirst: string
   return {};
 }
 
-export { adminAuthRegister, adminAuthLogin, adminAuthLogout, adminUserDetails, adminAuthUpdateDetails };
+/** Given a userId, the correct password, and a new password, this function updates the password of that
+ * specific user.
+ *
+ * @param {number} userId
+ * @param {string} oldPassword
+ * @param {string} newPassword
+ *
+ * @returns {}
+ */
+function adminAuthUpdatePassword(userId: number, oldPassword: string, newPassword: string): Record<string, never> | ErrorObject {
+  const data = getData();
+
+  const user = data.users.find(user => user.authUserId === userId);
+  user.pastPasswords.push(oldPassword);
+
+  if (newPassword === oldPassword) {
+    return { error: 'New password must not be the correct old password' };
+  }
+
+  for (const password of user.pastPasswords) {
+    if (newPassword === password) {
+      return { error: 'New password has already been used before by this user' };
+    }
+  }
+
+  if (newPassword.length < 8) {
+    return { error: 'New password is less than 8 characters' };
+  }
+
+  if (/\d/.test(newPassword) === false || /[a-zA-Z]/.test(newPassword) === false) {
+    return { error: 'New password does not contain at least one number and at least one letter' };
+  }
+
+  user.password = newPassword;
+
+  setData(data);
+  return {};
+}
+
+export { adminAuthRegister, adminAuthLogin, adminAuthLogout, adminUserDetails, adminAuthUpdateDetails, adminAuthUpdatePassword };
