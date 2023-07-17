@@ -3,6 +3,7 @@ import { echo } from './echo';
 import morgan from 'morgan';
 import config from './config.json';
 import cors from 'cors';
+import errorHandler from 'middleware-http-errors';
 import YAML from 'yaml';
 import sui from 'swagger-ui-express';
 import fs from 'fs';
@@ -13,8 +14,6 @@ const app = express();
 app.use(json());
 // Use middleware that allows for access from other domains
 app.use(cors());
-// for logging errors (print to terminal)
-app.use(morgan('dev'));
 // for producing the docs that define the API
 const file = fs.readFileSync('./swagger.yaml', 'utf8');
 app.get('/', (req: Request, res: Response) => res.redirect('/docs'));
@@ -36,6 +35,11 @@ app.get('/echo', (req: Request, res: Response) => {
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================
+
+// For handling errors
+app.use(errorHandler());
+// for logging errors (print to terminal)
+app.use(morgan('dev'));
 
 // start server
 const server = app.listen(PORT, HOST, () => {
