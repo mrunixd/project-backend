@@ -183,20 +183,19 @@ function adminQuizRemove(
     return {
       error: 'Quiz ID does not refer to a valid quiz that this user owns',
     };
-  } else {
-    // If no errors; remove the quiz and update 'quizzes' in dataStore.js
-    const index = user.quizIds.findIndex((id) => id.quizId === quizId);
-    const [removedQuiz] = user.quizIds.splice(index, 1);
-    user.trash.push(removedQuiz);
-
-    const quizDetails = data.quizzes.find((id) => id.quizId === quizId);
-    if (quizDetails === undefined) {
-      return { error: 'Quiz ID does not refer to a valid quiz' };
-    }
-    quizDetails.timeLastEdited = Math.floor(Date.now() / 1000);
-    setData(data);
-    return {};
   }
+  // If no errors; remove the quiz and update 'quizzes' in dataStore.js
+  const index = user.quizIds.findIndex((id) => id.quizId === quizId);
+  const [removedQuiz] = user.quizIds.splice(index, 1);
+  user.trash.push(removedQuiz);
+
+  const quizDetails = data.quizzes.find((id) => id.quizId === quizId);
+  if (quizDetails === undefined) {
+    return { error: 'Quiz ID does not refer to a valid quiz' };
+  }
+  quizDetails.timeLastEdited = Math.floor(Date.now() / 1000);
+  setData(data);
+  return {};
 }
 
 /**

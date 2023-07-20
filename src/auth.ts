@@ -45,7 +45,7 @@ function adminAuthRegister(
       return { error: 'Email address is already in use' };
     }
   }
-  if (validator.isEmail(email) === false) {
+  if (!validator.isEmail(email)) {
     return { error: 'Email address is not valid' };
   } else if (acceptedCharacters.test(nameFirst) === false) {
     return { error: 'First name is invalid' };

@@ -63,14 +63,6 @@ export interface ErrorObject {
   error: string;
 }
 
-// const data: DataStore = {
-//   users: [],
-//   quizzes: [],
-//   tokens: [],
-//   trash: [],
-//   unclaimedQuestionId: 0,
-// };
-
 function setData(data: DataStore) {
   fs.writeFileSync('./dbStore.json', JSON.stringify(data));
 }
