@@ -17,7 +17,6 @@ function postRequest(route: string, json: any) {
   };
 }
 
-
 function deleteRequest(route: string, qs: any) {
   const res = request('DELETE', `${SERVER_URL}${route}`, { qs: qs });
   return {
@@ -43,22 +42,33 @@ function getRequest(route: string, qs: any) {
   };
 }
 
-////////////////////////////////////////////////////////////
-/////INDIVIDUAL REQUEST FUNCTIONS BELOW, WRAPPERS ABOVE/////
-////////////////////////////////////////////////////////////
-
-export function requestadminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string) {
+export function requestAdminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string) {
   const response = postRequest('/v1/admin/auth/register', {email, password, nameFirst, nameLast});
   return response;
 }
 
-export function requestadminAuthLogin(email: string, password: string) {
+export function requestAdminAuthLogin(email: string, password: string) {
   const response = postRequest('/v1/admin/auth/login', {email, password});
   return response;
 }
 
-export function requestadminUserDetails(token: string) {
+export function requestAdminUserDetails(token: string) {
   const response = getRequest(`/v1/admin/user/details?token=${token}`, {});
+  return response;
+}
+
+export function requestAdminAuthLogout(token: string) {
+  const response = postRequest('/v1/admin/auth/logout', {token});
+  return response;
+}
+
+export function requestAdminAuthUpdateDetails(token: string, email: string, nameFirst: string, nameLast: string) {
+  const response = putRequest('/v1/admin/user/details', {token, email, nameFirst, nameLast});
+  return response;
+}
+
+export function requestAdminAuthUpdatePassword(token: string, oldPassword: string, newPassword: string) {
+  const response = putRequest('/v1/admin/user/password', {token, oldPassword, newPassword});
   return response;
 }
 
@@ -103,6 +113,10 @@ const quizQuestion2Body = {
   ],
 };
 
+////////////////////////////////////////////////////////////
+////EVERYTHING ABOVE NEEDS TO BE PORTED TO A HELPER FILE////
+////////////////////////////////////////////////////////////
+
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
   result1 = undefined;
@@ -127,7 +141,7 @@ describe('////////TESTING v1/clear////////', () => {
 describe('////////TESTING v1/admin/auth/register////////', () => {
   describe('Testing v1/admin/auth/register success', () => {
     test('Successful adminAuthRegister 1 person', () => {
-      result1 = requestadminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
+      result1 = requestAdminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
       expect(result1.body).toStrictEqual({
         token: expect.any(String),
       });
@@ -137,57 +151,57 @@ describe('////////TESTING v1/admin/auth/register////////', () => {
 
   describe('Testing v1/admin/auth/register errors', () => {
     test('CASE: Email address is already in use - same email in caps', () => {
-      requestadminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian',);
-      result2 = requestadminAuthRegister('Vincentxian@gmail.com', 'vincentpassword1', 'vincent', 'xian');
+      requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian',);
+      result2 = requestAdminAuthRegister('Vincentxian@gmail.com', 'vincentpassword1', 'vincent', 'xian');
       expect(result2.body).toStrictEqual({ error: expect.any(String) });
       expect(result2.status).toBe(INPUT_ERROR);
     });
 
     test('CASE: Email address is already in use - same email exactly', () => {
-      requestadminAuthRegister('vincentxian@gmail.com', 'vincentpassword1', 'vincent', 'xian');
-      result2 = requestadminAuthRegister('vincentxian@gmail.com', 'vincentpassword1', 'vincent', 'xian');
+      requestAdminAuthRegister('vincentxian@gmail.com', 'vincentpassword1', 'vincent', 'xian');
+      result2 = requestAdminAuthRegister('vincentxian@gmail.com', 'vincentpassword1', 'vincent', 'xian');
       expect(result2.body).toStrictEqual({ error: expect.any(String) });
       expect(result2.status).toBe(INPUT_ERROR);
     });
 
     test('CASE: Email address is invalid', () => {
-      result1 = requestadminAuthRegister('vincent123', 'vincentpassword1', 'vincent', 'xian');
+      result1 = requestAdminAuthRegister('vincent123', 'vincentpassword1', 'vincent', 'xian');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE: First name is is invalid', () => {
-      result1 = requestadminAuthRegister('vincentxian@gmail.com', 'vincentpassword1', '!!!', 'xian');
+      result1 = requestAdminAuthRegister('vincentxian@gmail.com', 'vincentpassword1', '!!!', 'xian');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE: First name is less than 2 characters or more than 20 characters', () => {
-      result1 = requestadminAuthRegister('vincentxian@gmail.com', 'vincentpassword1', 'v', 'xian');
+      result1 = requestAdminAuthRegister('vincentxian@gmail.com', 'vincentpassword1', 'v', 'xian');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE: Last name is is invalid', () => {
-      result1 = requestadminAuthRegister('vincentxian@gmail.com', 'vincentpasswor1', 'vincent', '!!!');
+      result1 = requestAdminAuthRegister('vincentxian@gmail.com', 'vincentpasswor1', 'vincent', '!!!');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE: Last name is less than 2 characters or more than 20 characters', () => {
-      result1 = requestadminAuthRegister('vincentxian@gmail.com', 'vincentpassword1', 'vincent', 'x');
+      result1 = requestAdminAuthRegister('vincentxian@gmail.com', 'vincentpassword1', 'vincent', 'x');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE: Password is less than 8 characters', () => {
-      result1 = requestadminAuthRegister('vincentxian@gmail.com', 'pass', 'vincent', 'xian');
+      result1 = requestAdminAuthRegister('vincentxian@gmail.com', 'pass', 'vincent', 'xian');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE: Password does not contain at least one number and at least one letter', () => {
-      result1 = requestadminAuthRegister('vincentxian@gmail.com', 'password', 'vincent', 'xian');
+      result1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password', 'vincent', 'xian');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
@@ -197,11 +211,11 @@ describe('////////TESTING v1/admin/auth/register////////', () => {
 describe('////////TESTING v1/admin/auth/login////////', () => {
   describe('Testing v1/admin/auth/login success', () => {
     beforeEach(() => {
-      requestadminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal');
+      requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal');
     });
 
     test('Successful adminAuthLogin 2 people', () => {
-      result1 = requestadminAuthLogin('manan.j2450@gmail.com', 'Abcd12345');
+      result1 = requestAdminAuthLogin('manan.j2450@gmail.com', 'Abcd12345');
       expect(result1.body).toStrictEqual({
         token: expect.any(String),
       });
@@ -209,7 +223,7 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
     });
 
     test('testing whether email address is case sensitive', () => {
-      result1 = requestadminAuthLogin('manan.j2450@gmail.com', 'Abcd12345');
+      result1 = requestAdminAuthLogin('manan.j2450@gmail.com', 'Abcd12345');
       expect(result1.body).toStrictEqual({
         token: expect.any(String),
       });
@@ -217,8 +231,8 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
     });
 
     test('testing successful increment of logins', () => {
-      requestadminAuthLogin('manan.j2450@gmail.com', 'Abcd12345');
-      result1 = requestadminAuthLogin('manan.j2450@gmail.com', 'Abcd12345');
+      requestAdminAuthLogin('manan.j2450@gmail.com', 'Abcd12345');
+      result1 = requestAdminAuthLogin('manan.j2450@gmail.com', 'Abcd12345');
       expect(result1.body).toStrictEqual({
         token: expect.any(String),
       });
@@ -226,9 +240,9 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
     });
 
     test('testing succesful increments of incorrect passwords', () => {
-      requestadminAuthLogin('manan.j2450@gmail.com', 'incorrectPw1234');
-      requestadminAuthLogin('manan.j2450@gmail.com', 'incorrectPw1234');
-      result1 = requestadminAuthLogin('manan.j2450@gmail.com', 'Abcd12345');
+      requestAdminAuthLogin('manan.j2450@gmail.com', 'incorrectPw1234');
+      requestAdminAuthLogin('manan.j2450@gmail.com', 'incorrectPw1234');
+      result1 = requestAdminAuthLogin('manan.j2450@gmail.com', 'Abcd12345');
       expect(result1.body).toStrictEqual({
         token: expect.any(String),
       });
@@ -238,28 +252,28 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
 
   describe('Testing v1/admin/auth/login errors', () => {
     beforeEach(() => {
-      requestadminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal');
+      requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal');
     });
     test('CASE (400): Email address does not exist', () => {
-      result1 = requestadminAuthLogin('unregisteredemail@gmail.com', 'incorrectpW1234');
+      result1 = requestAdminAuthLogin('unregisteredemail@gmail.com', 'incorrectpW1234');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE (400): Password is incorrect: Differing cases', () => {
-      result1 = requestadminAuthLogin('manan.j2450@gmail.com', 'abcd12345');
+      result1 = requestAdminAuthLogin('manan.j2450@gmail.com', 'abcd12345');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE (400): Password is incorrect: Differing password', () => {
-      result1 = requestadminAuthLogin('manan.j2450@gmail.com', 'incorrectpW1234');
+      result1 = requestAdminAuthLogin('manan.j2450@gmail.com', 'incorrectpW1234');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE (400): Password is incorrect: Differing cases', () => {
-      result1 = requestadminAuthLogin('manan.j2450@gmail.com', 'incorrectpW1234');
+      result1 = requestAdminAuthLogin('manan.j2450@gmail.com', 'incorrectpW1234');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
@@ -269,8 +283,8 @@ describe('////////TESTING v1/admin/auth/login////////', () => {
 describe('////////TESTING /v1/admin/user/details////////', () => {
   describe('Testing /v1/admin/user/details success', () => {
     test('CASE: Successful self check', () => {
-      person1 = requestadminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
-      result1 = requestadminUserDetails(person1.body.token);
+      person1 = requestAdminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
+      result1 = requestAdminUserDetails(person1.body.token);
       expect(result1.body).toStrictEqual({
         user: {
           userId: expect.any(Number),
@@ -284,12 +298,9 @@ describe('////////TESTING /v1/admin/user/details////////', () => {
     });
 
     test('CASE: Successful check on 2nd person', () => {
-      requestadminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
-      person2 = requestadminAuthRegister('manan.j2450@gmail.com', 'abcd1234', 'Manan', 'Jaiswal');
-      result1 = getRequest(
-        `/v1/admin/user/details?token=${person2.body.token}`,
-        {}
-      );
+      requestAdminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
+      person2 = requestAdminAuthRegister('manan.j2450@gmail.com', 'abcd1234', 'Manan', 'Jaiswal');
+      result1 = requestAdminUserDetails(person2.body.token);
       expect(result1.body).toStrictEqual({
         user: {
           userId: expect.any(Number),
@@ -303,19 +314,19 @@ describe('////////TESTING /v1/admin/user/details////////', () => {
     });
     describe('Testing /v1/admin/user/details errors', () => {
       test('CASE (401): Token is not a valid structure - too short', () => {
-        result1 = getRequest('/v1/admin/user/details?token=1', {});
+        result1 = requestAdminUserDetails('1');
         expect(result1.body).toStrictEqual({ error: expect.any(String) });
         expect(result1.status).toBe(UNAUTHORISED);
       });
       test('CASE (401): Token is not a valid structure - special symbols', () => {
-        result1 = getRequest('/v1/admin/user/details?token=lett!', {});
+        result1 = requestAdminUserDetails('lett!');
         expect(result1.body).toStrictEqual({ error: expect.any(String) });
         expect(result1.status).toBe(UNAUTHORISED);
       });
       test('CASE (403): Token is not valid for a currently logged in session', () => {
-        person1 = requestadminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
+        person1 = requestAdminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
         const sessionId = parseInt(person1.body.token) + 1;
-        result1 = getRequest(`/v1/admin/user/details?token=${sessionId}`, {});
+        result1 = requestAdminUserDetails(`${sessionId}`);
         expect(result1.body).toStrictEqual({ error: expect.any(String) });
         expect(result1.status).toBe(FORBIDDEN);
       });
@@ -325,7 +336,7 @@ describe('////////TESTING /v1/admin/user/details////////', () => {
 
 describe('////////TESTING v1/admin/quiz/list////////', () => {
   beforeEach(() => {
-    person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+    person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
   });
 
   describe('SUCCESS CASES', () => {
@@ -425,7 +436,7 @@ describe('////////TESTING v1/admin/quiz/list////////', () => {
 
 describe('//////// Testing v1/admin/quiz/ create////////', () => {
   beforeEach(() => {
-    person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+    person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
   });
 
   describe('Testing /v1/admin/quiz success cases', () => {
@@ -529,7 +540,7 @@ describe('//////// Testing v1/admin/quiz/ create////////', () => {
 
 describe('///////Testing /v1/admin/quiz/delete////////', () => {
   beforeEach(() => {
-    person1 = requestadminAuthRegister('manan.j2450@gmail.com', 'Abcd12345',  'Manan', 'Jaiswal');
+    person1 = requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345',  'Manan', 'Jaiswal');
   });
   describe('Testing /v1/admin/quiz/ delete success cases', () => {
     test('Successful deletion of quiz', () => {
@@ -580,7 +591,7 @@ describe('///////Testing /v1/admin/quiz/delete////////', () => {
   });
   describe('Testing /v1/admin/quiz/ delete error cases', () => {
     beforeEach(() => {
-      person2 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person2 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
       result2 = postRequest('/v1/admin/quiz', {
         token: person1.body.token,
         name: 'first quiz',
@@ -647,7 +658,7 @@ describe('///////Testing /v1/admin/quiz/delete////////', () => {
 describe('///////Testing /v1/admin/quiz/ info////////', () => {
   describe('Testing /v1/admin/quiz/ info success cases', () => {
     test('Success info 1 person 1 quiz 0 questions', () => {
-      person1 = requestadminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
+      person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
       quiz1 = postRequest('/v1/admin/quiz', {
         token: person1.body.token,
         name: 'first quiz',
@@ -671,7 +682,7 @@ describe('///////Testing /v1/admin/quiz/ info////////', () => {
     });
 
     test('Success info 1 person 1 quiz 2 questions', () => {
-      person1 = requestadminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
+      person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
         name: 'first quiz',
@@ -753,7 +764,7 @@ describe('///////Testing /v1/admin/quiz/ info////////', () => {
   });
   describe('Testing /v1/admin/quiz/ info error cases', () => {
     beforeEach(() => {
-      person1 = requestadminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
+      person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
         name: 'first quiz',
@@ -799,7 +810,7 @@ describe('///////Testing /v1/admin/quiz/ info////////', () => {
     });
 
     test('CASE: Quiz ID does not refer to a quiz that this user owns', () => {
-      person2 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person2 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
       result1 = getRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}?token=${person2.body.token}`,
         {}
@@ -813,7 +824,7 @@ describe('///////Testing /v1/admin/quiz/ info////////', () => {
 describe('/////// TESTING v1/admin/quiz/name ///////', () => {
   describe('/////// Testing v1/admin/quiz/name success', () => {
     test('CASE: Successful adminQuizNameUpdate', () => {
-      person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
@@ -847,7 +858,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
 
   describe('/////// Testing v1/admin/quiz/name error', () => {
     test('CASE: quizId does not refer to a valid quiz', () => {
-      person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
@@ -865,7 +876,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: quizId does not refer to a quiz that this user owns', () => {
-      person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
@@ -873,7 +884,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
         description: 'first quiz being tested',
       });
 
-      person2 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      person2 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
 
       result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/name`, {
         token: `${person2.body.token}`,
@@ -885,7 +896,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: Name contains invalid characters', () => {
-      person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
@@ -903,7 +914,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: Name is less than 3 characters long', () => {
-      person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
@@ -921,7 +932,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: Name is more than 30 characters long', () => {
-      person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
@@ -939,7 +950,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: Name is already used in the current logged in user for another quiz', () => {
-      person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
@@ -963,7 +974,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: Token is not a valid structure - too short', () => {
-      person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
@@ -981,7 +992,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: Token is not a valid structure - non-numeric characters', () => {
-      person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
@@ -999,7 +1010,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: Token is not a valid structure - too long', () => {
-      person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
@@ -1017,7 +1028,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
     });
 
     test('CASE: Provided token is valid structure, but is not for a currently logged in session', () => {
-      person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
@@ -1039,7 +1050,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
 describe('/////// TESTING v1/admin/quiz/description ///////', () => {
   describe('//////// Testing v1/admin/quiz/description success ////////', () => {
     test('CASE: Successful adminQuizDescriptionUpdate', () => {
-      person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
@@ -1069,7 +1080,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
   describe('/////// Testing v1/admin/quiz/description error(s)', () => {
     // Status 401
     test('CASE: Token is not a valid structure - too short', () => {
-      person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
@@ -1087,7 +1098,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
     });
 
     test('CASE: Token is not a valid structure - too long', () => {
-      person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
@@ -1105,7 +1116,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
     });
 
     test('CASE: Token is not a valid structure - special characters', () => {
-      person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       quiz1 = postRequest('/v1/admin/quiz', {
         token: `${person1.body.token}`,
@@ -1125,7 +1136,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
 
   // Status 403
   test('CASE: Provided token is valid structure, but is not for a currently logged in session', () => {
-    person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+    person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
     quiz1 = postRequest('/v1/admin/quiz', {
       token: `${person1.body.token}`,
@@ -1144,7 +1155,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
 
   // Status 400
   test('CASE: quizId does not refer to a valid quiz', () => {
-    person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+    person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
     quiz1 = postRequest('/v1/admin/quiz', {
       token: `${person1.body.token}`,
@@ -1165,7 +1176,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
   });
 
   test('CASE: quizId does not refer to a quiz that this user owns', () => {
-    person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+    person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
     quiz1 = postRequest('/v1/admin/quiz', {
       token: `${person1.body.token}`,
@@ -1173,7 +1184,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
       description: 'first quiz being tested',
     });
 
-    person2 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+    person2 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
 
     result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
       token: `${person2.body.token}`,
@@ -1185,7 +1196,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
   });
 
   test('CASE: Description is longer than 100 characters', () => {
-    person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+    person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
     quiz1 = postRequest('/v1/admin/quiz', {
       token: `${person1.body.token}`,
@@ -1204,7 +1215,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
   });
 
   test('CASE: More than 100 empty spaces', () => {
-    person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+    person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
     quiz1 = postRequest('/v1/admin/quiz', {
       token: `${person1.body.token}`,
@@ -1226,36 +1237,24 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
 describe('/////// /v1/admin/auth/logout ///////', () => {
   describe('/////// /v1/admin/auth/logout successful ///////', () => {
     test('CASE: Logout successful', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = postRequest('/v1/admin/auth/logout', {
-        token: `${person1.body.token}`,
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthLogout(person1.body.token);
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
     });
 
     test('CASE: Login, logout, login, logout success', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = postRequest('/v1/admin/auth/logout', {
-        token: `${person1.body.token}`,
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthLogout(person1.body.token);
+      result2 = requestAdminAuthLogin('zhizhao@gmail.com', 'Abcd12345');
+      result3 = requestAdminAuthLogout(result2.body.token);
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
-      result2 = requestadminAuthLogin('zhizhao@gmail.com', 'Abcd12345');
-
-      expect(result2.body).toStrictEqual({
-        token: expect.any(String),
-      });
+      expect(result2.body).toStrictEqual({token: expect.any(String)});
       expect(result2.status).toBe(OK);
-
-      result3 = postRequest('/v1/admin/auth/logout', {
-        token: `${result2.body.token}`,
-      });
 
       expect(result3.body).toStrictEqual({});
       expect(result3.status).toBe(OK);
@@ -1264,51 +1263,37 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
 
   describe('/////// /v1/admin/auth/logout error occurred ///////', () => {
     test('CASE(401): Token has invalid structure - too short', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = postRequest('/v1/admin/auth/logout', {
-        token: '1234',
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthLogout('1234',);
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
     });
 
     test('CASE(401): Token has invalid structure - too long', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = postRequest('/v1/admin/auth/logout', {
-        token: '123456',
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthLogout('123456');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
     });
 
     test('CASE(401): Token has invalid structure - non-numeric characters', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = postRequest('/v1/admin/auth/logout', {
-        token: 'SP!@#',
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthLogout('SP!@#');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
     });
 
     test('CASE(403): The token is for a user who has already logged out', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = postRequest('/v1/admin/auth/logout', {
-        token: `${person1.body.token}`,
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthLogout(person1.body.token);
+      result2 = requestAdminAuthLogout(person1.body.token);
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
-      result2 = postRequest('/v1/admin/auth/logout', {
-        token: `${person1.body.token}`,
-      });
 
       expect(result2.body).toStrictEqual({ error: expect.any(String) });
       expect(result2.status).toBe(INPUT_ERROR);
@@ -1319,22 +1304,13 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
 describe('/////// /v1/admin/user/details //////', () => {
   describe('////// adminAuthUpdateDetails runs ///////', () => {
     test('CASE(200): Updated details successfully', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/details', {
-        token: `${person1.body.token}`,
-        email: 'newEmail@gmail.com',
-        nameFirst: 'Vincent',
-        nameLast: 'Xian'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'newEmail@gmail.com','Vincent','Xian');
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
-      result2 = getRequest('/v1/admin/user/details', {
-        token: `${person1.body.token}`
-      });
-
+      result2 = requestAdminUserDetails(person1.body.token);
       expect(result2.body).toMatchObject({
         user: {
           name: 'Vincent Xian',
@@ -1348,23 +1324,15 @@ describe('/////// /v1/admin/user/details //////', () => {
     });
 
     test('CASE(200): Email is unchanged, other details change', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      person2 = requestAdminAuthRegister('vincentxian@gmail.com', 'Abcd12345', 'Vincent', 'Xian');
 
-      person2 = requestadminAuthRegister('vincentxian@gmail.com', 'Abcd12345', 'Vincent', 'Xian');
-
-      result1 = putRequest('/v1/admin/user/details', {
-        token: `${person1.body.token}`,
-        email: 'zhizhao@gmail.com',
-        nameFirst: 'Vincent',
-        nameLast: 'Xian'
-      });
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'zhizhao@gmail.com','Vincent','Xian');
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
-      result2 = getRequest('/v1/admin/user/details', {
-        token: `${person1.body.token}`
-      });
+      result2 = requestAdminUserDetails(person1.body.token);
 
       expect(result2.body).toMatchObject({
         user: {
@@ -1381,189 +1349,113 @@ describe('/////// /v1/admin/user/details //////', () => {
 
   describe('////// adminAuthUpdateDetails errors ///////', () => {
     test('CASE(400): Email is currently used for another user', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      person2 = requestadminAuthRegister('vincentxian@gmail.com', 'Abcd12345', 'Vincent', 'Xian');
-
-      result1 = putRequest('/v1/admin/user/details', {
-        token: `${person1.body.token}`,
-        email: 'vincentxian@gmail.com',
-        nameFirst: 'Zhi',
-        nameLast: 'Zhao'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      person2 = requestAdminAuthRegister('vincentxian@gmail.com', 'Abcd12345', 'Vincent', 'Xian');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','Zhi','Zhao');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(400): Email is invalid', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/details', {
-        token: `${person1.body.token}`,
-        email: 'invalidemail',
-        nameFirst: 'Zhi',
-        nameLast: 'Zhao'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'invalidemail','Zhi','Zhao');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(400): First name contains forbidden characters - numbers', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/details', {
-        token: `${person1.body.token}`,
-        email: 'vincentxian@gmail.com',
-        nameFirst: '12345',
-        nameLast: 'Zhao'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','12345','Zhao');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(400): First name contains forbidden characters - special characters/symbols', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/details', {
-        token: `${person1.body.token}`,
-        email: 'vincentxian@gmail.com',
-        nameFirst: '!@#$%',
-        nameLast: 'Zhao'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','!@#$%','Zhao');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(400): First name is either less than 2 characters or more than 20 characters long - too short', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/details', {
-        token: `${person1.body.token}`,
-        email: 'vincentxian@gmail.com',
-        nameFirst: 'V',
-        nameLast: 'Zhao'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','V','Zhao');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(400): First name is either less than 2 characters or more than 20 characters long - too long', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/details', {
-        token: `${person1.body.token}`,
-        email: 'vincentxian@gmail.com',
-        nameFirst: 'VincentVincentVincent',
-        nameLast: 'Zhao'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','VincentVincentVincent','Zhao');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(400): Last name contains forbidden characters - numbers', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/details', {
-        token: `${person1.body.token}`,
-        email: 'vincentxian@gmail.com',
-        nameFirst: 'Zhi',
-        nameLast: '12345'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','Zhi','12345');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(400): Last name contains forbidden characters - special characters/symbols', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/details', {
-        token: `${person1.body.token}`,
-        email: 'vincentxian@gmail.com',
-        nameFirst: 'Zhi',
-        nameLast: '!@#$%'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','Zhi','!@#$%');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(400): Last name is either less than 2 characters or more than 20 characters long - too short', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/details', {
-        token: `${person1.body.token}`,
-        email: 'vincentxian@gmail.com',
-        nameFirst: 'Zhi',
-        nameLast: 'Z'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','Zhi','Z');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(400): Last name is either less than 2 characters or more than 20 characters long - too long', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/details', {
-        token: `${person1.body.token}`,
-        email: 'vincentxian@gmail.com',
-        nameFirst: 'Zhi',
-        nameLast: 'ZhaoZhaoZhaoZhaoZhaoZ'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','Zhi','ZhaoZhaoZhaoZhaoZhaoZ');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(401): Token is invalid structure - too short', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdateDetails('1234','vincentxian@gmail.com','Vincent','Xian');
 
-      result1 = putRequest('/v1/admin/user/details', {
-        token: '1234',
-        email: 'vincentxian@gmail.com',
-        nameFirst: 'Vincent',
-        nameLast: 'Xian'
-      });
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(UNAUTHORISED);
     });
 
     test('CASE(401): Token is invalid structure - too long', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdateDetails('123456','vincentxian@gmail.com','Vincent','Xian');
 
-      result1 = putRequest('/v1/admin/user/details', {
-        token: '123456',
-        email: 'vincentxian@gmail.com',
-        nameFirst: 'Vincent',
-        nameLast: 'Xian'
-      });
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(UNAUTHORISED);
     });
 
     test('CASE(401): Token is invalid structure - special characters', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdateDetails('!@#$%','vincentxian@gmail.com','Vincent','Xian');
 
-      result1 = putRequest('/v1/admin/user/details', {
-        token: '!@#$%',
-        email: 'vincentxian@gmail.com',
-        nameFirst: 'Vincent',
-        nameLast: 'Xian'
-      });
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(UNAUTHORISED);
     });
 
     test('CASE(403): Provided token is valid structure, but is not for a currently logged in session', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/details', {
-        token: '12345',
-        email: 'vincentxian@gmail.com',
-        nameFirst: 'Vincent',
-        nameLast: 'Xian'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdateDetails('12345','vincentxian@gmail.com','Vincent','Xian');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(FORBIDDEN);
@@ -1574,25 +1466,17 @@ describe('/////// /v1/admin/user/details //////', () => {
 describe('/////// /v1/admin/user/password ///////', () => {
   describe('/////// /v1/admin/user/password runs ///////', () => {
     test('CASE(200): adminAuthUpdatePassword runs successfully', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde12345'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','Bcde12345');
+      result2 = requestAdminAuthLogout(person1.body.token);
+      result3 = requestAdminAuthLogin('zhizhao@gmail.com', 'Bcde12345');
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
-      result2 = postRequest('/v1/admin/auth/logout', {
-        token: `${person1.body.token}`,
-      });
 
       expect(result2.body).toStrictEqual({});
       expect(result2.status).toBe(OK);
-
-      result3 = requestadminAuthLogin('zhizhao@gmail.com', 'Bcde12345');
 
       expect(result3.body).toStrictEqual({ token: expect.any(String) });
       expect(result3.status).toBe(OK);
@@ -1601,170 +1485,100 @@ describe('/////// /v1/admin/user/password ///////', () => {
 
   describe('/////// /v1/admin/user/password error ///////', () => {
     test('CASE(400): New password is not the correct old password', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'Abcd12345'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','Abcd12345');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(400): New password has already been used before by this user - initial password', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde12345'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','Bcde12345');
+      result2 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Bcde12345','Abcd12345');
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
-
-      result2 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Bcde12345',
-        newPassword: 'Abcd12345'
-      });
 
       expect(result2.body).toStrictEqual({ error: expect.any(String) });
       expect(result2.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(400): New password has already been used before by this user - update password repeatedly', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde12345'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','Bcde12345');
+      result2 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Bcde12345','Cdef12345');
+      result3 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Cdef12345','Bcde12345');
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
-      result2 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Bcde12345',
-        newPassword: 'Cdef12345'
-      });
-
       expect(result2.body).toStrictEqual({});
       expect(result2.status).toBe(OK);
-
-      result3 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Cdef12345',
-        newPassword: 'Bcde12345'
-      });
 
       expect(result3.body).toStrictEqual({ error: expect.any(String) });
       expect(result3.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(400): New password is less than 8 characters', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde123'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','Bcde123');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(400): New password does not contain at least one number and at least one letter - all letters', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: 'aBcDeFgHi'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','aBcDeFgHi');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(400): New password does not contain at least one number and at least one letter - all numbers', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: '123456789'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','123456789');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(400): New password does not contain at least one number and at least one letter - non-alphanumeric characters', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: `${person1.body.token}`,
-        oldPassword: 'Abcd12345',
-        newPassword: '!@#$%^&*('
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','!@#$%^&*(');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE(401): Token is not a valid structure - too short', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: '1234',
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde12345'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdatePassword('1234','Abcd12345','Bcde12345');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
     });
 
     test('CASE(401): Token is not a valid structure - too long', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: '123456',
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde12345'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdatePassword('123456','Abcd12345','Bcde12345');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
     });
 
     test('CASE(401): Token is not a valid structure - special characters', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: '!@#$%',
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde12345'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdatePassword('!@#$%','Abcd12345','Bcde12345');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
     });
 
     test('CASE(403): Provided token is valid structure, but it not for a currently logged in session', () => {
-      person1 = requestadminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-
-      result1 = putRequest('/v1/admin/user/password', {
-        token: '12345',
-        oldPassword: 'Abcd12345',
-        newPassword: 'Bcde12345'
-      });
+      person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
+      result1 = requestAdminAuthUpdatePassword('12345','Abcd12345','Bcde12345');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(FORBIDDEN);
@@ -1774,7 +1588,7 @@ describe('/////// /v1/admin/user/password ///////', () => {
 
 describe('////////Testing v1/admin/quiz/trash////////', () => {
   beforeEach(() => {
-    person1 = requestadminAuthRegister('manan.j2450@gmail.com', 'Abcd12345',  'Manan', 'Jaiswal');
+    person1 = requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345',  'Manan', 'Jaiswal');
   });
 
   describe('Testing v1/admin/quiz/trash success cases', () => {
@@ -1886,8 +1700,8 @@ describe('////////Testing v1/admin/quiz/trash////////', () => {
 
 describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
   beforeEach(() => {
-    person1 = requestadminAuthRegister('manan.j2450@gmail.com', 'Abcd12345',  'Manan', 'Jaiswal');
-    person2 = requestadminAuthRegister('test@gmail.com', 'Abcd12345', 'Fake', 'Name');
+    person1 = requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345',  'Manan', 'Jaiswal');
+    person2 = requestAdminAuthRegister('test@gmail.com', 'Abcd12345', 'Fake', 'Name');
   });
   describe('Testing v1/admin/quiz/:quizid/restore success cases', () => {
     beforeEach(() => {
@@ -2022,8 +1836,8 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
 
 describe('////////Testing /v1/admin/quiz/trash/empty', () => {
   beforeEach(() => {
-    person1 = requestadminAuthRegister('manan.j2450@gmail.com', 'Abcd12345',  'Manan', 'Jaiswal');
-    person2 = requestadminAuthRegister('test@gmail.com', 'Abcd12345', 'Fake', 'Name');
+    person1 = requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345',  'Manan', 'Jaiswal');
+    person2 = requestAdminAuthRegister('test@gmail.com', 'Abcd12345', 'Fake', 'Name');
     quiz1 = postRequest('/v1/admin/quiz', {
       token: person1.body.token,
       name: 'first quiz',
@@ -2163,8 +1977,8 @@ describe('////////Testing /v1/admin/quiz/trash/empty', () => {
 
 describe('///////Testing /v1/admin/quiz/transfer////////', () => {
   beforeEach(() => {
-    person1 = requestadminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
-    person2 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+    person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
+    person2 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
     quiz1 = postRequest('/v1/admin/quiz', {
       token: `${person1.body.token}`,
       name: 'first quiz',
@@ -2387,7 +2201,7 @@ describe('///////Testing /v1/admin/quiz/transfer////////', () => {
     });
 
     test('CASE (400): Quiz ID does not refer to a quiz that this user owns', () => {
-      requestadminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal' );
+      requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal' );
       result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/transfer`, {
         token: `${person2.body.token}`,
         userEmail: 'manan.j2450@gmail.com',
@@ -2429,7 +2243,7 @@ describe('///////Testing /v1/admin/quiz/transfer////////', () => {
 
 describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
   beforeEach(() => {
-    person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+    person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
     quiz1 = postRequest('/v1/admin/quiz', {
       token: `${person1.body.token}`,
       name: 'first quiz',
@@ -2505,7 +2319,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
     });
 
     test('CASE: quiz does not exist for user', () => {
-      person2 = requestadminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
+      person2 = requestAdminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
       result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/question`, {
         token: `${person2.body.token}`,
         questionBody: quizQuestion1,
@@ -2705,7 +2519,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
 
 describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', () => {
   beforeEach(() => {
-    person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+    person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
     quiz1 = postRequest('/v1/admin/quiz', {
       token: `${person1.body.token}`,
       name: 'first quiz',
@@ -2840,7 +2654,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
     });
 
     test('CASE: quiz does not exist for user', () => {
-      person2 = requestadminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
+      person2 = requestAdminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
       result1 = putRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}`,
         {
@@ -3082,7 +2896,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
 
 describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
   beforeEach(() => {
-    person1 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+    person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
     quiz1 = postRequest('/v1/admin/quiz', {
       token: `${person1.body.token}`,
       name: 'first quiz',
@@ -3223,7 +3037,7 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
     });
 
     test('CASE: Quiz ID does not refer to a quiz that this user owns', () => {
-      person2 = requestadminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
+      person2 = requestAdminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
       result1 = deleteRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}?token=${person2.body.token}`,
         {}
@@ -3250,7 +3064,7 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
 
 describe('///////Testing /v1/admin/quiz/question/move////////', () => {
   beforeEach(() => {
-    person1 = requestadminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
+    person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
     quiz1 = postRequest('/v1/admin/quiz', {
       token: `${person1.body.token}`,
       name: 'first quiz',
@@ -3430,7 +3244,7 @@ describe('///////Testing /v1/admin/quiz/question/move////////', () => {
     });
 
     test('CASE (400): Quiz ID does not refer to a quiz that this user owns', () => {
-      person2 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person2 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       result1 = putRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}/move`,
@@ -3500,7 +3314,7 @@ describe('///////Testing /v1/admin/quiz/question/move////////', () => {
 
 describe('///////Testing /v1/admin/quiz/question/duplicate////////', () => {
   beforeEach(() => {
-    person1 = requestadminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
+    person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
     quiz1 = postRequest('/v1/admin/quiz', {
       token: `${person1.body.token}`,
       name: 'first quiz',
@@ -3744,7 +3558,7 @@ describe('///////Testing /v1/admin/quiz/question/duplicate////////', () => {
     });
 
     test('CASE (400): Quiz ID does not refer to a quiz that this user owns', () => {
-      person2 = requestadminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+      person2 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
       result1 = postRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}/duplicate`,
