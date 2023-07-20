@@ -22,6 +22,9 @@ app.use('/docs', sui.serve, sui.setup(YAML.parse(file), { swaggerOptions: { docE
 const PORT: number = parseInt(process.env.PORT || config.port);
 const HOST: string = process.env.IP || 'localhost';
 
+// for logging errors (print to terminal)
+app.use(morgan('dev'));
+
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
@@ -38,8 +41,6 @@ app.get('/echo', (req: Request, res: Response) => {
 
 // For handling errors
 app.use(errorHandler());
-// for logging errors (print to terminal)
-app.use(morgan('dev'));
 
 // start server
 const server = app.listen(PORT, HOST, () => {
