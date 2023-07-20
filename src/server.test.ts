@@ -43,12 +43,12 @@ function getRequest(route: string, qs: any) {
 }
 
 export function requestAdminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string) {
-  const response = postRequest('/v1/admin/auth/register', {email, password, nameFirst, nameLast});
+  const response = postRequest('/v1/admin/auth/register', { email, password, nameFirst, nameLast });
   return response;
 }
 
 export function requestAdminAuthLogin(email: string, password: string) {
-  const response = postRequest('/v1/admin/auth/login', {email, password});
+  const response = postRequest('/v1/admin/auth/login', { email, password });
   return response;
 }
 
@@ -58,17 +58,17 @@ export function requestAdminUserDetails(token: string) {
 }
 
 export function requestAdminAuthLogout(token: string) {
-  const response = postRequest('/v1/admin/auth/logout', {token});
+  const response = postRequest('/v1/admin/auth/logout', { token });
   return response;
 }
 
 export function requestAdminAuthUpdateDetails(token: string, email: string, nameFirst: string, nameLast: string) {
-  const response = putRequest('/v1/admin/user/details', {token, email, nameFirst, nameLast});
+  const response = putRequest('/v1/admin/user/details', { token, email, nameFirst, nameLast });
   return response;
 }
 
 export function requestAdminAuthUpdatePassword(token: string, oldPassword: string, newPassword: string) {
-  const response = putRequest('/v1/admin/user/password', {token, oldPassword, newPassword});
+  const response = putRequest('/v1/admin/user/password', { token, oldPassword, newPassword });
   return response;
 }
 
@@ -113,9 +113,9 @@ const quizQuestion2Body = {
   ],
 };
 
-////////////////////////////////////////////////////////////
-////EVERYTHING ABOVE NEEDS TO BE PORTED TO A HELPER FILE////
-////////////////////////////////////////////////////////////
+/// /////////////////////////////////////////////////////////
+/// /EVERYTHING ABOVE NEEDS TO BE PORTED TO A HELPER FILE////
+/// /////////////////////////////////////////////////////////
 
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
@@ -151,7 +151,7 @@ describe('////////TESTING v1/admin/auth/register////////', () => {
 
   describe('Testing v1/admin/auth/register errors', () => {
     test('CASE: Email address is already in use - same email in caps', () => {
-      requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian',);
+      requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
       result2 = requestAdminAuthRegister('Vincentxian@gmail.com', 'vincentpassword1', 'vincent', 'xian');
       expect(result2.body).toStrictEqual({ error: expect.any(String) });
       expect(result2.status).toBe(INPUT_ERROR);
@@ -540,7 +540,7 @@ describe('//////// Testing v1/admin/quiz/ create////////', () => {
 
 describe('///////Testing /v1/admin/quiz/delete////////', () => {
   beforeEach(() => {
-    person1 = requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345',  'Manan', 'Jaiswal');
+    person1 = requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal');
   });
   describe('Testing /v1/admin/quiz/ delete success cases', () => {
     test('Successful deletion of quiz', () => {
@@ -1253,7 +1253,7 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
-      expect(result2.body).toStrictEqual({token: expect.any(String)});
+      expect(result2.body).toStrictEqual({ token: expect.any(String) });
       expect(result2.status).toBe(OK);
 
       expect(result3.body).toStrictEqual({});
@@ -1264,7 +1264,7 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
   describe('/////// /v1/admin/auth/logout error occurred ///////', () => {
     test('CASE(401): Token has invalid structure - too short', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthLogout('1234',);
+      result1 = requestAdminAuthLogout('1234');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
@@ -1294,7 +1294,6 @@ describe('/////// /v1/admin/auth/logout ///////', () => {
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
-
       expect(result2.body).toStrictEqual({ error: expect.any(String) });
       expect(result2.status).toBe(INPUT_ERROR);
     });
@@ -1305,7 +1304,7 @@ describe('/////// /v1/admin/user/details //////', () => {
   describe('////// adminAuthUpdateDetails runs ///////', () => {
     test('CASE(200): Updated details successfully', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'newEmail@gmail.com','Vincent','Xian');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`, 'newEmail@gmail.com', 'Vincent', 'Xian');
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
@@ -1327,7 +1326,7 @@ describe('/////// /v1/admin/user/details //////', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
       person2 = requestAdminAuthRegister('vincentxian@gmail.com', 'Abcd12345', 'Vincent', 'Xian');
 
-      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'zhizhao@gmail.com','Vincent','Xian');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`, 'zhizhao@gmail.com', 'Vincent', 'Xian');
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
@@ -1351,7 +1350,7 @@ describe('/////// /v1/admin/user/details //////', () => {
     test('CASE(400): Email is currently used for another user', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
       person2 = requestAdminAuthRegister('vincentxian@gmail.com', 'Abcd12345', 'Vincent', 'Xian');
-      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','Zhi','Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`, 'vincentxian@gmail.com', 'Zhi', 'Zhao');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -1359,7 +1358,7 @@ describe('/////// /v1/admin/user/details //////', () => {
 
     test('CASE(400): Email is invalid', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'invalidemail','Zhi','Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`, 'invalidemail', 'Zhi', 'Zhao');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -1367,7 +1366,7 @@ describe('/////// /v1/admin/user/details //////', () => {
 
     test('CASE(400): First name contains forbidden characters - numbers', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','12345','Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`, 'vincentxian@gmail.com', '12345', 'Zhao');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -1375,7 +1374,7 @@ describe('/////// /v1/admin/user/details //////', () => {
 
     test('CASE(400): First name contains forbidden characters - special characters/symbols', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','!@#$%','Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`, 'vincentxian@gmail.com', '!@#$%', 'Zhao');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -1383,7 +1382,7 @@ describe('/////// /v1/admin/user/details //////', () => {
 
     test('CASE(400): First name is either less than 2 characters or more than 20 characters long - too short', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','V','Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`, 'vincentxian@gmail.com', 'V', 'Zhao');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -1391,7 +1390,7 @@ describe('/////// /v1/admin/user/details //////', () => {
 
     test('CASE(400): First name is either less than 2 characters or more than 20 characters long - too long', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','VincentVincentVincent','Zhao');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`, 'vincentxian@gmail.com', 'VincentVincentVincent', 'Zhao');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -1399,7 +1398,7 @@ describe('/////// /v1/admin/user/details //////', () => {
 
     test('CASE(400): Last name contains forbidden characters - numbers', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','Zhi','12345');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`, 'vincentxian@gmail.com', 'Zhi', '12345');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -1407,7 +1406,7 @@ describe('/////// /v1/admin/user/details //////', () => {
 
     test('CASE(400): Last name contains forbidden characters - special characters/symbols', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','Zhi','!@#$%');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`, 'vincentxian@gmail.com', 'Zhi', '!@#$%');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -1415,7 +1414,7 @@ describe('/////// /v1/admin/user/details //////', () => {
 
     test('CASE(400): Last name is either less than 2 characters or more than 20 characters long - too short', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','Zhi','Z');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`, 'vincentxian@gmail.com', 'Zhi', 'Z');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -1423,7 +1422,7 @@ describe('/////// /v1/admin/user/details //////', () => {
 
     test('CASE(400): Last name is either less than 2 characters or more than 20 characters long - too long', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`,'vincentxian@gmail.com','Zhi','ZhaoZhaoZhaoZhaoZhaoZ');
+      result1 = requestAdminAuthUpdateDetails(`${person1.body.token}`, 'vincentxian@gmail.com', 'Zhi', 'ZhaoZhaoZhaoZhaoZhaoZ');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -1431,7 +1430,7 @@ describe('/////// /v1/admin/user/details //////', () => {
 
     test('CASE(401): Token is invalid structure - too short', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdateDetails('1234','vincentxian@gmail.com','Vincent','Xian');
+      result1 = requestAdminAuthUpdateDetails('1234', 'vincentxian@gmail.com', 'Vincent', 'Xian');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
@@ -1439,7 +1438,7 @@ describe('/////// /v1/admin/user/details //////', () => {
 
     test('CASE(401): Token is invalid structure - too long', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdateDetails('123456','vincentxian@gmail.com','Vincent','Xian');
+      result1 = requestAdminAuthUpdateDetails('123456', 'vincentxian@gmail.com', 'Vincent', 'Xian');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
@@ -1447,7 +1446,7 @@ describe('/////// /v1/admin/user/details //////', () => {
 
     test('CASE(401): Token is invalid structure - special characters', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdateDetails('!@#$%','vincentxian@gmail.com','Vincent','Xian');
+      result1 = requestAdminAuthUpdateDetails('!@#$%', 'vincentxian@gmail.com', 'Vincent', 'Xian');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
@@ -1455,7 +1454,7 @@ describe('/////// /v1/admin/user/details //////', () => {
 
     test('CASE(403): Provided token is valid structure, but is not for a currently logged in session', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdateDetails('12345','vincentxian@gmail.com','Vincent','Xian');
+      result1 = requestAdminAuthUpdateDetails('12345', 'vincentxian@gmail.com', 'Vincent', 'Xian');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(FORBIDDEN);
@@ -1467,13 +1466,12 @@ describe('/////// /v1/admin/user/password ///////', () => {
   describe('/////// /v1/admin/user/password runs ///////', () => {
     test('CASE(200): adminAuthUpdatePassword runs successfully', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','Bcde12345');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`, 'Abcd12345', 'Bcde12345');
       result2 = requestAdminAuthLogout(person1.body.token);
       result3 = requestAdminAuthLogin('zhizhao@gmail.com', 'Bcde12345');
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
-
 
       expect(result2.body).toStrictEqual({});
       expect(result2.status).toBe(OK);
@@ -1486,7 +1484,7 @@ describe('/////// /v1/admin/user/password ///////', () => {
   describe('/////// /v1/admin/user/password error ///////', () => {
     test('CASE(400): New password is not the correct old password', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','Abcd12345');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`, 'Abcd12345', 'Abcd12345');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -1494,8 +1492,8 @@ describe('/////// /v1/admin/user/password ///////', () => {
 
     test('CASE(400): New password has already been used before by this user - initial password', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','Bcde12345');
-      result2 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Bcde12345','Abcd12345');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`, 'Abcd12345', 'Bcde12345');
+      result2 = requestAdminAuthUpdatePassword(`${person1.body.token}`, 'Bcde12345', 'Abcd12345');
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
@@ -1506,9 +1504,9 @@ describe('/////// /v1/admin/user/password ///////', () => {
 
     test('CASE(400): New password has already been used before by this user - update password repeatedly', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','Bcde12345');
-      result2 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Bcde12345','Cdef12345');
-      result3 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Cdef12345','Bcde12345');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`, 'Abcd12345', 'Bcde12345');
+      result2 = requestAdminAuthUpdatePassword(`${person1.body.token}`, 'Bcde12345', 'Cdef12345');
+      result3 = requestAdminAuthUpdatePassword(`${person1.body.token}`, 'Cdef12345', 'Bcde12345');
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
@@ -1522,7 +1520,7 @@ describe('/////// /v1/admin/user/password ///////', () => {
 
     test('CASE(400): New password is less than 8 characters', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','Bcde123');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`, 'Abcd12345', 'Bcde123');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -1530,7 +1528,7 @@ describe('/////// /v1/admin/user/password ///////', () => {
 
     test('CASE(400): New password does not contain at least one number and at least one letter - all letters', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','aBcDeFgHi');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`, 'Abcd12345', 'aBcDeFgHi');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -1538,7 +1536,7 @@ describe('/////// /v1/admin/user/password ///////', () => {
 
     test('CASE(400): New password does not contain at least one number and at least one letter - all numbers', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','123456789');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`, 'Abcd12345', '123456789');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -1546,7 +1544,7 @@ describe('/////// /v1/admin/user/password ///////', () => {
 
     test('CASE(400): New password does not contain at least one number and at least one letter - non-alphanumeric characters', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`,'Abcd12345','!@#$%^&*(');
+      result1 = requestAdminAuthUpdatePassword(`${person1.body.token}`, 'Abcd12345', '!@#$%^&*(');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -1554,7 +1552,7 @@ describe('/////// /v1/admin/user/password ///////', () => {
 
     test('CASE(401): Token is not a valid structure - too short', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdatePassword('1234','Abcd12345','Bcde12345');
+      result1 = requestAdminAuthUpdatePassword('1234', 'Abcd12345', 'Bcde12345');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
@@ -1562,7 +1560,7 @@ describe('/////// /v1/admin/user/password ///////', () => {
 
     test('CASE(401): Token is not a valid structure - too long', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdatePassword('123456','Abcd12345','Bcde12345');
+      result1 = requestAdminAuthUpdatePassword('123456', 'Abcd12345', 'Bcde12345');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
@@ -1570,7 +1568,7 @@ describe('/////// /v1/admin/user/password ///////', () => {
 
     test('CASE(401): Token is not a valid structure - special characters', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdatePassword('!@#$%','Abcd12345','Bcde12345');
+      result1 = requestAdminAuthUpdatePassword('!@#$%', 'Abcd12345', 'Bcde12345');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
@@ -1578,7 +1576,7 @@ describe('/////// /v1/admin/user/password ///////', () => {
 
     test('CASE(403): Provided token is valid structure, but it not for a currently logged in session', () => {
       person1 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
-      result1 = requestAdminAuthUpdatePassword('12345','Abcd12345','Bcde12345');
+      result1 = requestAdminAuthUpdatePassword('12345', 'Abcd12345', 'Bcde12345');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(FORBIDDEN);
@@ -1588,7 +1586,7 @@ describe('/////// /v1/admin/user/password ///////', () => {
 
 describe('////////Testing v1/admin/quiz/trash////////', () => {
   beforeEach(() => {
-    person1 = requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345',  'Manan', 'Jaiswal');
+    person1 = requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal');
   });
 
   describe('Testing v1/admin/quiz/trash success cases', () => {
@@ -1700,7 +1698,7 @@ describe('////////Testing v1/admin/quiz/trash////////', () => {
 
 describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
   beforeEach(() => {
-    person1 = requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345',  'Manan', 'Jaiswal');
+    person1 = requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal');
     person2 = requestAdminAuthRegister('test@gmail.com', 'Abcd12345', 'Fake', 'Name');
   });
   describe('Testing v1/admin/quiz/:quizid/restore success cases', () => {
@@ -1836,7 +1834,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
 
 describe('////////Testing /v1/admin/quiz/trash/empty', () => {
   beforeEach(() => {
-    person1 = requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345',  'Manan', 'Jaiswal');
+    person1 = requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal');
     person2 = requestAdminAuthRegister('test@gmail.com', 'Abcd12345', 'Fake', 'Name');
     quiz1 = postRequest('/v1/admin/quiz', {
       token: person1.body.token,
@@ -2201,7 +2199,7 @@ describe('///////Testing /v1/admin/quiz/transfer////////', () => {
     });
 
     test('CASE (400): Quiz ID does not refer to a quiz that this user owns', () => {
-      requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal' );
+      requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal');
       result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/transfer`, {
         token: `${person2.body.token}`,
         userEmail: 'manan.j2450@gmail.com',
