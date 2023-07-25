@@ -97,6 +97,20 @@ export function requestAdminQuizNameUpdate(quizId: string, token: string, name: 
   return response;
 }
 
+export function requestAdminQuizDescriptionUpdate(quizId: string, token: string, description: string) {
+  const response = putRequest(`/v1/admin/quiz/${quizId}/description`, { token, description });
+  return response;
+}
+
+export function requestAdminQuizQuestionCreate(quizId: string, token: string, questionBody: any) {
+  const response = postRequest(`/v1/admin/quiz/${quizId}/question`, { token, questionBody });
+  return response;
+}
+
+export function requestAdminQuizTrashList(token: string) {
+  const response = getRequest(`/v1/admin/quiz/trash?token=${token}`, {});
+  return response;
+}
 
 let result1: any;
 let result2: any;
@@ -367,7 +381,7 @@ describe('////////TESTING v1/admin/quiz/list////////', () => {
 
   describe('SUCCESS CASES', () => {
     test('Successful adminQuizList 1 quiz', () => {
-      const quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested')
+      const quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
       result1 = requestAdminQuizList(`${person1.body.token}`);
 
@@ -441,7 +455,7 @@ describe('//////// Testing v1/admin/quiz/ create////////', () => {
 
   describe('Testing /v1/admin/quiz success cases', () => {
     test('Successful adminQuizCreate 1 quiz', () => {
-      result1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested')
+      result1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
       expect(result1.body).toStrictEqual({ quizId: expect.any(Number) });
       expect(result1.status).toBe(OK);
     });
@@ -462,7 +476,7 @@ describe('//////// Testing v1/admin/quiz/ create////////', () => {
 
     test('CASE (403): Token is not valid for a currently logged in session', () => {
       const sessionId = parseInt(person1.body.token) + 1;
-      result1 = requestAdminQuizCreate(`${sessionId}`,'first quiz','first quiz being tested');
+      result1 = requestAdminQuizCreate(`${sessionId}`, 'first quiz', 'first quiz being tested');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(FORBIDDEN);
     });
@@ -592,20 +606,8 @@ describe('///////Testing /v1/admin/quiz/ info////////', () => {
       person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
       quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
-      quizQuestion1 = postRequest(
-        `/v1/admin/quiz/${quiz1.body.quizId}/question`,
-        {
-          token: `${person1.body.token}`,
-          questionBody: quizQuestion1Body,
-        }
-      );
-      quizQuestion2 = postRequest(
-        `/v1/admin/quiz/${quiz1.body.quizId}/question`,
-        {
-          token: `${person1.body.token}`,
-          questionBody: quizQuestion2Body,
-        }
-      );
+      quizQuestion1 = requestAdminQuizQuestionCreate(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
+      quizQuestion2 = requestAdminQuizQuestionCreate(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion2Body);
 
       result1 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person1.body.token}`);
       expect(result1.status).toBe(OK);
@@ -791,9 +793,9 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
 
       quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
-      quiz2 = requestAdminQuizCreate(`${person1.body.token}`,'existingQuiz','A pre-existing quiz with the name "existingQuiz".');
+      quiz2 = requestAdminQuizCreate(`${person1.body.token}`, 'existingQuiz', 'A pre-existing quiz with the name "existingQuiz".');
 
-      result1 =  requestAdminQuizNameUpdate(`${quiz1.body.quizId}`, `${person1.body.token}`, 'existingQuiz');
+      result1 = requestAdminQuizNameUpdate(`${quiz1.body.quizId}`, `${person1.body.token}`, 'existingQuiz');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -804,7 +806,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
 
       quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
-      result1 =  requestAdminQuizNameUpdate(`${quiz1.body.quizId}`, `${1}`, 'newName');
+      result1 = requestAdminQuizNameUpdate(`${quiz1.body.quizId}`, `${1}`, 'newName');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
@@ -815,7 +817,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
 
       quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
-      result1 =  requestAdminQuizNameUpdate(`${quiz1.body.quizId}`, 'let!!', 'newQuizName');
+      result1 = requestAdminQuizNameUpdate(`${quiz1.body.quizId}`, 'let!!', 'newQuizName');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
@@ -826,7 +828,7 @@ describe('/////// TESTING v1/admin/quiz/name ///////', () => {
 
       quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
-      result1 =  requestAdminQuizNameUpdate(`${quiz1.body.quizId}`, `${12121322}`, 'NewQuizName');
+      result1 = requestAdminQuizNameUpdate(`${quiz1.body.quizId}`, `${12121322}`, 'NewQuizName');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
@@ -852,17 +854,12 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
 
       quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
-        token: `${person1.body.token}`,
-        description: 'newDescriptionToBeChangedTo',
-      });
+      result1 = requestAdminQuizDescriptionUpdate(`${quiz1.body.quizId}`, `${person1.body.token}`, 'newDescriptionToBeChangedTo');
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
-      result2 = getRequest(`/v1/admin/quiz/${quiz1.body.quizId}`, {
-        token: `${person1.body.token}`,
-      });
+      result2 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person1.body.token}`);
 
       expect(result2.body).toMatchObject({
         description: 'newDescriptionToBeChangedTo',
@@ -878,10 +875,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
 
       quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
-        token: '1424',
-        name: 'newQuizName',
-      });
+      result1 = requestAdminQuizDescriptionUpdate(`${quiz1.body.quizId}`, '1424', 'newQuizName');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
@@ -892,10 +886,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
 
       quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
-        token: '142324',
-        name: 'newQuizName',
-      });
+      result1 = requestAdminQuizDescriptionUpdate(`${quiz1.body.quizId}`, '142324', 'newQuizName');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
@@ -906,10 +897,7 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
 
       quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
-      result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
-        token: 'd@421',
-        name: 'newQuizName',
-      });
+      result1 = requestAdminQuizDescriptionUpdate(`${quiz1.body.quizId}`, 'd@421', 'newQuizName');
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
@@ -920,12 +908,9 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
   test('CASE: Provided token is valid structure, but is not for a currently logged in session', () => {
     person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
-    quiz1 = requestAdminQuizCreate(`${person1.body.token}`,'first quiz','first quiz being tested');
+    quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
-    result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
-      token: '12345',
-      description: 'newDescription',
-    });
+    result1 = requestAdminQuizDescriptionUpdate(`${quiz1.body.quizId}`, '12345', 'newDescription');
 
     expect(result1.body).toStrictEqual({ error: expect.any(String) });
     expect(result1.status).toBe(FORBIDDEN);
@@ -935,15 +920,9 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
   test('CASE: quizId does not refer to a valid quiz', () => {
     person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
-    quiz1 = requestAdminQuizCreate(`${person1.body.token}`,'first quiz', 'first quiz being tested')
+    quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
-    result1 = putRequest(
-      `/v1/admin/quiz/${quiz1.body.quizId + 1}/description`,
-      {
-        token: `${person1.body.token}`,
-        description: 'newDescription',
-      }
-    );
+    result1 = requestAdminQuizDescriptionUpdate(`${quiz1.body.quizId + 1}`, `${person1.body.token}`, 'newDescription');
 
     expect(result1.body).toStrictEqual({ error: expect.any(String) });
     expect(result1.status).toBe(INPUT_ERROR);
@@ -952,14 +931,11 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
   test('CASE: quizId does not refer to a quiz that this user owns', () => {
     person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
-    quiz1 = requestAdminQuizCreate(`${person1.body.token}`,'first quiz', 'first quiz being tested')
+    quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
     person2 = requestAdminAuthRegister('zhizhao@gmail.com', 'Abcd12345', 'Zhi', 'Zhao');
 
-    result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
-      token: `${person2.body.token}`,
-      description: 'newDescription',
-    });
+    result1 = requestAdminQuizDescriptionUpdate(`${quiz1.body.quizId}`, `${person2.body.token}`, 'newDescription');
 
     expect(result1.body).toStrictEqual({ error: expect.any(String) });
     expect(result1.status).toBe(INPUT_ERROR);
@@ -968,13 +944,9 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
   test('CASE: Description is longer than 100 characters', () => {
     person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
-    quiz1 = requestAdminQuizCreate(`${person1.body.token}`,'first quiz', 'first quiz being tested')
+    quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
-    result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
-      token: `${person1.body.token}`,
-      description:
-        'zhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzh',
-    });
+    result1 = requestAdminQuizDescriptionUpdate(`${quiz1.body.quizId}`, `${person1.body.token}`, 'zhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzh');
 
     expect(result1.body).toStrictEqual({ error: expect.any(String) });
     expect(result1.status).toBe(INPUT_ERROR);
@@ -983,13 +955,9 @@ describe('/////// TESTING v1/admin/quiz/description ///////', () => {
   test('CASE: More than 100 empty spaces', () => {
     person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
 
-    quiz1 = requestAdminQuizCreate(`${person1.body.token}`,'first quiz', 'first quiz being tested')
+    quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
-    result1 = putRequest(`/v1/admin/quiz/${quiz1.body.quizId}/description`, {
-      token: `${person1.body.token}`,
-      description:
-        '                                                                                                      ',
-    });
+    result1 = requestAdminQuizDescriptionUpdate(`${quiz1.body.quizId}`, `${person1.body.token}`, '                                                                                                      ');
 
     expect(result1.body).toStrictEqual({ error: expect.any(String) });
     expect(result1.status).toBe(INPUT_ERROR);
@@ -1360,7 +1328,7 @@ describe('////////Testing v1/admin/quiz/trash////////', () => {
     test('successfully removing 1 quiz and viewing in trash', () => {
       const sessionId = person1.body.token;
       requestAdminQuizDelete(`${quiz1.body.quizId}`, `${sessionId}`);
-      result1 = getRequest(`/v1/admin/quiz/trash?token=${sessionId}`, {});
+      result1 = requestAdminQuizTrashList(`${sessionId}`);
       expect(result1.body).toStrictEqual({
         quizzes: [
           {
@@ -1376,7 +1344,7 @@ describe('////////Testing v1/admin/quiz/trash////////', () => {
       requestAdminQuizDelete(`${quiz1.body.quizId}`, `${sessionId}`);
       requestAdminQuizDelete(`${quiz2.body.quizId}`, `${sessionId}`);
       requestAdminQuizDelete(`${quiz3.body.quizId}`, `${sessionId}`);
-      result1 = getRequest(`/v1/admin/quiz/trash?token=${sessionId}`, {});
+      result1 = requestAdminQuizTrashList(`${sessionId}`);
       expect(result1.body).toStrictEqual({
         quizzes: [
           {
@@ -1397,7 +1365,7 @@ describe('////////Testing v1/admin/quiz/trash////////', () => {
     });
     test('checking successful empty trash', () => {
       const sessionId = person1.body.token;
-      result1 = getRequest(`/v1/admin/quiz/trash?token=${sessionId}`, {});
+      result1 = requestAdminQuizTrashList(`${sessionId}`);
       expect(result1.body).toStrictEqual({
         quizzes: [],
       });
@@ -1478,7 +1446,7 @@ describe('////////Testing v1/admin/quiz/:quizid/restore////////', () => {
         `/v1/admin/quiz/${quiz3.body.quizId}/restore`,
         { token: sessionId }
       );
-      const result2 = getRequest(`/v1/admin/quiz/trash?token=${sessionId}`, {});
+      const result2 = requestAdminQuizTrashList(`${sessionId}`);
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toStrictEqual(OK);
       expect(result2.body).toStrictEqual({ quizzes: [] });
@@ -1552,7 +1520,7 @@ describe('////////Testing /v1/admin/quiz/trash/empty', () => {
         `/v1/admin/quiz/trash/empty?token=${sessionId}&quizIds=[${quiz1.body.quizId}]`,
         {}
       );
-      const result2 = getRequest(`/v1/admin/quiz/trash?token=${sessionId}`, {});
+      const result2 = requestAdminQuizTrashList(`${sessionId}`);
       expect(result2.body).toStrictEqual({
         quizzes: [
           {
@@ -1574,7 +1542,7 @@ describe('////////Testing /v1/admin/quiz/trash/empty', () => {
         `/v1/admin/quiz/trash/empty?token=${sessionId}&quizIds=[${quiz1.body.quizId},${quiz2.body.quizId}]`,
         {}
       );
-      const result2 = getRequest(`/v1/admin/quiz/trash?token=${sessionId}`, {});
+      const result2 = requestAdminQuizTrashList(`${sessionId}`);
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toStrictEqual(OK);
       expect(result2.body).toStrictEqual({
@@ -1617,7 +1585,7 @@ describe('////////Testing /v1/admin/quiz/trash/empty', () => {
         `/v1/admin/quiz/trash/empty?token=${person2.body.token}&quizIds=[${quiz1.body.quizId}]`,
         {}
       );
-      const result2 = getRequest(`/v1/admin/quiz/trash?token=${sessionId}`, {});
+      const result2 = requestAdminQuizTrashList(`${sessionId}`);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
       expect(result2.body).toStrictEqual({
@@ -1658,19 +1626,13 @@ describe('///////Testing /v1/admin/quiz/transfer////////', () => {
   beforeEach(() => {
     person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
     person2 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
-    quiz1 = requestAdminQuizCreate(`${person1.body.token}`,'first quiz', 'first quiz being tested')
-    quizQuestion1 = postRequest(
-      `/v1/admin/quiz/${quiz1.body.quizId}/question`,
-      {
-        token: `${person1.body.token}`,
-        questionBody: quizQuestion1Body,
-      }
-    );
+    quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
+    quizQuestion1 = requestAdminQuizQuestionCreate(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
   });
 
   describe('Testing /v1/admin/quiz/question/move success cases', () => {
     test('move quiz to 2nd person who already has a quiz', () => {
-      quiz2 = requestAdminQuizCreate(`${person2.body.token}`,'second quiz', 'second quiz being tested')
+      quiz2 = requestAdminQuizCreate(`${person2.body.token}`, 'second quiz', 'second quiz being tested');
       result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/transfer`, {
         token: `${person1.body.token}`,
         userEmail: 'aarnavsample@gmail.com',
@@ -1732,13 +1694,7 @@ describe('///////Testing /v1/admin/quiz/transfer////////', () => {
     });
 
     test('duplicate 1st question after transfer to 2nd person', () => {
-      quizQuestion2 = postRequest(
-        `/v1/admin/quiz/${quiz1.body.quizId}/question`,
-        {
-          token: `${person1.body.token}`,
-          questionBody: quizQuestion2Body,
-        }
-      );
+      quizQuestion2 = requestAdminQuizQuestionCreate(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion2Body);
 
       result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/transfer`, {
         token: `${person1.body.token}`,
@@ -1897,7 +1853,7 @@ describe('///////Testing /v1/admin/quiz/transfer////////', () => {
       expect(result1.status).toBe(INPUT_ERROR);
     });
     test('CASE (400): Quiz ID refers to a quiz that has a name that is already used by the target user', () => {
-      quiz2 = requestAdminQuizCreate(`${person2.body.token}`,'first quiz', 'second quiz being tested',);
+      quiz2 = requestAdminQuizCreate(`${person2.body.token}`, 'first quiz', 'second quiz being tested');
       result1 = postRequest(`/v1/admin/quiz/${quiz1.body.quizId}/transfer`, {
         token: `${person1.body.token}`,
         userEmail: 'aarnavsample@gmail.com',
@@ -1911,7 +1867,7 @@ describe('///////Testing /v1/admin/quiz/transfer////////', () => {
 describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
   beforeEach(() => {
     person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
-    quiz1 = requestAdminQuizCreate(`${person1.body.token}`,'first quiz', 'first quiz being tested')
+    quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
     quizQuestion1 = {
       question: 'Who is the Monarch of England?',
       duration: 4,
@@ -2183,14 +2139,8 @@ describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
 describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', () => {
   beforeEach(() => {
     person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
-    quiz1 = requestAdminQuizCreate(`${person1.body.token}`,'first quiz', 'first quiz being tested')
-    quizQuestion1 = postRequest(
-      `/v1/admin/quiz/${quiz1.body.quizId}/question`,
-      {
-        token: `${person1.body.token}`,
-        questionBody: quizQuestion1Body,
-      }
-    );
+    quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
+    quizQuestion1 = requestAdminQuizQuestionCreate(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
   });
 
   describe('Testing /v1/admin/quiz/{quizid}/question/{questionid} success cases', () => {
@@ -2556,14 +2506,8 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
 describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
   beforeEach(() => {
     person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
-    quiz1 = requestAdminQuizCreate(`${person1.body.token}`,'first quiz', 'first quiz being tested')
-    quizQuestion1 = postRequest(
-      `/v1/admin/quiz/${quiz1.body.quizId}/question`,
-      {
-        token: `${person1.body.token}`,
-        questionBody: quizQuestion1Body,
-      }
-    );
+    quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
+    quizQuestion1 = requestAdminQuizQuestionCreate(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
   });
 
   describe('Success cases', () => {
@@ -2576,10 +2520,7 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
-      result2 = getRequest(
-        `/v1/admin/quiz/${quiz1.body.quizId}?token=${person1.body.token}`,
-        {}
-      );
+      result2 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person1.body.token}`);
 
       expect(result2.body).toStrictEqual({
         quizId: quiz1.body.quizId,
@@ -2594,13 +2535,7 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
     });
 
     test('CASE: Successful delete 1 out of 2 questions', () => {
-      const quizQuestion2 = postRequest(
-        `/v1/admin/quiz/${quiz1.body.quizId}/question`,
-        {
-          token: `${person1.body.token}`,
-          questionBody: quizQuestion2Body,
-        }
-      );
+      const quizQuestion2 = requestAdminQuizQuestionCreate(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion2Body);
       result1 = deleteRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion1.body.questionId}?token=${person1.body.token}`,
         {}
@@ -2720,25 +2655,13 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
 describe('///////Testing /v1/admin/quiz/question/move////////', () => {
   beforeEach(() => {
     person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
-    quiz1 = requestAdminQuizCreate(`${person1.body.token}`,'first quiz', 'first quiz being tested')
-    quizQuestion1 = postRequest(
-      `/v1/admin/quiz/${quiz1.body.quizId}/question`,
-      {
-        token: `${person1.body.token}`,
-        questionBody: quizQuestion1Body,
-      }
-    );
+    quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
+    quizQuestion1 = requestAdminQuizQuestionCreate(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
   });
 
   describe('Testing /v1/admin/quiz/question/move success cases', () => {
     test('Success move 1st question in middle of 3 question', () => {
-      quizQuestion2 = postRequest(
-        `/v1/admin/quiz/${quiz1.body.quizId}/question`,
-        {
-          token: `${person1.body.token}`,
-          questionBody: quizQuestion2Body,
-        }
-      );
+      quizQuestion2 = requestAdminQuizQuestionCreate(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion2Body);
       const quizQuestion3 = postRequest(
         `/v1/admin/quiz/${quiz1.body.quizId}/question/${quizQuestion2.body.questionId}/duplicate`,
         {
@@ -2837,7 +2760,7 @@ describe('///////Testing /v1/admin/quiz/question/move////////', () => {
   });
   describe('Testing /v1/admin/quiz/question/move error cases', () => {
     beforeEach(() => {
-      quiz2 = requestAdminQuizCreate(`${person1.body.token}`,'second quiz', 'second quiz being tested')
+      quiz2 = requestAdminQuizCreate(`${person1.body.token}`, 'second quiz', 'second quiz being tested');
     });
     test('CASE (401): Token is not a valid structure - too short', () => {
       result1 = putRequest(
@@ -2962,25 +2885,13 @@ describe('///////Testing /v1/admin/quiz/question/move////////', () => {
 describe('///////Testing /v1/admin/quiz/question/duplicate////////', () => {
   beforeEach(() => {
     person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
-    quiz1 = requestAdminQuizCreate(`${person1.body.token}`,'first quiz', 'first quiz being tested')
-    quizQuestion1 = postRequest(
-      `/v1/admin/quiz/${quiz1.body.quizId}/question`,
-      {
-        token: `${person1.body.token}`,
-        questionBody: quizQuestion1Body,
-      }
-    );
+    quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
+    quizQuestion1 = requestAdminQuizQuestionCreate(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
   });
 
   describe('Testing /v1/admin/quiz/question/duplicate success cases', () => {
     test('Success duplicating 1st question with 1 quiz 2 question', () => {
-      quizQuestion2 = postRequest(
-        `/v1/admin/quiz/${quiz1.body.quizId}/question`,
-        {
-          token: `${person1.body.token}`,
-          questionBody: quizQuestion2Body,
-        }
-      );
+      quizQuestion2 = requestAdminQuizQuestionCreate(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion2Body);
 
       const expectedTime = Math.floor(Date.now() / 1000);
       const quizQuestion3 = postRequest(
@@ -3072,7 +2983,7 @@ describe('///////Testing /v1/admin/quiz/question/duplicate////////', () => {
       });
     });
     test('Success duplicating 1st question of 2nd quiz with 1 question', () => {
-      quiz2 = requestAdminQuizCreate(`${person1.body.token}`,'second quiz', 'second quiz being tested')
+      quiz2 = requestAdminQuizCreate(`${person1.body.token}`, 'second quiz', 'second quiz being tested');
       quizQuestion2 = postRequest(
         `/v1/admin/quiz/${quiz2.body.quizId}/question`,
         {
@@ -3210,7 +3121,7 @@ describe('///////Testing /v1/admin/quiz/question/duplicate////////', () => {
     });
 
     test('CASE (400): Question Id does not refer to a valid question within this quiz', () => {
-      quiz2 = requestAdminQuizCreate(`${person1.body.token}`,'second quiz', 'second quiz being tested')
+      quiz2 = requestAdminQuizCreate(`${person1.body.token}`, 'second quiz', 'second quiz being tested');
       quizQuestion2 = postRequest(
         `/v1/admin/quiz/${quiz2.body.quizId}/question`,
         {
