@@ -2360,7 +2360,7 @@ paths:
             If any of the following are true:
             - Quiz ID does not refer to a valid quiz
             - Quiz ID does not refer to a quiz that this user owns
-            - Session Id does not refer to a valid question within this quiz
+            - Session Id does not refer to a valid session within this quiz
             - Action provided is not a valid Action enum
             - Action enum cannot be applied in the current state (see spec for details)
           schema:
@@ -2395,7 +2395,7 @@ paths:
             If any of the following are true:
             - Quiz ID does not refer to a valid quiz
             - Quiz ID does not refer to a quiz that this user owns
-            - Session Id does not refer to a valid question within this quiz
+            - Session Id does not refer to a valid session within this quiz
           schema:
             $ref: '#/components/return/Error'
       security:
@@ -2430,7 +2430,7 @@ paths:
             If any of the following are true:
             - Quiz ID does not refer to a valid quiz
             - Quiz ID does not refer to a quiz that this user owns
-            - Session Id does not refer to a valid question within this quiz
+            - Session Id does not refer to a valid session within this quiz
             - Session is not in FINAL_RESULTS state
           schema:
             $ref: '#/components/return/Error'
@@ -2465,7 +2465,7 @@ paths:
             If any of the following are true:
             - Quiz ID does not refer to a valid quiz
             - Quiz ID does not refer to a quiz that this user owns
-            - Session Id does not refer to a valid question within this quiz
+            - Session Id does not refer to a valid session within this quiz
             - Session is not in FINAL_RESULTS state
           schema:
             $ref: '#/components/return/Error'
