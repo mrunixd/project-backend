@@ -7,6 +7,7 @@
  *
  */
 import { setData, getData, DataStore } from './dataStore';
+import HTTPError from 'http-errors';
 
 function clear() {
   const clearData: DataStore = {
@@ -39,4 +40,14 @@ function checkValidToken(token: string): boolean {
   return true;
 }
 
-export { clear, sessionIdtoUserId, checkValidToken };
+function fullTokenCheck(token: string): number {
+  if (!checkValidToken(token)) {
+    throw HTTPError(401, {'error': 'token has invalid structure'});
+  }
+  const userId = sessionIdtoUserId(token);
+  if (userId === -1) {
+    throw HTTPError(403, {'error': 'Provided token is valid structure, but is not for a currently logged in session'});
+  }
+  return userId;
+}
+export { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck };
