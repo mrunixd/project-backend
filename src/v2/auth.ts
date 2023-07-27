@@ -173,19 +173,10 @@ function adminAuthLogin(
  *  }
  * }
  */
-function adminUserDetails(authUserId: number): User | ErrorObject {
+function adminUserDetails(authUserId: number): User {
   const data = getData();
-
-  // Find user with matching UserId; returns error if userId not found
-  if (!data.users.some((users) => users.authUserId === authUserId)) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  }
-
   // Save required user and return relevant information
   const user = data.users.find((users) => users.authUserId === authUserId);
-  if (user === undefined) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  }
   return {
     user: {
       userId: user.authUserId,
