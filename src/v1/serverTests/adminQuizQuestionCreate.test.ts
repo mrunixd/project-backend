@@ -10,60 +10,19 @@ import {
 } from '../helper';
 
 let result1: any;
-let result2: any;
-let result3: any;
 let person1: any;
 let person2: any;
 let quiz1: any;
-let quiz2: any;
-let quiz3: any;
 let quizQuestion1: any;
-let quizQuestion2: any;
 
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
   result1 = undefined;
-  result2 = undefined;
-  result3 = undefined;
   person1 = undefined;
   person2 = undefined;
   quiz1 = undefined;
-  quiz2 = undefined;
-  quiz3 = undefined;
   quizQuestion1 = undefined;
-  quizQuestion2 = undefined;
 });
-
-const quizQuestion1Body = {
-  question: 'Who is the Monarch of England?',
-  duration: 4,
-  points: 5,
-  answers: [
-    {
-      answer: 'Prince Charles',
-      correct: false,
-    },
-    {
-      answer: 'King Charles',
-      correct: true,
-    },
-  ],
-};
-const quizQuestion2Body = {
-  question: 'second question?',
-  duration: 2,
-  points: 3,
-  answers: [
-    {
-      answer: 'second answer',
-      correct: false,
-    },
-    {
-      answer: 'second real answer',
-      correct: true,
-    },
-  ],
-};
 
 describe('////////Testing v1/admin/quiz/{quizid}/question//////////', () => {
   beforeEach(() => {

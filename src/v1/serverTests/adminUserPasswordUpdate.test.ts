@@ -14,12 +14,6 @@ let result1: any;
 let result2: any;
 let result3: any;
 let person1: any;
-let person2: any;
-let quiz1: any;
-let quiz2: any;
-let quiz3: any;
-let quizQuestion1: any;
-let quizQuestion2: any;
 
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
@@ -27,14 +21,7 @@ beforeEach(() => {
   result2 = undefined;
   result3 = undefined;
   person1 = undefined;
-  person2 = undefined;
-  quiz1 = undefined;
-  quiz2 = undefined;
-  quiz3 = undefined;
-  quizQuestion1 = undefined;
-  quizQuestion2 = undefined;
 });
-
 
 describe('/////// /v1/admin/user/password ///////', () => {
   describe('/////// /v1/admin/user/password runs ///////', () => {

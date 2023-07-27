@@ -11,27 +11,15 @@ import {
 
 let result1: any;
 let result2: any;
-let result3: any;
 let person1: any;
 let person2: any;
-let quiz1: any;
-let quiz2: any;
-let quiz3: any;
-let quizQuestion1: any;
-let quizQuestion2: any;
 
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
   result1 = undefined;
   result2 = undefined;
-  result3 = undefined;
   person1 = undefined;
   person2 = undefined;
-  quiz1 = undefined;
-  quiz2 = undefined;
-  quiz3 = undefined;
-  quizQuestion1 = undefined;
-  quizQuestion2 = undefined;
 });
 
 describe('/////// /v1/admin/user/details //////', () => {
@@ -89,6 +77,7 @@ describe('/////// /v1/admin/user/details //////', () => {
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
+      expect(person2.status).toBe(OK);
 
       result2 = requestAdminUserDetails(person1.body.token);
 
@@ -128,6 +117,7 @@ describe('/////// /v1/admin/user/details //////', () => {
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
+      expect(person2.status).toBe(OK);
     });
 
     test('CASE(400): Email is invalid', () => {
