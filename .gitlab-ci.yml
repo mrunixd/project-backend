@@ -23,6 +23,9 @@ tests:
 
 typecheck:
   stage: checks
+  only:
+  - master
+  - merge_requests
   script:
     - npm run tsc
 
