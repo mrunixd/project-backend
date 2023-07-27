@@ -1,5 +1,6 @@
 import validator from 'validator';
 import { getData, setData, SessionId, ErrorObject } from './dataStore';
+import HTTPError from 'http-errors';
 
 const MAXNAMELENGTH = 20;
 const MINNAMELENGTH = 2;
@@ -42,33 +43,26 @@ function adminAuthRegister(
   // Error checking block
   for (const user of data.users) {
     if (user.email.toLowerCase() === email.toLowerCase()) {
-      return { error: 'Email address is already in use' };
+      throw HTTPError(400, { error: 'Email address is already in use' });
     }
   }
   if (!validator.isEmail(email)) {
-    return { error: 'Email address is not valid' };
+    throw HTTPError(400, { error: 'Email address is not valid' });
   } else if (acceptedCharacters.test(nameFirst) === false) {
-    return { error: 'First name is invalid' };
+    throw HTTPError(400, { error: 'First name is invalid' });
   } else if (nameFirst.length < MINNAMELENGTH || nameFirst.length > MAXNAMELENGTH) {
-    return {
-      error: 'First name is less than 2 characters or more than 20 characters',
-    };
+    throw HTTPError(400, { error: 'First name is less than 2 characters or more than 20 characters' });
   } else if (acceptedCharacters.test(nameLast) === false) {
-    return { error: 'Last name is invalid' };
+    throw HTTPError(400, { error: 'Last name is invalid' });
   } else if (nameLast.length < MINNAMELENGTH || nameLast.length > MAXNAMELENGTH) {
-    return {
-      error: 'Last name is less than 2 characters or more than 20 characters'
-    };
+    throw HTTPError(400, { error: 'Last name is less than 2 characters or more than 20 characters' });
   } else if (password.length < MINPASSWORD) {
-    return { error: 'Password is less than 8 characters' };
+    throw HTTPError(400, { error: 'Password is less than 8 characters' });
   } else if (
     numbers.test(password) === false ||
     letters.test(password) === false
   ) {
-    return {
-      error:
-        'Password does not contain at least one number and at least one letter',
-    };
+    throw HTTPError(400, { error: 'Password does not contain at least one number and at least one letter' });
   }
 
   // All inputs are valid, thus add user info into dataStore.js
@@ -129,11 +123,11 @@ function adminAuthLogin(
     (user) => user.email.toLowerCase() === email.toLowerCase()
   );
   if (selectedUser === undefined) {
-    return { error: 'Email address does not exist' };
+    throw HTTPError(400, { error: 'Email address does not exist' });
   }
   if (selectedUser.password !== password) {
     selectedUser.numFailedPasswordsSinceLastLogin++;
-    return { error: 'Password is incorrect' };
+    throw HTTPError(400, { error: 'Password is incorrect' });
   }
 
   // Increment numSuccesfulLogins && reset numFailedPasswordsSinceLastLogin
@@ -184,15 +178,13 @@ function adminUserDetails(authUserId: number): User | ErrorObject {
 
   // Find user with matching UserId; returns error if userId not found
   if (!data.users.some((users) => users.authUserId === authUserId)) {
-    return { error: 'AuthUserId is not a valid user' };
+    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
   }
 
   // Save required user and return relevant information
   const user = data.users.find((users) => users.authUserId === authUserId);
   if (user === undefined) {
-    return {
-      error: 'AuthUserId is not a valid user',
-    };
+    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
   }
   return {
     user: {
@@ -218,7 +210,7 @@ function adminAuthLogout(authUserId: number): Record<string, never> | ErrorObjec
 
   // If the sessionId does not exist, the function sessionIdtoUserId returns -1.
   if (authUserId === -1) {
-    return { error: 'This token is for a user who has already logged out.' };
+    throw HTTPError(400, { error: 'This token is for a user who has already logged out.' });
   }
 
   // Finds the relevant token.
@@ -254,24 +246,20 @@ function adminAuthUpdateDetails(userId: number, email: string, nameFirst: string
   const selected = data.users.find((users) => users.authUserId === userId);
   if (selected.email !== email) {
     if (data.users.find((user) => user.email === email)) {
-      return { error: 'Email is currently used by another user (excluding the current authorised user)' };
+      throw HTTPError(400, { error: 'Email is currently used by another user (excluding the current authorised user)' });
     }
   }
 
   if (validator.isEmail(email) === false) {
-    return { error: 'Email address is not valid' };
+    throw HTTPError(400, { error: 'Email address is not valid' });
   } else if (acceptedCharacters.test(nameFirst) === false) {
-    return { error: 'First name is invalid' };
+    throw HTTPError(400, { error: 'First name is invalid' });
   } else if (nameFirst.length < MINNAMELENGTH || nameFirst.length > MAXNAMELENGTH) {
-    return {
-      error: 'First name is less than 2 characters or more than 20 characters'
-    };
+    throw HTTPError(400, { error: 'First name is less than 2 characters or more than 20 characters' });
   } else if (acceptedCharacters.test(nameLast) === false) {
-    return { error: 'Last name is invalid' };
+    throw HTTPError(400, { error: 'Last name is invalid' });
   } else if (nameLast.length < MINNAMELENGTH || nameLast.length > MAXNAMELENGTH) {
-    return {
-      error: 'Last name is less than 2 characters or more than 20 characters',
-    };
+    throw HTTPError(400, { error: 'Last name is less than 2 characters or more than 20 characters' });
   }
 
   selected.email = email;
@@ -297,21 +285,21 @@ function adminAuthUpdatePassword(userId: number, oldPassword: string, newPasswor
   user.pastPasswords.push(oldPassword);
 
   if (newPassword === oldPassword) {
-    return { error: 'New password must not be the correct old password' };
+    throw HTTPError(400, { error: 'New password must not be the correct old password' });
   }
 
   for (const password of user.pastPasswords) {
     if (newPassword === password) {
-      return { error: 'New password has already been used before by this user' };
+      throw HTTPError(400, { error: 'New password has already been used before by this user' });
     }
   }
 
   if (newPassword.length < MINPASSWORD) {
-    return { error: 'New password is less than 8 characters' };
+    throw HTTPError(400, { error: 'New password is less than 8 characters' });
   }
 
   if (/\d/.test(newPassword) === false || /[a-zA-Z]/.test(newPassword) === false) {
-    return { error: 'New password does not contain at least one number and at least one letter' };
+    throw HTTPError(400, { error: 'New password does not contain at least one number and at least one letter' });
   }
 
   user.password = newPassword;
