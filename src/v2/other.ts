@@ -42,11 +42,11 @@ function checkValidToken(token: string): boolean {
 
 function fullTokenCheck(token: string): number {
   if (!checkValidToken(token)) {
-    throw HTTPError(401, {'error': 'token has invalid structure'});
+    throw HTTPError(401, { error: 'token has invalid structure' });
   }
   const userId = sessionIdtoUserId(token);
   if (userId === -1) {
-    throw HTTPError(403, {'error': 'Provided token is valid structure, but is not for a currently logged in session'});
+    throw HTTPError(403, { error: 'Provided token is valid structure, but is not for a currently logged in session' });
   }
   return userId;
 }
