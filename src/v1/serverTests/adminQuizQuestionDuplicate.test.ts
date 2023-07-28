@@ -109,7 +109,7 @@ describe('///////Testing /v1/admin/quiz/question/duplicate////////', () => {
       expect(quizQuestion3.status).toBe(OK);
 
       expect(result2.body.timeLastEdited).toBeGreaterThanOrEqual(expectedTime);
-      expect(result2.body).toStrictEqual({
+      expect(result2.body).toMatchObject({
         quizId: quiz1.body.quizId,
         name: 'first quiz',
         timeCreated: expect.any(Number),
@@ -209,7 +209,7 @@ describe('///////Testing /v1/admin/quiz/question/duplicate////////', () => {
       });
       expect(quizQuestion3.status).toBe(OK);
       expect(result2.body.timeLastEdited).toBeGreaterThanOrEqual(expectedTime);
-      expect(result2.body).toStrictEqual({
+      expect(result2.body).toMatchObject({
         quizId: quiz2.body.quizId,
         name: 'second quiz',
         timeCreated: expect.any(Number),

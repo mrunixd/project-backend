@@ -173,6 +173,7 @@ const quizQuestion1Body = {
       correct: true,
     },
   ],
+  thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
 };
 const quizQuestion2Body = {
   question: 'second question?',
@@ -188,6 +189,7 @@ const quizQuestion2Body = {
       correct: true,
     },
   ],
+  thumbnailUrl: 'https://media.sproutsocial.com/uploads/PI_Analytics_Instagram_Competitors_Report.png'
 };
 
 /// /////////////////////////////////////////////////////////
@@ -635,6 +637,7 @@ describe('///////Testing /v2/admin/quiz/ info////////', () => {
         numQuestions: 0,
         questions: [],
         duration: 0,
+        thumbnailUrl: ''
       });
     });
 
@@ -674,6 +677,7 @@ describe('///////Testing /v2/admin/quiz/ info////////', () => {
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion1Body.thumbnailUrl
           },
           {
             questionId: quizQuestion2.body.questionId,
@@ -694,9 +698,11 @@ describe('///////Testing /v2/admin/quiz/ info////////', () => {
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion2Body.thumbnailUrl
           },
         ],
         duration: 6,
+        thumbnailUrl: ''
       });
     });
   });
@@ -1647,9 +1653,11 @@ describe('///////Testing /v2/admin/quiz/transfer////////', () => {
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion1Body.thumbnailUrl
           },
         ],
         duration: 4,
+        thumbnailUrl: ''
       });
       expect(result3.body).toStrictEqual({
         quizId: quiz2.body.quizId,
@@ -1660,6 +1668,7 @@ describe('///////Testing /v2/admin/quiz/transfer////////', () => {
         numQuestions: 0,
         questions: [],
         duration: 0,
+        thumbnailUrl: ''
       });
     });
 
@@ -1705,6 +1714,7 @@ describe('///////Testing /v2/admin/quiz/transfer////////', () => {
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion1Body.thumbnailUrl
           },
           {
             questionId: quizQuestion3.body.newQuestionId,
@@ -1725,6 +1735,7 @@ describe('///////Testing /v2/admin/quiz/transfer////////', () => {
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion1Body.thumbnailUrl
           },
           {
             questionId: quizQuestion2.body.questionId,
@@ -1745,9 +1756,11 @@ describe('///////Testing /v2/admin/quiz/transfer////////', () => {
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion2Body.thumbnailUrl
           },
         ],
         duration: 10,
+        thumbnailUrl: ''
       });
     });
   });
@@ -1996,6 +2009,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
             correct: true,
           },
         ],
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
       };
       result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -2016,6 +2030,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
             correct: false,
           },
         ],
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
       };
       result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -2047,6 +2062,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
             correct: true,
           },
         ],
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
       };
       result1 = requestAdminQuizQuestionUpdate(`${quiz1.body.quizId}`, `${quizQuestion1.body.questionId}`, `${person1.body.token}`, quizQuestion3Body);
       result2 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person1.body.token}`);
@@ -2080,9 +2096,11 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion1Body.thumbnailUrl
           },
         ],
         duration: 4,
+        thumbnailUrl: ''
       });
       expect(result2.status).toBe(OK);
     });
@@ -2142,6 +2160,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
             correct: true,
           },
         ],
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png'
       };
       result1 = requestAdminQuizQuestionUpdate(`${quiz1.body.quizId}`, `${quizQuestion1.body.questionId}`, `${person1.body.token}`, quizQuestion3Body);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -2159,6 +2178,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
             correct: true,
           },
         ],
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png'
       };
       result1 = requestAdminQuizQuestionUpdate(`${quiz1.body.quizId}`, `${quizQuestion1.body.questionId}`, `${person1.body.token}`, quizQuestion3Body);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -2180,6 +2200,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
             correct: true,
           },
         ],
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png'
       };
       result1 = requestAdminQuizQuestionUpdate(`${quiz1.body.quizId}`, `${quizQuestion1.body.questionId}`, `${person1.body.token}`, quizQuestion3Body);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -2201,6 +2222,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
             correct: true,
           },
         ],
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png'
       };
       result1 = requestAdminQuizQuestionUpdate(`${quiz1.body.quizId}`, `${quizQuestion1.body.questionId}`, `${person1.body.token}`, quizQuestion3Body);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -2222,6 +2244,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
             correct: true,
           },
         ],
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png'
       };
       result1 = requestAdminQuizQuestionUpdate(`${quiz1.body.quizId}`, `${quizQuestion1.body.questionId}`, `${person1.body.token}`, quizQuestion3Body);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -2244,6 +2267,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
             correct: true,
           },
         ],
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png'
       };
       result1 = requestAdminQuizQuestionUpdate(`${quiz1.body.quizId}`, `${quizQuestion1.body.questionId}`, `${person1.body.token}`, quizQuestion3Body);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -2265,6 +2289,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
             correct: true,
           },
         ],
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png'
       };
       result1 = requestAdminQuizQuestionUpdate(`${quiz1.body.quizId}`, `${quizQuestion1.body.questionId}`, `${person1.body.token}`, quizQuestion3Body);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -2285,6 +2310,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
             correct: false,
           },
         ],
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png'
       };
       result1 = requestAdminQuizQuestionUpdate(`${quiz1.body.quizId}`, `${quizQuestion1.body.questionId}`, `${person1.body.token}`, quizQuestion3Body);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -2318,6 +2344,7 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
         numQuestions: 0,
         questions: [],
         duration: 0,
+        thumbnailUrl: ''
       });
     });
 
@@ -2355,9 +2382,11 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion2Body.thumbnailUrl
           },
         ],
         duration: 2,
+        thumbnailUrl: ''
       });
     });
   });
@@ -2450,6 +2479,7 @@ describe('///////Testing /v2/admin/quiz/question/move////////', () => {
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion2Body.thumbnailUrl
           },
           {
             questionId: quizQuestion1.body.questionId,
@@ -2470,6 +2500,7 @@ describe('///////Testing /v2/admin/quiz/question/move////////', () => {
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion1Body.thumbnailUrl
           },
           {
             questionId: quizQuestion3.body.newQuestionId,
@@ -2490,9 +2521,11 @@ describe('///////Testing /v2/admin/quiz/question/move////////', () => {
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion2Body.thumbnailUrl
           },
         ],
         duration: 8,
+        thumbnailUrl: ''
       });
     });
   });
@@ -2605,6 +2638,7 @@ describe('///////Testing /v2/admin/quiz/question/duplicate////////', () => {
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion1Body.thumbnailUrl
           },
           {
             questionId: quizQuestion3.body.newQuestionId,
@@ -2625,6 +2659,7 @@ describe('///////Testing /v2/admin/quiz/question/duplicate////////', () => {
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion1Body.thumbnailUrl
           },
           {
             questionId: quizQuestion2.body.questionId,
@@ -2645,9 +2680,11 @@ describe('///////Testing /v2/admin/quiz/question/duplicate////////', () => {
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion2Body.thumbnailUrl
           },
         ],
         duration: 10,
+        thumbnailUrl: ''
       });
     });
     test('Success duplicating 1st question of 2nd quiz with 1 question', () => {
@@ -2688,6 +2725,7 @@ describe('///////Testing /v2/admin/quiz/question/duplicate////////', () => {
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion2Body.thumbnailUrl
           },
           {
             questionId: quizQuestion3.body.newQuestionId,
@@ -2708,9 +2746,11 @@ describe('///////Testing /v2/admin/quiz/question/duplicate////////', () => {
                 correct: true,
               },
             ],
+            thumbnailUrl: quizQuestion2Body.thumbnailUrl
           },
         ],
         duration: 4,
+        thumbnailUrl: ''
       });
     });
   });

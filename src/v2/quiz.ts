@@ -41,6 +41,7 @@ interface questionInput {
   duration: number;
   points: number;
   answers: answerInput[];
+  thumbnailUrl: string;
 }
 
 interface QuestionId {
@@ -151,6 +152,7 @@ function adminQuizCreate(
     numQuestions: 0,
     questions: [],
     duration: 0,
+    thumbnailUrl: ''
   });
 
   setData(data);
@@ -240,6 +242,7 @@ function adminQuizInfo(authUserId: number, quizId: number): Quiz | ErrorObject {
     numQuestions: selected.numQuestions,
     questions: selected.questions,
     duration: selected.duration,
+    thumbnailUrl: selected.thumbnailUrl
   };
 }
 
@@ -481,11 +484,8 @@ function adminQuizQuestion(
     throw HTTPError(400, { error: 'The question duration is not a positive number' });
   } else if (
     currentQuiz.questions.reduce(
-      (accumulator, currentItem) => accumulator + currentItem.duration,
-      0
-    ) +
-      questionBody.duration >
-    MAXDURATION
+      (accumulator, currentItem) => accumulator + currentItem.duration, 0) +
+      questionBody.duration > MAXDURATION
   ) {
     throw HTTPError(400, { error: 'The sum of the question durations in the quiz exceeds 3 minutes' });
   } else if (questionBody.points > MAXPOINTS || questionBody.points < MINPOINTS) {
@@ -511,7 +511,12 @@ function adminQuizQuestion(
     });
   } else if (!questionBody.answers.some((answer) => answer.correct)) {
     throw HTTPError(400, { error: 'Question must have at least one correct answer' });
+  } else if (questionBody.thumbnailUrl === '') {
+    throw HTTPError(400, { error: 'The thumbnailUrl is an empty string' });
   }
+  /// /////////////////////////////////////////////////////////
+  /// /FINISH THE ERROR CHECKING ABOVE (should be 2 more) ////
+  /// /////////////////////////////////////////////////////////
 
   // Create a new answer array: this generates a random colour based on a random index
   const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
@@ -538,7 +543,11 @@ function adminQuizQuestion(
     duration: questionBody.duration,
     points: questionBody.points,
     answers: newAnswers,
+    thumbnailUrl: questionBody.thumbnailUrl
   };
+  /// /////////////////////////////////////////////////////////
+  /// /NEED TO SAVE THE THUMBNAILURL HERE INTO A FILE HERE ////
+  /// /////////////////////////////////////////////////////////
 
   data.unclaimedQuestionId++;
   currentQuiz.questions.push(newQuestion);
@@ -813,6 +822,9 @@ function adminQuizQuestionUpdate(
   } else if (!questionBody.answers.some((answer) => answer.correct)) {
     throw HTTPError(400, { error: 'Question must have at least one correct answer' });
   }
+  /// /////////////////////////////////////////////////////////
+  /// /FINISH THE ERROR CHECKING ABOVE (should be 3 more) ////
+  /// /////////////////////////////////////////////////////////
 
   const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
     const numbers = [0, 1, 2, 3, 4, 5];
@@ -835,6 +847,11 @@ function adminQuizQuestionUpdate(
   currentQuestion.duration = questionBody.duration;
   currentQuestion.points = questionBody.points;
   currentQuestion.answers = newAnswers;
+  currentQuestion.thumbnailUrl = questionBody.thumbnailUrl;
+  /// /////////////////////////////////////////////////////////
+  // REMOVE THE OLD THUMBNAIL URL FROM FILE AND ADD NEW ONE ////
+  /// /////////////////////////////////////////////////////////
+
   // Update the timeLastEdited for the quiz and duration
   currentQuiz.duration = currentQuiz.questions.reduce(
     (total, question) => total + question.duration,

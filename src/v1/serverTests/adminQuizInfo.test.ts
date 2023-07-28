@@ -78,7 +78,7 @@ describe('///////Testing /v1/admin/quiz/ info////////', () => {
         `${person1.body.token}`
       );
       expect(result1.status).toBe(OK);
-      expect(result1.body).toStrictEqual({
+      expect(result1.body).toMatchObject({
         quizId: quiz1.body.quizId,
         name: 'first quiz',
         timeCreated: expect.any(Number),
@@ -119,7 +119,7 @@ describe('///////Testing /v1/admin/quiz/ info////////', () => {
         `${person1.body.token}`
       );
       expect(result1.status).toBe(OK);
-      expect(result1.body).toStrictEqual({
+      expect(result1.body).toMatchObject({
         quizId: quiz1.body.quizId,
         name: 'first quiz',
         timeCreated: expect.any(Number),

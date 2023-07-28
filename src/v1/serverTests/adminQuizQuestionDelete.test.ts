@@ -96,7 +96,7 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
         `${person1.body.token}`
       );
 
-      expect(result2.body).toStrictEqual({
+      expect(result2.body).toMatchObject({
         quizId: quiz1.body.quizId,
         name: 'first quiz',
         timeCreated: expect.any(Number),
@@ -126,7 +126,7 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
         {}
       );
 
-      expect(result2.body).toStrictEqual({
+      expect(result2.body).toMatchObject({
         quizId: quiz1.body.quizId,
         name: 'first quiz',
         timeCreated: expect.any(Number),

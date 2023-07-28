@@ -112,7 +112,7 @@ describe('///////Testing /v1/admin/quiz/question/move////////', () => {
       expect(result1.status).toBe(OK);
 
       expect(result2.body.timeLastEdited).toBeGreaterThanOrEqual(expectedTime);
-      expect(result2.body).toStrictEqual({
+      expect(result2.body).toMatchObject({
         quizId: quiz1.body.quizId,
         name: 'first quiz',
         timeCreated: expect.any(Number),

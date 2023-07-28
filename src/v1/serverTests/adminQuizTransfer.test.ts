@@ -115,7 +115,7 @@ describe('///////Testing /v1/admin/quiz/transfer////////', () => {
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
-      expect(result2.body).toStrictEqual({
+      expect(result2.body).toMatchObject({
         quizId: quiz1.body.quizId,
         name: 'first quiz',
         timeCreated: expect.any(Number),
@@ -146,7 +146,7 @@ describe('///////Testing /v1/admin/quiz/transfer////////', () => {
         ],
         duration: 4,
       });
-      expect(result3.body).toStrictEqual({
+      expect(result3.body).toMatchObject({
         quizId: quiz2.body.quizId,
         name: 'second quiz',
         timeCreated: expect.any(Number),
@@ -191,7 +191,7 @@ describe('///////Testing /v1/admin/quiz/transfer////////', () => {
       expect(result3.status).toBe(INPUT_ERROR);
 
       expect(result2.body.timeLastEdited).toBeGreaterThanOrEqual(expectedTime);
-      expect(result2.body).toStrictEqual({
+      expect(result2.body).toMatchObject({
         quizId: quiz1.body.quizId,
         name: 'first quiz',
         timeCreated: expect.any(Number),
