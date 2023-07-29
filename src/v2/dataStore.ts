@@ -50,17 +50,52 @@ export interface Token {
   authUserId: number;
 }
 
+interface PlayerScore {
+  name: string;
+  score: number;
+}
+
+interface QuestionBreakdown {
+  answerId: number;
+  playersCorrect: string[];
+}
+interface QuestionResult {
+  questionId: number;
+  questionCorrectBreakDown: QuestionBreakdown[];
+  averageAnswerTime: number;
+  percentCorrect: number;
+}
+
+export enum SessionState {
+  LOBBY = 'lobby',
+  QUESTION_COUNTDOWN = 'question_countdown',
+  QUESTION_OPEN = 'question_open',
+  QUESTION_CLOSE = 'question_close',
+  ANSWER_SHOW = 'answer_show',
+  FINAL_RESULTS = 'final_results',
+  END = 'end'
+}
+
+export interface Session {
+  usersRankedByScore: PlayerScore[];
+  questionResults: QuestionResult[];
+  sessionState: SessionState;
+  sessionId: number;
+}
+
+export interface SessionId {
+  sessionId: number;
+}
+
 export interface DataStore {
   users: User[];
   quizzes: Quiz[];
   tokens: Token[];
+  sessions: Session[];
   unclaimedQuestionId: number;
   quizCounter: number;
 }
 
-export interface SessionId {
-  token: string;
-}
 export interface ErrorObject {
   error: string;
 }

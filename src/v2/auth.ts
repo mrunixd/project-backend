@@ -1,5 +1,5 @@
 import validator from 'validator';
-import { getData, setData, SessionId, ErrorObject } from './dataStore';
+import { getData, setData, ErrorObject } from './dataStore';
 import HTTPError from 'http-errors';
 
 const MAXNAMELENGTH = 20;
@@ -14,6 +14,10 @@ interface User {
     numSuccessfulLogins: number;
     numFailedPasswordsSinceLastLogin: number;
   };
+}
+
+interface TokenReturn {
+  token: string;
 }
 
 /**
@@ -33,7 +37,7 @@ function adminAuthRegister(
   password: string,
   nameFirst: string,
   nameLast: string
-): SessionId | ErrorObject {
+): TokenReturn | ErrorObject {
   const data = getData();
   // These regexes are needed to check for valid characters in names & password
   const acceptedCharacters = /^[a-zA-Z0-9' -]+$/;
@@ -116,7 +120,7 @@ function adminAuthRegister(
 function adminAuthLogin(
   email: string,
   password: string
-): SessionId | ErrorObject {
+): TokenReturn | ErrorObject {
   const data = getData();
 
   const selectedUser = data.users.find(
