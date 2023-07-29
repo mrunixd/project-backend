@@ -33,6 +33,7 @@ import {
   adminQuizTrashEmpty,
   adminQuizQuestionUpdate,
   adminQuizQuestionDelete,
+  adminQuizSessionStart
 } from './quiz';
 import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck } from './other';
 import HTTPError from 'http-errors';
@@ -748,6 +749,21 @@ app.post(
 
     const userId = fullTokenCheck(token);
     const response = adminQuizQuestionDuplicate(userId, quizId, questionId);
+
+    return res.json(response);
+  }
+);
+
+// ROUTE: adminQuizSessionStart
+app.post(
+  '/v1/admin/quiz/:quizid/session/start',
+  (req: Request, res: Response) => {
+    const quizId = parseInt(req.params.quizid);
+    const token = req.headers.token.toString();
+    const { autoStartNum } = req.body;
+
+    const userId = fullTokenCheck(token);
+    const response = adminQuizSessionStart(userId, quizId, autoStartNum);
 
     return res.json(response);
   }

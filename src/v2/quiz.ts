@@ -1,4 +1,4 @@
-import { getData, setData, QuizIds, Quiz, Question, Answer } from './dataStore';
+import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, SessionState } from './dataStore';
 import HTTPError from 'http-errors';
 
 // defining all magic numbers
@@ -917,6 +917,62 @@ function adminQuizQuestionDelete(
   return {};
 }
 
+/**
+ * This function copies a quiz and starts a session for it
+ *
+ * @param {number} authUserId
+ * @param {number} quizId
+ * @param {number} autoStartNum
+ *
+ * @returns {SessionId}
+ *
+ */
+function adminQuizSessionStart(
+  authUserId: number,
+  quizId: number,
+  autoStartNum: number
+): SessionId | ErrorObject {
+  const data = getData();
+
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
+  const nonEndedQuizzes = data.sessions.map((session) => session.sessionState !== SessionState.END);
+
+  // Error-checking block
+  if (currentQuiz === undefined) {
+    throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
+  } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
+    throw HTTPError(400, { error: 'Quiz ID does not refer to a quiz that this user owns' });
+  } else if (autoStartNum > 50) {
+    throw HTTPError(400, { error: 'autoStartNum is a number greater than 50' });
+  } else if (nonEndedQuizzes.length > 10) {
+    throw HTTPError(400, { error: 'A maximum of 10 sessions that are not in END state currently exist' });
+  } else if (currentQuiz.numQuestions <= 0) {
+    throw HTTPError(400, { error: 'The quiz does not have any questions in it' });
+  }
+
+  // Generates a unique 5 digit number for the new sessionId
+  let uniqueNumberFlag = false;
+  let sessionId = (Math.floor(Math.random() * 90000) + 10000);
+  while (uniqueNumberFlag === false) {
+    // If the generated sessionId already exists, generate a new one
+    if (data.sessions.some((session) => session.sessionId === sessionId)) {
+      sessionId = (Math.floor(Math.random() * 90000) + 10000);
+    } else {
+      uniqueNumberFlag = true;
+    }
+  }
+
+  data.sessions.push({
+    usersRankedByScore: [],
+    questionResults: [],
+    sessionState: SessionState.LOBBY,
+    sessionId: sessionId
+  });
+  setData(data);
+  return { sessionId: sessionId };
+}
+
 export {
   adminQuizCreate,
   adminQuizList,
@@ -933,4 +989,5 @@ export {
   adminQuizTrashEmpty,
   adminQuizQuestionUpdate,
   adminQuizQuestionDelete,
+  adminQuizSessionStart
 };
