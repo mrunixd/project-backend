@@ -35,6 +35,11 @@ import {
   adminQuizQuestionDelete,
   adminQuizSessionStart
 } from './quiz';
+
+import {
+  adminQuizQuestionV2,
+} from './question';
+
 import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck } from './other';
 import HTTPError from 'http-errors';
 
@@ -680,7 +685,7 @@ app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const { questionBody } = req.body;
 
   const userId = fullTokenCheck(token);
-  const response = adminQuizQuestion(userId, quizId, questionBody);
+  const response = adminQuizQuestionV2(userId, quizId, questionBody);
   return res.json(response);
 });
 
