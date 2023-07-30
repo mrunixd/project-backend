@@ -28,6 +28,7 @@ function deleteRequest(route: string, qs: any, headers: IncomingHttpHeaders = {}
 
 function putRequest(route: string, json: any, headers: IncomingHttpHeaders = {}) {
   const res = request('PUT', `${SERVER_URL}${route}`, { json: json, headers: headers });
+  console.log(res.body);
 
   return {
     status: res.statusCode,
@@ -153,6 +154,11 @@ export function requestAdminQuizSessionStart(token: string, quizId: string, auto
   return response;
 }
 
+export function requestAdminQuizSessionUpdate(token: string, quizId: string, sessionId: string, action: string) {
+  const response = putRequest(`/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
+  return response;
+}
+
 let result1: any;
 let result2: any;
 let result3: any;
@@ -163,6 +169,8 @@ let quiz2: any;
 let quiz3: any;
 let quizQuestion1: any;
 let quizQuestion2: any;
+let session1: any;
+let session2: any;
 const quizQuestion1Body = {
   question: 'Who is the Monarch of England?',
   duration: 4,
@@ -212,6 +220,8 @@ beforeEach(() => {
   quiz3 = undefined;
   quizQuestion1 = undefined;
   quizQuestion2 = undefined;
+  session1 = undefined;
+  session2 = undefined;
 });
 describe('////////TESTING v1/clear////////', () => {
   test('test clear() returns {}', () => {
@@ -2873,5 +2883,31 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/start ///////', () => {
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
+  });
+});
+
+describe.only('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid} ///////', () => {
+  beforeEach(() => {
+    person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
+    quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
+    quizQuestion1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
+    session1 = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 3);
+  });
+
+  describe('/////// Testing v1/admin/quiz/{quizid}/session/{sessionid} success', () => {
+    test('CASE: success 1 quiz 1 session, single change', () => {
+      result1 = requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toBe(OK);
+    });
+    test('CASE: success 1 quiz 1 session, question automatically closes', () => {
+      requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
+      result1 = requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'FINISH_COUNTDOWN');
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toBe(OK);
+    });
+    ////////////////////////////////////////////////////////////
+    ////more tests for when info is complete to check state/////
+    ////////////////////////////////////////////////////////////
   });
 });
