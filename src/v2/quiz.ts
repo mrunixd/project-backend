@@ -969,14 +969,13 @@ function adminQuizSessionStart(
     sessionState: STATE.LOBBY,
     sessionId: sessionId,
     autoStartNum: autoStartNum,
-    timeoutId: undefined,
+    // timeoutId: undefined,
     atQuestion: 0,
     metadata: currentQuiz
   });
   setData(data);
   return { sessionId: sessionId };
 }
-
 
 // Changes state and then returns TRUE if succesful, or FALSE if unsuccessful
 function changeState(sessionId: number, action: string): boolean {
@@ -986,34 +985,27 @@ function changeState(sessionId: number, action: string): boolean {
 
   if (session.sessionState === 'END') {
     return false;
-
   } else if (action === 'END') {
     session.sessionState = STATE.END;
-
   } else if (session.sessionState === 'LOBBY') {
-    if (action === 'NEXT_QUESTION') { session.sessionState = STATE.QUESTION_COUNTDOWN }
+    if (action === 'NEXT_QUESTION') { session.sessionState = STATE.QUESTION_COUNTDOWN; }
 
-  // } else if (session.sessionState === 'QUESTION_COUNTDOWN') {
-  //   if (action === 'FINISH_COUNTDOWN') { session.sessionState = STATE.QUESTION_OPEN }
-
+    // } else if (session.sessionState === 'QUESTION_COUNTDOWN') {
+    //   if (action === 'FINISH_COUNTDOWN') { session.sessionState = STATE.QUESTION_OPEN }
   } else if (session.sessionState === 'QUESTION_COUNTDOWN') {
     if (action === 'FINISH_COUNTDOWN') {
       session.sessionState = STATE.QUESTION_OPEN;
-      setTimeout(() => {
-        session.sessionState = STATE.QUESTION_CLOSE;
-        setData(data);
-      }, session.metadata.duration * 1000)
+      // setTimeout(() => {
+      //   session.sessionState = STATE.QUESTION_CLOSE;
+      //   setData(data);
+      // }, session.metadata.duration * 1000);
     }
-
   } else if (session.sessionState === 'QUESTION_OPEN') {
-    if (action === 'GO_TO_ANSWER') {session.sessionState = STATE.ANSWER_SHOW }
-
+    if (action === 'GO_TO_ANSWER') { session.sessionState = STATE.ANSWER_SHOW; }
   } else if (session.sessionState === 'QUESTION_CLOSE') {
-    if (action === 'GO_TO_ANSWER') {session.sessionState = STATE.ANSWER_SHOW }
-    else if (action === 'GO_TO_FINAL_RESULTS') {session.sessionState = STATE.FINAL_RESULTS };
-
+    if (action === 'GO_TO_ANSWER') { session.sessionState = STATE.ANSWER_SHOW; } else if (action === 'GO_TO_FINAL_RESULTS') { session.sessionState = STATE.FINAL_RESULTS; }
   } else if (session.sessionState === 'ANSWER_SHOW') {
-    if (action === 'GO_TO_FINAL_RESULTS') {session.sessionState = STATE.FINAL_RESULTS }
+    if (action === 'GO_TO_FINAL_RESULTS') { session.sessionState = STATE.FINAL_RESULTS; }
   }
   // only actions FINAL_RESULTS can do is go to END
   setData(data);
@@ -1053,7 +1045,10 @@ function adminQuizSessionUpdate(
     throw HTTPError(400, { error: 'Quiz ID does not refer to a quiz that this user owns' });
   } else if (currentSession === undefined) {
     throw HTTPError(400, { error: 'Session ID does not refer to a valid quiz' });
+  } else if (currentSession.metadata.quizId !== quizId) {
+    throw HTTPError(400, { error: 'Session ID isnt the same as quizId' });
   } else if (!(action in ACTION)) {
+  // } else if (action !== ('NEXT_QUESTION' || 'GO_TO_ANSWER' || 'GO_TO_FINAL_RESULTS' || 'END' || 'FINISH_COUNTDOWN')) {
     throw HTTPError(400, { error: 'Action provided is not a valid Action enum' });
   } else if (changeState(sessionId, action) === false) {
     throw HTTPError(400, { error: 'Action enum cannot be applied in the current state' });

@@ -90,7 +90,7 @@ export interface Session {
   sessionState: STATE;
   sessionId: number;
   autoStartNum: number;
-  timeoutId: NodeJS.Timeout;
+  // timeoutId: any;
   atQuestion: number;
   metadata: Quiz;
 }
@@ -135,8 +135,6 @@ export interface ErrorObject {
 function setData(data: DataStore) {
   fs.writeFileSync('./dbStore.json', JSON.stringify(data));
 }
-
-
 
 function getData(): DataStore {
   const dataString = fs.readFileSync('./dbStore.json');

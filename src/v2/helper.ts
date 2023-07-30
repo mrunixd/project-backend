@@ -151,3 +151,8 @@ export function requestAdminQuizSessionStart(token: string, quizId: string, auto
   const response = postRequest(`/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
   return response;
 }
+
+export function requestAdminQuizSessionUpdate(token: string, quizId: string, sessionId: string, action: string) {
+  const response = putRequest(`/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
+  return response;
+}

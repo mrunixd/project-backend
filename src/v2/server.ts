@@ -780,7 +780,7 @@ app.put(
     const { action } = req.body;
 
     const userId = fullTokenCheck(token);
-    const response = adminQuizSessionUpdate(userId, quizId, sessionId, action);
+    const response = adminQuizSessionUpdate(userId, quizId, sessionId, action.toString());
 
     return res.json(response);
   }
