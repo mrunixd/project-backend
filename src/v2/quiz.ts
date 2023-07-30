@@ -1,4 +1,4 @@
-import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, SessionState } from './dataStore';
+import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, STATE, ACTION } from './dataStore';
 import HTTPError from 'http-errors';
 
 // defining all magic numbers
@@ -936,7 +936,7 @@ function adminQuizSessionStart(
 
   const user = data.users.find((user) => user.authUserId === authUserId);
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
-  const nonEndedQuizzes = data.sessions.map((session) => session.sessionState !== SessionState.END);
+  const nonEndedQuizzes = data.sessions.map((session) => session.sessionState !== STATE.END);
 
   // Error-checking block
   if (currentQuiz === undefined) {
@@ -966,11 +966,116 @@ function adminQuizSessionStart(
   data.sessions.push({
     usersRankedByScore: [],
     questionResults: [],
-    sessionState: SessionState.LOBBY,
-    sessionId: sessionId
+    sessionState: STATE.LOBBY,
+    sessionId: sessionId,
+    autoStartNum: autoStartNum,
+    timeoutId: undefined,
+    atQuestion: 0,
+    metadata: currentQuiz
   });
   setData(data);
   return { sessionId: sessionId };
+}
+
+
+// Changes state and then returns TRUE if succesful, or FALSE if unsuccessful
+function changeState(sessionId: number, action: string): boolean {
+  const data = getData();
+  const session = data.sessions.find((session) => session.sessionId === sessionId);
+  const initialState = session.sessionState;
+
+  if (session.sessionState === 'END') {
+    return false;
+
+  } else if (action === 'END') {
+    session.sessionState = STATE.END;
+
+  } else if (session.sessionState === 'LOBBY') {
+    if (action === 'NEXT_QUESTION') { session.sessionState = STATE.QUESTION_COUNTDOWN }
+
+  // } else if (session.sessionState === 'QUESTION_COUNTDOWN') {
+  //   if (action === 'FINISH_COUNTDOWN') { session.sessionState = STATE.QUESTION_OPEN }
+
+  } else if (session.sessionState === 'QUESTION_COUNTDOWN') {
+    if (action === 'FINISH_COUNTDOWN') {
+      session.sessionState = STATE.QUESTION_OPEN;
+      setTimeout(() => {
+        session.sessionState = STATE.QUESTION_CLOSE;
+        setData(data);
+      }, session.metadata.duration * 1000)
+    }
+
+  } else if (session.sessionState === 'QUESTION_OPEN') {
+    if (action === 'GO_TO_ANSWER') {session.sessionState = STATE.ANSWER_SHOW }
+
+  } else if (session.sessionState === 'QUESTION_CLOSE') {
+    if (action === 'GO_TO_ANSWER') {session.sessionState = STATE.ANSWER_SHOW }
+    else if (action === 'GO_TO_FINAL_RESULTS') {session.sessionState = STATE.FINAL_RESULTS };
+
+  } else if (session.sessionState === 'ANSWER_SHOW') {
+    if (action === 'GO_TO_FINAL_RESULTS') {session.sessionState = STATE.FINAL_RESULTS }
+  }
+  // only actions FINAL_RESULTS can do is go to END
+  setData(data);
+  if (session.sessionState === initialState) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * This function copies a quiz and starts a session for it
+ *
+ * @param {number} authUserId
+ * @param {number} quizId
+ * @param {number} sessionId
+ * @param {string} action
+ *
+ * @returns {SessionId}
+ *
+ */
+function adminQuizSessionUpdate(
+  authUserId: number,
+  quizId: number,
+  sessionId: number,
+  action: string
+): Record<string, never> | ErrorObject {
+  const data = getData();
+
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
+  const currentSession = data.sessions.find((session) => session.sessionId === sessionId);
+
+  // Error-checking block
+  if (currentQuiz === undefined) {
+    throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
+  } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
+    throw HTTPError(400, { error: 'Quiz ID does not refer to a quiz that this user owns' });
+  } else if (currentSession === undefined) {
+    throw HTTPError(400, { error: 'Session ID does not refer to a valid quiz' });
+  } else if (!(action in ACTION)) {
+    throw HTTPError(400, { error: 'Action provided is not a valid Action enum' });
+  } else if (changeState(sessionId, action) === false) {
+    throw HTTPError(400, { error: 'Action enum cannot be applied in the current state' });
+  }
+  // //Update state based on input
+  // if (action === ACTION.NEXT_QUESTION) {
+  //   currentSession.sessionState = STATE.QUESTION_COUNTDOWN;
+
+  //   // currentSession.timeoutId = (setTimeout(() => {
+  //   //   currentSession.sessionState === STATE.QUESTION_OPEN;
+  //   //   currentSession.atQuestion++;
+  //   //   setData(data);
+
+  //   //   currentSession.timeoutId = (setTimeout(() => {
+  //   //     currentSession.sessionState === STATE.QUESTION_CLOSE;
+  //   //     currentSession.timeoutId = undefined;
+  //   //     setData(data);
+  //   //     return {};
+  //   //   }, currentSession.metadata.duration * 1000));
+
+  //   // }, COUNTDOWN * 1000));
+  return {};
 }
 
 export {
@@ -989,5 +1094,6 @@ export {
   adminQuizTrashEmpty,
   adminQuizQuestionUpdate,
   adminQuizQuestionDelete,
-  adminQuizSessionStart
+  adminQuizSessionStart,
+  adminQuizSessionUpdate
 };
