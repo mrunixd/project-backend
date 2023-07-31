@@ -68,6 +68,7 @@ describe('////////TESTING v1/player/join////////', () => {
   describe('TESTING v1/player/join success', () => {
     test('player joins empty game successfully', () => {
       result1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
+      console.log(result1.body);
       expect(result1.body).toStrictEqual({ playerId: expect.any(Number) });
       expect(result1.status).toBe(OK);
     });
@@ -76,6 +77,7 @@ describe('////////TESTING v1/player/join////////', () => {
     test('CASE 400: player joins game where individual has same name', () => {
       result1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
       result2 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
+      console.log(result1.body);
       expect(result2.body).toStrictEqual({ error: expect.any(String) });
       expect(result2.status).toBe(INPUT_ERROR);
     });

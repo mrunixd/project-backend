@@ -53,6 +53,7 @@ export interface Token {
 interface PlayerScore {
   name: string;
   score: number;
+  playerId: number;
 }
 
 interface QuestionBreakdown {
