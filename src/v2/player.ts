@@ -15,7 +15,7 @@ function playerJoin(sessionId: number, name: string): {playerId: number} | Error
   } else if (session.usersRankedByScore.find(user => user.name === name)) {
     throw HTTPError(400, { error: 'Name is already in use' });
   } else {
-    const player = { name: name, score: 0 };
+    const player = { name: name, score: 0, playerId: session.usersRankedByScore.length + 1 };
     session.usersRankedByScore.push(player);
     setData(data);
     return { playerId: session.usersRankedByScore.length };
