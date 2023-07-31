@@ -4,6 +4,8 @@ import {
   requestAdminQuizCreate,
   requestAdminQuizQuestion,
   requestAdminQuizSessionUpdate,
+  requestAdminQuizSessionStatus,
+  requestAdminQuizInfo,
   deleteRequest,
   OK,
   UNAUTHORISED,
@@ -12,13 +14,15 @@ import {
 } from '../helper';
 
 let result1: any;
+let result2: any;
 let person1: any;
 let person2: any;
 let quiz1: any;
 let session1: any;
+let info1: any;
 const quizQuestion1Body = {
   question: 'Who is the Monarch of England?',
-  duration: 4,
+  duration: 1,
   points: 5,
   answers: [
     {
@@ -30,8 +34,7 @@ const quizQuestion1Body = {
       correct: true,
     },
   ],
-  thumbnailUrl:
-      'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
+  thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
 };
 
 function sleepSync(ms: number) {
@@ -44,10 +47,12 @@ function sleepSync(ms: number) {
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
   result1 = undefined;
+  result2 = undefined;
   person1 = undefined;
   person2 = undefined;
   quiz1 = undefined;
   session1 = undefined;
+  info1 = undefined;
 });
 
 describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid} ///////', () => {
@@ -56,23 +61,60 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid} ///////', (
     quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
     requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
     session1 = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 10);
+    info1 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person1.body.token}`);
   });
 
   describe('/////// Testing v1/admin/quiz/{quizid}/session/{sessionid} success', () => {
-    test('CASE: success 1 quiz 1 session, single change', () => {
-      result1 = requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
-      expect(result1.body).toStrictEqual({});
-      expect(result1.status).toBe(OK);
-    });
     test('CASE: success 1 quiz 1 session, question automatically closes', () => {
       requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
       result1 = requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'FINISH_COUNTDOWN');
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
+      sleepSync(quizQuestion1Body.duration * 1000);
+
+      result2 = requestAdminQuizSessionStatus(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
+      expect(result2.body).toStrictEqual({
+        state: 'QUESTION_CLOSE', // CHANGE LATER
+        atQuestion: 1,
+        players: [],
+        metadata: info1.body
+      });
+    });
+
+    test('CASE: change state of 2nd quiz 2nd person, full cycle', () => {
+      person2 = requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal');
+      requestAdminQuizCreate(`${person2.body.token}`, 'second quiz', 'second quiz being tested');
+      const quiz3 = requestAdminQuizCreate(`${person2.body.token}`, 'third quiz', 'third quiz being tested');
+      requestAdminQuizQuestion(`${quiz3.body.quizId}`, `${person2.body.token}`, quizQuestion1Body);
+      requestAdminQuizQuestion(`${quiz3.body.quizId}`, `${person2.body.token}`, quizQuestion1Body);
+
+      session1 = requestAdminQuizSessionStart(`${person2.body.token}`, `${quiz3.body.quizId}`, 10);
+      info1 = requestAdminQuizInfo(`${quiz3.body.quizId}`, `${person2.body.token}`);
+
+      requestAdminQuizSessionUpdate(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
+      requestAdminQuizSessionUpdate(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`, 'FINISH_COUNTDOWN');
+      sleepSync(quizQuestion1Body.duration * 1000 + 1000);
+      requestAdminQuizSessionUpdate(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
+      requestAdminQuizSessionUpdate(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`, 'FINISH_COUNTDOWN');
+      sleepSync(quizQuestion1Body.duration * 1000 + 1000);
+      requestAdminQuizSessionUpdate(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`, 'GO_TO_ANSWER');
+      requestAdminQuizSessionUpdate(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`, 'GO_TO_FINAL_RESULTS');
+      result1 = requestAdminQuizSessionUpdate(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`, 'END');
+
+      expect(result1.body).toStrictEqual({});
+      expect(result1.status).toBe(OK);
+
+      result2 = requestAdminQuizSessionStatus(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`);
+      expect(result2.body).toStrictEqual({
+        state: 'END', // CHANGE LATER
+        atQuestion: 2,
+        players: [],
+        metadata: info1.body
+      });
     });
     /// /////////////////////////////////////////////////////////
-    /// /more tests for when info is complete to check state/////
+    /// /more tests for when PLAYERS is complete to check state/////
     /// /////////////////////////////////////////////////////////
   });
 
@@ -111,7 +153,6 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid} ///////', (
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (400): Action provided is not a valid Action enum', () => {
-      sleepSync(2 * 1000);
       result1 = requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'fake');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);

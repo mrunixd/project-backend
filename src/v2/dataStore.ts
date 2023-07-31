@@ -85,14 +85,14 @@ export enum ACTION {
 }
 
 export interface Session {
-  usersRankedByScore: PlayerScore[];
-  questionResults: QuestionResult[];
-  sessionState: STATE;
   sessionId: number;
   autoStartNum: number;
-  // timeoutId: any;
+  sessionState: STATE;
   atQuestion: number;
+  players: string[];
   metadata: Quiz;
+  // usersRankedByScore: PlayerScore[];
+  // questionResults: QuestionResult[];
 }
 
 export interface SessionId {
@@ -111,26 +111,6 @@ export interface DataStore {
 export interface ErrorObject {
   error: string;
 }
-
-// function stringify(obj: any) {
-//   let cache: Array<string> = [];
-//   let str = JSON.stringify(obj, function(key, value) {
-//     if (typeof value === "object" && value !== null) {
-//       if (cache.indexOf(value) !== -1) {
-//         // Circular reference found, discard key
-//         return;
-//       }
-//       // Store value in our collection
-//       cache.push(value);
-//     }
-//     return value;
-//   });
-//   cache = null; // reset the cache
-//   return str;
-// }
-// export function setDataCircular(data: DataStore) {
-//   fs.writeFileSync('./dbStore.json', stringify(data));
-// }
 
 function setData(data: DataStore) {
   fs.writeFileSync('./dbStore.json', JSON.stringify(data));
