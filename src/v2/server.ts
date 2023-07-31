@@ -36,6 +36,8 @@ import {
   adminQuizSessionStart,
   adminQuizSessionUpdate
 } from './quiz';
+
+import { playerJoin } from './player';
 import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck } from './other';
 import HTTPError from 'http-errors';
 
@@ -769,6 +771,14 @@ app.post(
     return res.json(response);
   }
 );
+
+app.post('/v1/player/join', (req: Request, res: Response) => {
+  const { sessionId, name } = req.body;
+
+  const response = playerJoin(sessionId, name);
+
+  return res.json(response);
+});
 
 // ROUTE: adminQuizSessionUpdate
 app.put(

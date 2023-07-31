@@ -156,3 +156,8 @@ export function requestAdminQuizSessionUpdate(token: string, quizId: string, ses
   const response = putRequest(`/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
   return response;
 }
+
+export function requestPlayerJoin(sessionId: number, name: string) {
+  const response = postRequest('/v1/player/join', { sessionId, name });
+  return response;
+}
