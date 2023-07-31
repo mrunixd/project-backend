@@ -17,7 +17,6 @@ let result1: any;
 let person1: any;
 let person2: any;
 let quiz1: any;
-let quizQuestion1: any;
 let session1: any;
 const quizQuestion1Body = {
   question: 'Who is the Monarch of England?',
@@ -36,20 +35,12 @@ const quizQuestion1Body = {
   thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
 };
 
-function sleepSync(ms: number) {
-  const startTime = new Date().getTime();
-  while (new Date().getTime() - startTime < ms) {
-    // zzzZZ
-  }
-}
-
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
   result1 = undefined;
   person1 = undefined;
   person2 = undefined;
   quiz1 = undefined;
-  quizQuestion1 = undefined;
   session1 = undefined;
 });
 
@@ -57,7 +48,7 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid} INFO///////
   beforeEach(() => {
     person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
     quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
-    quizQuestion1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
+    requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
     session1 = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 10);
   });
 
@@ -66,43 +57,62 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid} INFO///////
       const info1 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person1.body.token}`);
       result1 = requestAdminQuizSessionStatus(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
       expect(result1.body).toStrictEqual({
-        state: result1.body.state, //CHANGE LATER
+        state: result1.body.state,
         atQuestion: 0,
         players: [],
         metadata: info1.body
-          // quizId: quiz1.body.quizId,
-          // name: 'first quiz',
-          // timeCreated: expect.any(Number),
-          // timeLastEdited: expect.any(Number),
-          // description: 'first quiz being tested',
-          // numQuestions: 1,
-          // questions: [
-          //   {
-          //     questionId: quizQuestion1.body.questionId,
-          //     question: 'Who is the Monarch of England?',
-          //     duration: 4,
-          //     points: 5,
-          //     answers: [
-          //       {
-          //         answer: 'Prince Charles',
-          //         answerId: expect.any(Number),
-          //         colour: expect.any(String),
-          //         correct: false,
-          //       },
-          //       {
-          //         answer: 'King Charles',
-          //         answerId: expect.any(Number),
-          //         colour: expect.any(String),
-          //         correct: true,
-          //       },
-          //     ],
-          //     thumbnailUrl: quizQuestion1Body.thumbnailUrl,
-          //   }
-          // ],
-          // duration: 4,
-          // thumbnailUrl: '',
       });
       expect(result1.status).toBe(OK);
+    });
+
+    test('CASE: success 1 quiz 1 session, info correct after status update', () => {
+      requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
+
+      const info1 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person1.body.token}`);
+      result1 = requestAdminQuizSessionStatus(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
+      expect(result1.body).toStrictEqual({
+        state: 'QUESTION_COUNTDOWN',
+        atQuestion: 0,
+        players: [],
+        metadata: info1.body
+      });
+      expect(result1.status).toBe(OK);
+    });
+  });
+
+  describe('/////// Testing v1/admin/quiz/{quizid}/session/{sessionid} INFO errors', () => {
+    test('CASE (403): provided token is a valid structure, but is not for a currently logged on session', () => {
+      result1 = requestAdminQuizSessionStatus(`${parseInt(person1.body.token) - 1}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toStrictEqual(FORBIDDEN);
+    });
+    test('CASE (401): token is not valid structure', () => {
+      result1 = requestAdminQuizSessionStatus('hi!!!', `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toStrictEqual(UNAUTHORISED);
+    });
+    test('CASE (401): token is not valid structure', () => {
+      result1 = requestAdminQuizSessionStatus('a1aaa', `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toStrictEqual(UNAUTHORISED);
+    });
+    test('CASE (400): Quiz ID does not refer to a valid quiz', () => {
+      result1 = requestAdminQuizSessionStatus(`${person1.body.token}`, `${quiz1.body.quizId + 1}`, `${session1.body.sessionId}`);
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toStrictEqual(INPUT_ERROR);
+    });
+    test('CASE (400): Quiz ID does not refer to a quiz that this user owns', () => {
+      person2 = requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal');
+
+      result1 = requestAdminQuizSessionStatus(`${person2.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toStrictEqual(INPUT_ERROR);
+    });
+    test('CASE (400): Session ID does not refer to a valid quiz', () => {
+      const newSessionId = parseInt(session1.body.sessionId) + 1;
+      result1 = requestAdminQuizSessionStatus(`${person1.body.token}`, `${quiz1.body.quizId}`, `${newSessionId}`);
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
   });
 });
