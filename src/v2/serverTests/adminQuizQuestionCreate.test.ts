@@ -277,7 +277,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
         ],
         thumbnailUrl: '',
       };
-      result1 = requestAdminQuizQuestionU(`${quiz1.body.quizId}`, `${quizQuestion1.body.questionId}`, `${person1.body.token}`, quizQuestion3Body);
+      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion3Body);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
@@ -299,7 +299,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
         ],
         thumbnailUrl: 'https://NOT_AREAL_URL.png'
       };
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${quizQuestion1.body.questionId}`, `${person1.body.token}`, quizQuestion3Body);
+      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion3Body);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
@@ -321,7 +321,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
         ],
         thumbnailUrl: 'https://www.wix.com/'
       };
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${quizQuestion1.body.questionId}`, `${person1.body.token}`, quizQuestion3Body);
+      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion3Body);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });

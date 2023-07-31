@@ -1,5 +1,8 @@
 import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, SessionState } from './dataStore';
 import HTTPError from 'http-errors';
+import { answerInput, questionInput, QuestionId, NewQuestionId, Colours} from './quiz';
+import PORT from './server'
+import request from 'sync-request';
 
 const MAXNAME = 30;
 const MINNAME = 3;
@@ -14,10 +17,30 @@ const MINANSWERLENGTH = 1;
 const MAXANSWERLENGTH = 30;
 const MAXDURATION = 180;
 
-function adminQuizQuestionV2(
+import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+
+function isValidURL(url: string) {
+  try {
+    new URL(url);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+// Function to check if a given URL is a valid image (jpg or png)
+function isValidImageUrl(url: string): boolean {
+  const validExtensions = ['.jpg', '.jpeg', '.png'];
+  const extension = path.extname(url).toLowerCase();
+  return validExtensions.includes(extension);
+}
+
+export function adminQuizQuestionV2(
     authUserId: number,
     quizId: number,
-    questionBody: questionInput
+    questionBody: questionInput,
   ): QuestionId | ErrorObject {
     const data = getData();
   
@@ -28,7 +51,7 @@ function adminQuizQuestionV2(
     if (user === undefined) {
       throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
     } else if (currentQuiz === undefined) {
-      throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
+      throw new HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
     } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
       throw HTTPError(400, { error: 'Quiz ID does not refer to a quiz that this user owns' });
     } else if (
@@ -75,15 +98,27 @@ function adminQuizQuestionV2(
       });
     } else if (!questionBody.answers.some((answer) => answer.correct)) {
       throw HTTPError(400, { error: 'Question must have at least one correct answer' });
-    } else if (questionBody.thumbnailUrl === '') {
-      throw HTTPError(400, { error: 'The thumbnailUrl is an empty string' });
     }
+    
 
-    try {
-      const url = new URL(thumbnailUrl);
-    } catch (error) {
-      throw HTTPError(400, { error: 'The thumbnailUrl is an empty string' });
+
+
+    const res = request('GET', `${questionBody.thumbnailUrl}`);
+    const body = res.getBody();
+    
+    // Check if the request was successful and the response is not empty
+    if (res.statusCode !== 200 || body.length === 0) {
+      throw new HTTPError(400, { error: 'Invalid URL: The thumbnailUrl did not return a valid file.' });
     }
+    const fileExtension = path.extname(questionBody.thumbnailUrl).toLowerCase();
+    if (fileExtension !== '.jpg' && fileExtension !== '.png' && fileExtension !== '.jpeg') {
+      throw new HTTPError(400, { error: 'Invalid URL: The thumbnailUrl is not of type jpg or png' });
+    }
+ 
+    const fileName = `${Date.now()}${Math.random().toString(36).substring(7)}${fileExtension}`;
+    // const imageUrlOnServer = `http://localhost:${PORT}/imgurl/${fileName}`;
+    const imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
+    fs.writeFileSync(imagesDirectoryPath, body, { flag: 'w' });
 
 
     // Create a new answer array: this generates a random colour based on a random index

@@ -31,12 +31,12 @@ interface QuizList {
   quizzes: QuizIds[];
 }
 
-interface answerInput {
+export interface answerInput {
   answer: string;
   correct: boolean;
 }
 
-interface questionInput {
+export export interface questionInput {
   question: string;
   duration: number;
   points: number;
@@ -44,15 +44,15 @@ interface questionInput {
   thumbnailUrl: string;
 }
 
-interface QuestionId {
+export interface QuestionId {
   questionId: number;
 }
 
-interface NewQuestionId {
+export interface NewQuestionId {
   newQuestionId: number;
 }
 
-enum Colours {
+export enum Colours {
   red = 'red',
   blue = 'blue',
   green = 'green',

@@ -38,9 +38,10 @@ import {
 
 import {
   adminQuizQuestionV2,
+  downloadAndSaveImage
 } from './question';
 
-import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck } from './other';
+import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck, clearImagesDirectory } from './other';
 import HTTPError from 'http-errors';
 
 // Set up web app
@@ -60,7 +61,7 @@ app.use(
   })
 );
 
-const PORT: number = parseInt(process.env.PORT || config.port);
+export const PORT: number = parseInt(process.env.PORT || config.port);
 const HOST: string = process.env.IP || 'localhost';
 
 // for logging errors (print to terminal)
@@ -78,7 +79,9 @@ app.get('/echo', (req: Request, res: Response) => {
 
 // ROUTE: clear
 app.delete('/v1/clear', (req: Request, res: Response) => {
-  const response = clear(); return res.json(response);
+  const response = clear(); 
+  //clearImagesDirectory();
+  return res.json(response);
 });
 
 // ROUTE: adminAuthRegister
@@ -684,7 +687,17 @@ app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const token = req.headers.token.toString();
   const { questionBody } = req.body;
 
-  const userId = fullTokenCheck(token);
+  if (!checkValidToken(token)) {
+    return res.status(401).json({ error: 'token has invalid structure' });
+  }
+  const userId = sessionIdtoUserId(token);
+  if (userId === -1) {
+    return res.status(403).json({
+      error:
+        'Provided token is valid structure, but is not for a currently logged in session',
+    });
+  }
+
   const response = adminQuizQuestionV2(userId, quizId, questionBody);
   return res.json(response);
 });
