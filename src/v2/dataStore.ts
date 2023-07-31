@@ -92,8 +92,8 @@ export interface Session {
   atQuestion: number;
   players: string[];
   metadata: Quiz;
-  // usersRankedByScore: PlayerScore[];
-  // questionResults: QuestionResult[];
+  usersRankedByScore: PlayerScore[];
+  questionResults: QuestionResult[];
 }
 
 export interface SessionId {

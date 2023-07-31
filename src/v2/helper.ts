@@ -159,6 +159,7 @@ export function requestAdminQuizSessionUpdate(token: string, quizId: string, ses
 
 export function requestAdminQuizSessionStatus(token: string, quizId: string, sessionId: string) {
   const response = getRequest(`/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
+  return response;
 }
 
 export function requestPlayerJoin(sessionId: number, name: string) {
