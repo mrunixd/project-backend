@@ -36,10 +36,6 @@ const quizQuestion1Body = {
     'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
 };
 
-/// /////////////////////////////////////////////////////////
-/// /EVERYTHING ABOVE NEEDS TO BE PORTED TO A HELPER FILE////
-/// /////////////////////////////////////////////////////////
-
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
   result1 = undefined;
