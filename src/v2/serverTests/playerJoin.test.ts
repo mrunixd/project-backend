@@ -13,7 +13,6 @@ let result1: any;
 let result2: any;
 let person1: any;
 let quiz1: any;
-let quizQuestion1: any;
 let sessionId: any;
 
 beforeEach(() => {
@@ -22,7 +21,6 @@ beforeEach(() => {
   result2 = undefined;
   person1 = undefined;
   quiz1 = undefined;
-  quizQuestion1 = undefined;
 });
 
 const quizQuestion1Body = {
@@ -56,7 +54,7 @@ describe('////////TESTING v1/player/join////////', () => {
       'first quiz',
       'first quiz being tested'
     );
-    quizQuestion1 = requestAdminQuizQuestion(
+    requestAdminQuizQuestion(
       `${quiz1.body.quizId}`,
       `${person1.body.token}`,
       quizQuestion1Body
@@ -76,10 +74,10 @@ describe('////////TESTING v1/player/join////////', () => {
   });
   describe('TESTING v1/player/join errors', () => {
     test('CASE 400: player joins game where individual has same name', () => {
-        result1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
-        result2 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
-        expect(result2.body).toStrictEqual({ error: expect.any(String)});
-        expect(result2.status).toBe(INPUT_ERROR);
+      result1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
+      result2 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
+      expect(result2.body).toStrictEqual({ error: expect.any(String) });
+      expect(result2.status).toBe(INPUT_ERROR);
     });
   });
 });

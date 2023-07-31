@@ -153,6 +153,6 @@ export function requestAdminQuizSessionStart(token: string, quizId: string, auto
 }
 
 export function requestPlayerJoin(sessionId: number, name: string) {
-  const response = postRequest('/v1/player/join', {sessionId, name});
+  const response = postRequest('/v1/player/join', { sessionId, name });
   return response;
 }
