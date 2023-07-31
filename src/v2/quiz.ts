@@ -52,6 +52,13 @@ interface NewQuestionId {
   newQuestionId: number;
 }
 
+interface sessionStatusReturn {
+  state: STATE;
+  atQuestion: number;
+  players: string[];
+  metadata: Quiz;
+}
+
 enum Colours {
   red = 'red',
   blue = 'blue',
@@ -964,14 +971,14 @@ function adminQuizSessionStart(
   }
 
   data.sessions.push({
-    usersRankedByScore: [],
-    questionResults: [],
-    sessionState: STATE.LOBBY,
     sessionId: sessionId,
     autoStartNum: autoStartNum,
-    // timeoutId: undefined,
+    sessionState: STATE.LOBBY,
     atQuestion: 0,
-    metadata: currentQuiz
+    players: [],
+    metadata: currentQuiz,
+    usersRankedByScore: [],
+    questionResults: []
   });
   setData(data);
   return { sessionId: sessionId };
@@ -989,21 +996,19 @@ function changeState(sessionId: number, action: string): boolean {
     session.sessionState = STATE.END;
   } else if (session.sessionState === 'LOBBY') {
     if (action === 'NEXT_QUESTION') { session.sessionState = STATE.QUESTION_COUNTDOWN; }
-
-    // } else if (session.sessionState === 'QUESTION_COUNTDOWN') {
-    //   if (action === 'FINISH_COUNTDOWN') { session.sessionState = STATE.QUESTION_OPEN }
   } else if (session.sessionState === 'QUESTION_COUNTDOWN') {
     if (action === 'FINISH_COUNTDOWN') {
       session.sessionState = STATE.QUESTION_OPEN;
-      // setTimeout(() => {
-      //   session.sessionState = STATE.QUESTION_CLOSE;
-      //   setData(data);
-      // }, session.metadata.duration * 1000);
+      session.atQuestion++;
+      setTimeout(() => {
+        session.sessionState = STATE.QUESTION_CLOSE;
+        setData(data);
+      }, session.metadata.duration * 1000);
     }
   } else if (session.sessionState === 'QUESTION_OPEN') {
     if (action === 'GO_TO_ANSWER') { session.sessionState = STATE.ANSWER_SHOW; }
   } else if (session.sessionState === 'QUESTION_CLOSE') {
-    if (action === 'GO_TO_ANSWER') { session.sessionState = STATE.ANSWER_SHOW; } else if (action === 'GO_TO_FINAL_RESULTS') { session.sessionState = STATE.FINAL_RESULTS; }
+    if (action === 'GO_TO_ANSWER') { session.sessionState = STATE.ANSWER_SHOW; } else if (action === 'GO_TO_FINAL_RESULTS') { session.sessionState = STATE.FINAL_RESULTS; } else if (action === 'NEXT_QUESTION') { session.sessionState = STATE.QUESTION_COUNTDOWN; }
   } else if (session.sessionState === 'ANSWER_SHOW') {
     if (action === 'GO_TO_FINAL_RESULTS') { session.sessionState = STATE.FINAL_RESULTS; }
   }
@@ -1016,7 +1021,7 @@ function changeState(sessionId: number, action: string): boolean {
 }
 
 /**
- * This function copies a quiz and starts a session for it
+ * This function updates the status of a session
  *
  * @param {number} authUserId
  * @param {number} quizId
@@ -1073,6 +1078,47 @@ function adminQuizSessionUpdate(
   return {};
 }
 
+/**
+ * This function copies a quiz and starts a session for it
+ *
+ * @param {number} authUserId
+ * @param {number} quizId
+ * @param {number} sessionId
+ * @param {string} action
+ *
+ * @returns {SessionId}
+ *
+ */
+function adminQuizSessionStatus(
+  authUserId: number,
+  quizId: number,
+  sessionId: number
+): sessionStatusReturn | ErrorObject {
+  const data = getData();
+
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
+  const currentSession = data.sessions.find((session) => session.sessionId === sessionId);
+
+  // Error-checking block
+  if (currentQuiz === undefined) {
+    throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
+  } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
+    throw HTTPError(400, { error: 'Quiz ID does not refer to a quiz that this user owns' });
+  } else if (currentSession === undefined) {
+    throw HTTPError(400, { error: 'Session ID does not refer to a valid quiz' });
+  } else if (currentSession.metadata.quizId !== quizId) {
+    throw HTTPError(400, { error: 'Session ID isnt the same as quizId' });
+  }
+
+  return {
+    state: currentSession.sessionState,
+    atQuestion: currentSession.atQuestion,
+    players: currentSession.players,
+    metadata: currentSession.metadata
+  };
+}
+
 export {
   adminQuizCreate,
   adminQuizList,
@@ -1090,5 +1136,6 @@ export {
   adminQuizQuestionUpdate,
   adminQuizQuestionDelete,
   adminQuizSessionStart,
-  adminQuizSessionUpdate
+  adminQuizSessionUpdate,
+  adminQuizSessionStatus
 };
