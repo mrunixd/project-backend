@@ -69,4 +69,4 @@ function fullTokenCheck(token: string): number {
 //   });
 // }
 
-export { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck, clearImagesDirectory };
+export { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck };

@@ -1,5 +1,8 @@
 import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, SessionState } from './dataStore';
 import HTTPError from 'http-errors';
+import request from 'sync-request';
+import fs from 'fs';
+import path from 'path';
 
 // defining all magic numbers
 const MAXNAME = 30;
@@ -821,10 +824,9 @@ function adminQuizQuestionUpdate(
     });
   } else if (!questionBody.answers.some((answer) => answer.correct)) {
     throw HTTPError(400, { error: 'Question must have at least one correct answer' });
+  } else if (questionBody.thumbnailUrl === '') {
+    throw HTTPError(400, { error: 'ThumbnailUrl cannot be empty string' });
   }
-  /// /////////////////////////////////////////////////////////
-  /// /FINISH THE ERROR CHECKING ABOVE (should be 3 more) ////
-  /// /////////////////////////////////////////////////////////
 
   const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
     const numbers = [0, 1, 2, 3, 4, 5];

@@ -428,5 +428,84 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
+    test('CASE: empty url', () => {
+      const quizQuestion3Body = {
+        question: 'Who is the monarch of England?',
+        duration: 13,
+        points: 8,
+        answers: [
+          {
+            answer: 'King Charless',
+            correct: false,
+          },
+          {
+            answer: 'Prince Charles',
+            correct: false,
+          },
+        ],
+        thumbnailUrl: '',
+      };
+      result1 = requestAdminQuizQuestionUpdate(
+        `${quiz1.body.quizId}`,
+        `${quizQuestion1.body.questionId}`,
+        `${person1.body.token}`,
+        quizQuestion3Body
+      );
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+    test('CASE: invalid url', () => {
+      const quizQuestion3Body = {
+        question: 'Who is the monarch of England?',
+        duration: 13,
+        points: 8,
+        answers: [
+          {
+            answer: 'King Charless',
+            correct: false,
+          },
+          {
+            answer: 'Prince Charles',
+            correct: false,
+          },
+        ],
+        thumbnailUrl: 'https://NOT_AREAL_URL.png'
+      };
+      result1 = requestAdminQuizQuestionUpdate(
+        `${quiz1.body.quizId}`,
+        `${quizQuestion1.body.questionId}`,
+        `${person1.body.token}`,
+        quizQuestion3Body
+      );
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+
+    test('CASE: valid url but not a jpeg or png', () => {
+      const quizQuestion3Body = {
+        question: 'Who is the monarch of England?',
+        duration: 13,
+        points: 8,
+        answers: [
+          {
+            answer: 'King Charless',
+            correct: false,
+          },
+          {
+            answer: 'Prince Charles',
+            correct: false,
+          },
+        ],
+        thumbnailUrl: 'https://www.wix.com/'
+      };
+      result1 = requestAdminQuizQuestionUpdate(
+        `${quiz1.body.quizId}`,
+        `${quizQuestion1.body.questionId}`,
+        `${person1.body.token}`,
+        quizQuestion3Body
+      );
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
   });
 });

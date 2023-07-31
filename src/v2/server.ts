@@ -38,10 +38,9 @@ import {
 
 import {
   adminQuizQuestionV2,
-  downloadAndSaveImage
 } from './question';
 
-import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck, clearImagesDirectory } from './other';
+import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck } from './other';
 import HTTPError from 'http-errors';
 
 // Set up web app
@@ -79,8 +78,8 @@ app.get('/echo', (req: Request, res: Response) => {
 
 // ROUTE: clear
 app.delete('/v1/clear', (req: Request, res: Response) => {
-  const response = clear(); 
-  //clearImagesDirectory();
+  const response = clear();
+  // clearImagesDirectory();
   return res.json(response);
 });
 
@@ -697,7 +696,6 @@ app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
         'Provided token is valid structure, but is not for a currently logged in session',
     });
   }
-
   const response = adminQuizQuestionV2(userId, quizId, questionBody);
   return res.json(response);
 });
