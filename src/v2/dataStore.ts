@@ -66,21 +66,33 @@ interface QuestionResult {
   percentCorrect: number;
 }
 
-export enum SessionState {
-  LOBBY = 'lobby',
-  QUESTION_COUNTDOWN = 'question_countdown',
-  QUESTION_OPEN = 'question_open',
-  QUESTION_CLOSE = 'question_close',
-  ANSWER_SHOW = 'answer_show',
-  FINAL_RESULTS = 'final_results',
-  END = 'end'
+export enum STATE {
+  LOBBY = 'LOBBY',
+  QUESTION_COUNTDOWN = 'QUESTION_COUNTDOWN',
+  QUESTION_OPEN = 'QUESTION_OPEN',
+  QUESTION_CLOSE = 'QUESTION_CLOSE',
+  ANSWER_SHOW = 'ANSWER_SHOW',
+  FINAL_RESULTS = 'FINAL_RESULTS',
+  END = 'END'
+}
+
+export enum ACTION {
+  NEXT_QUESTION = 'NEXT_QUESTION',
+  GO_TO_ANSWER = 'GO_TO_ANSWER',
+  GO_TO_FINAL_RESULTS = 'GO_TO_FINAL_RESULTS',
+  END = 'END',
+  FINISH_COUNTDOWN = 'FINISH_COUNTDOWN'
 }
 
 export interface Session {
   usersRankedByScore: PlayerScore[];
   questionResults: QuestionResult[];
-  sessionState: SessionState;
+  sessionState: STATE;
   sessionId: number;
+  autoStartNum: number;
+  // timeoutId: any;
+  atQuestion: number;
+  metadata: Quiz;
 }
 
 export interface SessionId {
@@ -99,6 +111,26 @@ export interface DataStore {
 export interface ErrorObject {
   error: string;
 }
+
+// function stringify(obj: any) {
+//   let cache: Array<string> = [];
+//   let str = JSON.stringify(obj, function(key, value) {
+//     if (typeof value === "object" && value !== null) {
+//       if (cache.indexOf(value) !== -1) {
+//         // Circular reference found, discard key
+//         return;
+//       }
+//       // Store value in our collection
+//       cache.push(value);
+//     }
+//     return value;
+//   });
+//   cache = null; // reset the cache
+//   return str;
+// }
+// export function setDataCircular(data: DataStore) {
+//   fs.writeFileSync('./dbStore.json', stringify(data));
+// }
 
 function setData(data: DataStore) {
   fs.writeFileSync('./dbStore.json', JSON.stringify(data));

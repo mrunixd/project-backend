@@ -33,7 +33,8 @@ import {
   adminQuizTrashEmpty,
   adminQuizQuestionUpdate,
   adminQuizQuestionDelete,
-  adminQuizSessionStart
+  adminQuizSessionStart,
+  adminQuizSessionUpdate
 } from './quiz';
 
 import { playerJoin } from './player';
@@ -778,6 +779,23 @@ app.post('/v1/player/join', (req: Request, res: Response) => {
 
   return res.json(response);
 });
+
+// ROUTE: adminQuizSessionUpdate
+app.put(
+  '/v1/admin/quiz/:quizid/session/:sessionid',
+  (req: Request, res: Response) => {
+    const quizId = parseInt(req.params.quizid);
+    const sessionId = parseInt(req.params.sessionid);
+    const token = req.headers.token.toString();
+    const { action } = req.body;
+
+    const userId = fullTokenCheck(token);
+    const response = adminQuizSessionUpdate(userId, quizId, sessionId, action.toString());
+
+    return res.json(response);
+  }
+);
+
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================

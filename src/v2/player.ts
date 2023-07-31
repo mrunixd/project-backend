@@ -1,4 +1,4 @@
-import { getData, setData, ErrorObject, SessionState } from './dataStore';
+import { getData, setData, ErrorObject, STATE } from './dataStore';
 import HTTPError from 'http-errors';
 
 function playerJoin(sessionId: number, name: string): {playerId: number} | ErrorObject {
@@ -10,7 +10,7 @@ function playerJoin(sessionId: number, name: string): {playerId: number} | Error
   const session = data.sessions.find(session => session.sessionId === sessionId);
   if (session === undefined) {
     throw HTTPError(400, { error: 'SessionId does not exist' });
-  } else if (session?.sessionState !== SessionState.LOBBY) {
+  } else if (session?.sessionState !== STATE.LOBBY) {
     throw HTTPError(400, { error: 'Session has already started' });
   } else if (session.usersRankedByScore.find(user => user.name === name)) {
     throw HTTPError(400, { error: 'Name is already in use' });
