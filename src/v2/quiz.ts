@@ -514,12 +514,30 @@ function adminQuizQuestion(
     });
   } else if (!questionBody.answers.some((answer) => answer.correct)) {
     throw HTTPError(400, { error: 'Question must have at least one correct answer' });
-  } else if (questionBody.thumbnailUrl === '') {
-    throw HTTPError(400, { error: 'The thumbnailUrl is an empty string' });
   }
-  /// /////////////////////////////////////////////////////////
-  /// /FINISH THE ERROR CHECKING ABOVE (should be 2 more) ////
-  /// /////////////////////////////////////////////////////////
+
+  if (questionBody.thumbnailUrl !== undefined) {
+    if (questionBody.thumbnailUrl === '') {
+      throw HTTPError(400, { error: 'ThumbnailUrl cannot be empty string' });
+    }
+
+    const res = request('GET', `${questionBody.thumbnailUrl}`);
+    const body = res.getBody();
+
+    // Check if the request was successful and the response is not empty
+    if (res.statusCode !== 200 || body.length === 0) {
+      throw new HTTPError(400, { error: 'Invalid URL: The thumbnailUrl did not return a valid file.' });
+    }
+    const fileExtension = path.extname(questionBody.thumbnailUrl).toLowerCase();
+    if (fileExtension !== '.jpg' && fileExtension !== '.png' && fileExtension !== '.jpeg') {
+      throw new HTTPError(400, { error: 'Invalid URL: The thumbnailUrl is not of type jpg or png' });
+    }
+
+    const fileName = `${Date.now()}${Math.random().toString(36).substring(7)}${fileExtension}`;
+    // const imageUrlOnServer = `http://localhost:${PORT}/imgurl/${fileName}`;
+    const imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
+    fs.writeFileSync(imagesDirectoryPath, body, { flag: 'w' });
+  }
 
   // Create a new answer array: this generates a random colour based on a random index
   const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
@@ -824,8 +842,31 @@ function adminQuizQuestionUpdate(
     });
   } else if (!questionBody.answers.some((answer) => answer.correct)) {
     throw HTTPError(400, { error: 'Question must have at least one correct answer' });
-  } else if (questionBody.thumbnailUrl === '') {
-    throw HTTPError(400, { error: 'ThumbnailUrl cannot be empty string' });
+  }
+
+  if (questionBody.thumbnailUrl !== undefined) {
+    if (questionBody.thumbnailUrl === '') {
+      throw HTTPError(400, { error: 'ThumbnailUrl cannot be empty string' });
+    }
+
+    const res = request('GET', `${questionBody.thumbnailUrl}`);
+    const body = res.getBody();
+
+    // Check if the request was successful and the response is not empty
+    if (res.statusCode !== 200 || body.length === 0) {
+      throw new HTTPError(400, { error: 'Invalid URL: The thumbnailUrl did not return a valid file.' });
+    }
+    const fileExtension = path.extname(questionBody.thumbnailUrl).toLowerCase();
+    if (fileExtension !== '.jpg' && fileExtension !== '.png' && fileExtension !== '.jpeg') {
+      throw new HTTPError(400, { error: 'Invalid URL: The thumbnailUrl is not of type jpg or png' });
+    }
+
+    const fileName = `${Date.now()}${Math.random().toString(36).substring(7)}${fileExtension}`;
+    // const imageUrlOnServer = `http://localhost:${PORT}/imgurl/${fileName}`;
+    const imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
+    fs.writeFileSync(imagesDirectoryPath, body, { flag: 'w' });
+
+    currentQuestion.thumbnailUrl = questionBody.thumbnailUrl;
   }
 
   const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
@@ -849,7 +890,7 @@ function adminQuizQuestionUpdate(
   currentQuestion.duration = questionBody.duration;
   currentQuestion.points = questionBody.points;
   currentQuestion.answers = newAnswers;
-  currentQuestion.thumbnailUrl = questionBody.thumbnailUrl;
+
   /// /////////////////////////////////////////////////////////
   // REMOVE THE OLD THUMBNAIL URL FROM FILE AND ADD NEW ONE ////
   /// /////////////////////////////////////////////////////////

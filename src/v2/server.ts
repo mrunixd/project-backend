@@ -36,10 +36,6 @@ import {
   adminQuizSessionStart
 } from './quiz';
 
-import {
-  adminQuizQuestionV2,
-} from './question';
-
 import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck } from './other';
 import HTTPError from 'http-errors';
 
@@ -686,17 +682,18 @@ app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const token = req.headers.token.toString();
   const { questionBody } = req.body;
 
-  if (!checkValidToken(token)) {
-    return res.status(401).json({ error: 'token has invalid structure' });
-  }
-  const userId = sessionIdtoUserId(token);
-  if (userId === -1) {
-    return res.status(403).json({
-      error:
-        'Provided token is valid structure, but is not for a currently logged in session',
-    });
-  }
-  const response = adminQuizQuestionV2(userId, quizId, questionBody);
+  // if (!checkValidToken(token)) {
+  //   return res.status(401).json({ error: 'token has invalid structure' });
+  // }
+  // const userId = sessionIdtoUserId(token);
+  // if (userId === -1) {
+  //   return res.status(403).json({
+  //     error:
+  //       'Provided token is valid structure, but is not for a currently logged in session',
+  //   });
+  // }
+  const userId = fullTokenCheck(token);
+  const response = adminQuizQuestion(userId, quizId, questionBody);
   return res.json(response);
 });
 
