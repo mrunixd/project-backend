@@ -151,3 +151,8 @@ export function requestAdminQuizSessionStart(token: string, quizId: string, auto
   const response = postRequest(`/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
   return response;
 }
+
+export function requestPlayerJoin(sessionId: number, name: string) {
+  const response = postRequest('/v1/player/join', {sessionId, name});
+  return response;
+}

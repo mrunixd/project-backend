@@ -35,6 +35,8 @@ import {
   adminQuizQuestionDelete,
   adminQuizSessionStart
 } from './quiz';
+
+import { playerJoin } from './player';
 import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck } from './other';
 import HTTPError from 'http-errors';
 
@@ -769,6 +771,13 @@ app.post(
   }
 );
 
+app.post('/v1/player/join', (req: Request, res: Response) => {
+  const { sessionId, name } = req.body;
+
+  const response = playerJoin(sessionId, name);
+
+  return res.json(response);
+});
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================
