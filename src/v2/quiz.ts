@@ -983,8 +983,6 @@ function adminQuizQuestionDelete(
   return {};
 }
 
-
-
 /**
  * This function copies a quiz and starts a session for it
  *
