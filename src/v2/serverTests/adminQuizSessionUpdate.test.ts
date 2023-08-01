@@ -10,7 +10,8 @@ import {
   OK,
   UNAUTHORISED,
   FORBIDDEN,
-  INPUT_ERROR
+  INPUT_ERROR,
+  sleepSync
 } from '../helper';
 
 let result1: any;
@@ -36,13 +37,6 @@ const quizQuestion1Body = {
   ],
   thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
 };
-
-function sleepSync(ms: number) {
-  const startTime = new Date().getTime();
-  while (new Date().getTime() - startTime < ms) {
-    // zzzZZ
-  }
-}
 
 beforeEach(() => {
   deleteRequest('/v1/clear', {});

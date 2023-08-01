@@ -73,6 +73,16 @@ export enum ACTION {
   END = 'END',
   FINISH_COUNTDOWN = 'FINISH_COUNTDOWN'
 }
+interface QuestionBreakdown {
+  answerId: number;
+  playersCorrect: string[];
+}
+export interface QuestionResult {
+  questionId: number;
+  questionCorrectBreakDown: QuestionBreakdown[];
+  averageAnswerTime: number;
+  percentCorrect: number;
+}
 
 export interface Session {
   sessionId: number;
@@ -82,7 +92,7 @@ export interface Session {
   players: Player[];
   metadata: Quiz;
   // usersRankedByScore: PlayerScore[];
-  // questionResults: QuestionResult[];
+  questionResults: QuestionResult[];
 }
 
 export interface SessionId {
