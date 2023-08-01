@@ -65,7 +65,7 @@ describe('////////Testing v1/admin/quiz/{quizid}/question/update //////////', ()
   });
 
   describe('Testing /v1/admin/quiz/{quizid}/question/{questionid} success cases', () => {
-    test('Successful adminQuizCreate 1 quiz question update', () => {
+    test('Successful adminQuestionUpdate 1 quiz question update', () => {
       const quizQuestion3Body = {
         question: 'Who was the Monarch of England?',
         duration: 4,

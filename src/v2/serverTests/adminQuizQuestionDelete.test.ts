@@ -157,7 +157,7 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
                 correct: true,
               },
             ],
-            thumbnailUrl: quizQuestion2Body.thumbnailUrl,
+            thumbnailUrl: expect.any(String),
           },
         ],
         duration: 2,

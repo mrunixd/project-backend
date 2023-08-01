@@ -1,3 +1,8 @@
+import { setData, getData, DataStore } from './dataStore';
+import HTTPError from 'http-errors';
+import fs from 'fs';
+import path from 'path';
+
 /**
  * This function resets the state of the application back to the start
  *
@@ -6,9 +11,6 @@
  * @returns {}
  *
  */
-import { setData, getData, DataStore } from './dataStore';
-import HTTPError from 'http-errors';
-
 function clear() {
   const clearData: DataStore = {
     users: [],
@@ -19,6 +21,11 @@ function clear() {
     quizCounter: 0,
   };
   setData(clearData);
+  const imagesDirectory = path.join(__dirname, '../../images');
+  fs.readdirSync(imagesDirectory).forEach((file) => {
+    const filePath = path.join(imagesDirectory, file);
+    fs.unlinkSync(filePath);
+  });
   return {};
 }
 
@@ -51,4 +58,15 @@ function fullTokenCheck(token: string): number {
   }
   return userId;
 }
+
+// Function to clear all files in the 'images' directory
+// function clearImagesDirectory() {
+//   const imagesDirectory = path.join(__dirname, '../../images');
+
+//   fs.readdirSync(imagesDirectory).forEach((file) => {
+//     const filePath = path.join(imagesDirectory, file);
+//     fs.unlinkSync(filePath);
+//   });
+// }
+
 export { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck };
