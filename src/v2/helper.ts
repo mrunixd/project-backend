@@ -162,6 +162,11 @@ export function requestAdminQuizSessionStatus(token: string, quizId: string, ses
   return response;
 }
 
+export function requestAdminQuizSessionResults(token: string, quizId: string, sessionId: string) {
+  const response = getRequest(`/v1/admin/quiz/${quizId}/session/${sessionId}/results`, {}, { token });
+  return response;
+}
+
 export function requestPlayerJoin(sessionId: number, name: string) {
   const response = postRequest('/v1/player/join', { sessionId, name });
   return response;
@@ -170,4 +175,11 @@ export function requestPlayerJoin(sessionId: number, name: string) {
 export function requestPlayerStatus(playerId: number) {
   const response = getRequest(`/v1/player/${playerId}`, {}, {});
   return response;
+}
+
+export function sleepSync(ms: number) {
+  const startTime = new Date().getTime();
+  while (new Date().getTime() - startTime < ms) {
+    // zzzZZ
+  }
 }

@@ -1,4 +1,4 @@
-import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, STATE, ACTION } from './dataStore';
+import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, STATE, ACTION, QuestionResult } from './dataStore';
 import HTTPError from 'http-errors';
 import request from 'sync-request';
 import fs from 'fs';
@@ -67,24 +67,14 @@ interface sessionStatusReturn {
 }
 
 /// /
-// interface UserRank {
-//   name: string;
-//   score: number;
-// }
-// interface QuestionBreakdown {
-//   answerId: number;
-//   playersCorrect: string[];
-// }
-// interface QuestionResult {
-//   questionId: number;
-//   questionCorrectBreakDown: QuestionBreakdown[];
-//   averageAnswerTime: number;
-//   percentCorrect: number;
-// }
-// interface SessionResultsReturn {
-//   usersRankedByScore: UserRank[];
-//   questionResults: QuestionResult[];
-// }
+interface UserRank {
+  name: string;
+  score: number;
+}
+interface SessionResultsReturn {
+  usersRankedByScore: UserRank[];
+  questionResults: QuestionResult[];
+}
 /// /
 
 enum Colours {
@@ -1058,7 +1048,7 @@ function adminQuizSessionStart(
     players: [],
     metadata: currentQuiz,
     // usersRankedByScore: [],
-    // questionResults: []
+    questionResults: []
   });
   setData(data);
   return { sessionId: sessionId };
@@ -1088,7 +1078,11 @@ function changeState(sessionId: number, action: string): boolean {
   } else if (session.sessionState === 'QUESTION_OPEN') {
     if (action === 'GO_TO_ANSWER') { session.sessionState = STATE.ANSWER_SHOW; }
   } else if (session.sessionState === 'QUESTION_CLOSE') {
-    if (action === 'GO_TO_ANSWER') { session.sessionState = STATE.ANSWER_SHOW; } else if (action === 'GO_TO_FINAL_RESULTS') { session.sessionState = STATE.FINAL_RESULTS; } else if (action === 'NEXT_QUESTION') { session.sessionState = STATE.QUESTION_COUNTDOWN; }
+    if (action === 'GO_TO_ANSWER') {
+      session.sessionState = STATE.ANSWER_SHOW;
+    } else if (action === 'GO_TO_FINAL_RESULTS') {
+      session.sessionState = STATE.FINAL_RESULTS;
+    } else if (action === 'NEXT_QUESTION') { session.sessionState = STATE.QUESTION_COUNTDOWN; }
   } else if (session.sessionState === 'ANSWER_SHOW') {
     if (action === 'GO_TO_FINAL_RESULTS') { session.sessionState = STATE.FINAL_RESULTS; }
   }
@@ -1215,7 +1209,7 @@ function adminQuizSessionResults(
   authUserId: number,
   quizId: number,
   sessionId: number
-): number | ErrorObject {
+): SessionResultsReturn | ErrorObject {
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
@@ -1231,18 +1225,20 @@ function adminQuizSessionResults(
     throw HTTPError(400, { error: 'Session ID does not refer to a valid quiz' });
   } else if (currentSession.metadata.quizId !== quizId) {
     throw HTTPError(400, { error: 'Session ID isnt the same as quizId' });
-  } else if (currentSession.sessionState !== STATE.FINAL_RESULTS) {
+  } else if (currentSession.sessionState !== 'FINAL_RESULTS') {
     throw HTTPError(400, { error: 'Session is not in FINAL_RESULTS state' });
   }
-  return 1;
-  // return {
-  //   usersRankedByScore: {
 
-  //   },
-  //   questionResults: {
+  const userRank = currentSession.players.map((player) => {
+    const { name, score } = player;
+    return { name, score };
+  });
+  userRank.sort((a, b) => b.score - a.score);
 
-  //   }
-  // };
+  return {
+    usersRankedByScore: userRank,
+    questionResults: currentSession.questionResults
+  };
 }
 
 export {

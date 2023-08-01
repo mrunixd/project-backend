@@ -817,7 +817,7 @@ app.get(
   }
 );
 
-// ROUTE: adminQuizSessionStatus
+// ROUTE: adminQuizSessionResults
 app.get(
   '/v1/admin/quiz/:quizid/session/:sessionid/results',
   (req: Request, res: Response) => {
