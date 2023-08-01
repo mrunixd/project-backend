@@ -1036,8 +1036,8 @@ function adminQuizSessionStart(
     atQuestion: 0,
     players: [],
     metadata: currentQuiz,
-    usersRankedByScore: [],
-    questionResults: []
+    // usersRankedByScore: [],
+    // questionResults: []
   });
   setData(data);
   return { sessionId: sessionId };
