@@ -38,7 +38,7 @@ import {
   adminQuizSessionStatus
 } from './quiz';
 
-import { playerJoin } from './player';
+import { playerJoin, playerStatus } from './player';
 import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck } from './other';
 import HTTPError from 'http-errors';
 
@@ -812,6 +812,15 @@ app.get(
     return res.json(response);
   }
 );
+
+// ROUTE: playerStatus
+app.get('/v1/player/:playerid', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+
+  const response = playerStatus(playerId);
+
+  return res.json(response);
+});
 
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================

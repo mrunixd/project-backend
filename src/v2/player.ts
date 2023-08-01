@@ -17,9 +17,25 @@ function playerJoin(sessionId: number, name: string): {playerId: number} | Error
   } else {
     const player = { name: name, score: 0, playerId: session.usersRankedByScore.length + 1 };
     session.usersRankedByScore.push(player);
+    session.players.push({ name: name, playerId: session.usersRankedByScore.length });
+    session.players.sort((a, b) => a.name.localeCompare(b.name));
     setData(data);
-    return { playerId: session.usersRankedByScore.length };
+    return { playerId: session.players.length };
   }
+}
+
+function playerStatus(playerId: number) {
+  const data = getData();
+  const session = data.sessions.find(session => session.players.find(player => player.playerId === playerId));
+  if (session === undefined) {
+    throw HTTPError(400, { error: 'Player ID does not exit' });
+  }
+  const status = {
+    state: session.sessionState,
+    numQuestions: session.metadata.numQuestions,
+    atQuestion: session.atQuestion
+  };
+  return status;
 }
 
 function createName(): string {
@@ -42,4 +58,4 @@ function createName(): string {
 
   return name;
 }
-export { playerJoin };
+export { playerJoin, playerStatus };

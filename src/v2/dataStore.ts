@@ -67,6 +67,11 @@ interface QuestionResult {
   percentCorrect: number;
 }
 
+export interface Player {
+  name: string;
+  playerId: number;
+}
+
 export enum STATE {
   LOBBY = 'LOBBY',
   QUESTION_COUNTDOWN = 'QUESTION_COUNTDOWN',
@@ -90,7 +95,7 @@ export interface Session {
   autoStartNum: number;
   sessionState: STATE;
   atQuestion: number;
-  players: string[];
+  players: Player[];
   metadata: Quiz;
   usersRankedByScore: PlayerScore[];
   questionResults: QuestionResult[];

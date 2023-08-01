@@ -166,3 +166,8 @@ export function requestPlayerJoin(sessionId: number, name: string) {
   const response = postRequest('/v1/player/join', { sessionId, name });
   return response;
 }
+
+export function requestPlayerStatus(playerId: number) {
+  const response = getRequest(`/v1/player/${playerId}`, {}, {});
+  return response;
+}
