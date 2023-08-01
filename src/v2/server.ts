@@ -77,7 +77,9 @@ app.get('/echo', (req: Request, res: Response) => {
 
 // ROUTE: clear
 app.delete('/v1/clear', (req: Request, res: Response) => {
-  const response = clear(); return res.json(response);
+  const response = clear();
+  // clearImagesDirectory();
+  return res.json(response);
 });
 
 // ROUTE: adminAuthRegister
@@ -683,6 +685,16 @@ app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const token = req.headers.token.toString();
   const { questionBody } = req.body;
 
+  // if (!checkValidToken(token)) {
+  //   return res.status(401).json({ error: 'token has invalid structure' });
+  // }
+  // const userId = sessionIdtoUserId(token);
+  // if (userId === -1) {
+  //   return res.status(403).json({
+  //     error:
+  //       'Provided token is valid structure, but is not for a currently logged in session',
+  //   });
+  // }
   const userId = fullTokenCheck(token);
   const response = adminQuizQuestion(userId, quizId, questionBody);
   return res.json(response);

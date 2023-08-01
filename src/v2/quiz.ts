@@ -1,5 +1,11 @@
 import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, STATE, ACTION, Player } from './dataStore';
 import HTTPError from 'http-errors';
+import request from 'sync-request';
+import fs from 'fs';
+import path from 'path';
+import config from './config.json';
+
+const PORT: number = parseInt(process.env.PORT || config.port);
 
 // defining all magic numbers
 const MAXNAME = 30;
@@ -14,6 +20,7 @@ const MINPOINTS = 1;
 const MINANSWERLENGTH = 1;
 const MAXANSWERLENGTH = 30;
 const MAXDURATION = 180;
+let imageUrlOnServer: string;
 
 interface ErrorObject {
   error: string;
@@ -31,12 +38,12 @@ interface QuizList {
   quizzes: QuizIds[];
 }
 
-interface answerInput {
+export interface answerInput {
   answer: string;
   correct: boolean;
 }
 
-interface questionInput {
+export interface questionInput {
   question: string;
   duration: number;
   points: number;
@@ -44,11 +51,11 @@ interface questionInput {
   thumbnailUrl: string;
 }
 
-interface QuestionId {
+export interface QuestionId {
   questionId: number;
 }
 
-interface NewQuestionId {
+export interface NewQuestionId {
   newQuestionId: number;
 }
 
@@ -518,12 +525,30 @@ function adminQuizQuestion(
     });
   } else if (!questionBody.answers.some((answer) => answer.correct)) {
     throw HTTPError(400, { error: 'Question must have at least one correct answer' });
-  } else if (questionBody.thumbnailUrl === '') {
-    throw HTTPError(400, { error: 'The thumbnailUrl is an empty string' });
   }
-  /// /////////////////////////////////////////////////////////
-  /// /FINISH THE ERROR CHECKING ABOVE (should be 2 more) ////
-  /// /////////////////////////////////////////////////////////
+
+  if (questionBody.thumbnailUrl !== undefined) {
+    if (questionBody.thumbnailUrl === '') {
+      throw HTTPError(400, { error: 'ThumbnailUrl cannot be empty string' });
+    }
+
+    const res = request('GET', `${questionBody.thumbnailUrl}`);
+    const body = res.getBody();
+
+    // Check if the request was successful and the response is not empty
+    if (res.statusCode !== 200 || body.length === 0) {
+      throw HTTPError(400, { error: 'Invalid URL: The thumbnailUrl did not return a valid file.' });
+    }
+    const fileExtension = path.extname(questionBody.thumbnailUrl).toLowerCase();
+    if (fileExtension !== '.jpg' && fileExtension !== '.png' && fileExtension !== '.jpeg') {
+      throw HTTPError(400, { error: 'Invalid URL: The thumbnailUrl is not of type jpg or png' });
+    }
+
+    const fileName = `${Date.now()}${Math.random().toString(36).substring(7)}${fileExtension}`;
+    imageUrlOnServer = `http://localhost:${PORT}/images/${fileName}`;
+    const imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
+    fs.writeFileSync(imagesDirectoryPath, body, { flag: 'w' });
+  }
 
   // Create a new answer array: this generates a random colour based on a random index
   const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
@@ -550,11 +575,8 @@ function adminQuizQuestion(
     duration: questionBody.duration,
     points: questionBody.points,
     answers: newAnswers,
-    thumbnailUrl: questionBody.thumbnailUrl
+    thumbnailUrl: imageUrlOnServer
   };
-  /// /////////////////////////////////////////////////////////
-  /// /NEED TO SAVE THE THUMBNAILURL HERE INTO A FILE HERE ////
-  /// /////////////////////////////////////////////////////////
 
   data.unclaimedQuestionId++;
   currentQuiz.questions.push(newQuestion);
@@ -829,9 +851,40 @@ function adminQuizQuestionUpdate(
   } else if (!questionBody.answers.some((answer) => answer.correct)) {
     throw HTTPError(400, { error: 'Question must have at least one correct answer' });
   }
-  /// /////////////////////////////////////////////////////////
-  /// /FINISH THE ERROR CHECKING ABOVE (should be 3 more) ////
-  /// /////////////////////////////////////////////////////////
+
+  if (questionBody.thumbnailUrl !== undefined) {
+    if (questionBody.thumbnailUrl === '') {
+      throw HTTPError(400, { error: 'ThumbnailUrl cannot be empty string' });
+    }
+
+    const res = request('GET', `${questionBody.thumbnailUrl}`);
+    const body = res.getBody();
+
+    // Check if the request was successful and the response is not empty
+    if (res.statusCode !== 200 || body.length === 0) {
+      throw HTTPError(400, { error: 'Invalid URL: The thumbnailUrl did not return a valid file.' });
+    }
+    const fileExtension = path.extname(questionBody.thumbnailUrl).toLowerCase();
+    if (fileExtension !== '.jpg' && fileExtension !== '.png' && fileExtension !== '.jpeg') {
+      throw HTTPError(400, { error: 'Invalid URL: The thumbnailUrl is not of type jpg or png' });
+    }
+
+    let fileName = `${Date.now()}${Math.random().toString(36).substring(7)}${fileExtension}`;
+    let imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
+    fs.writeFileSync(imagesDirectoryPath, body, { flag: 'w' });
+    imageUrlOnServer = `http://localhost:${PORT}/imgurl/${fileName}`;
+
+    // Delete the old file
+    const urlParts = currentQuestion.thumbnailUrl.split('/');
+    fileName = urlParts[urlParts.length - 1];
+
+    // Construct the full path to the image file
+    imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
+
+    fs.unlinkSync(imagesDirectoryPath);
+
+    currentQuestion.thumbnailUrl = imageUrlOnServer;
+  }
 
   const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
     const numbers = [0, 1, 2, 3, 4, 5];
@@ -854,10 +907,6 @@ function adminQuizQuestionUpdate(
   currentQuestion.duration = questionBody.duration;
   currentQuestion.points = questionBody.points;
   currentQuestion.answers = newAnswers;
-  currentQuestion.thumbnailUrl = questionBody.thumbnailUrl;
-  /// /////////////////////////////////////////////////////////
-  // REMOVE THE OLD THUMBNAIL URL FROM FILE AND ADD NEW ONE ////
-  /// /////////////////////////////////////////////////////////
 
   // Update the timeLastEdited for the quiz and duration
   currentQuiz.duration = currentQuiz.questions.reduce(
@@ -904,6 +953,16 @@ function adminQuizQuestionDelete(
   } else if (currentQuestion === undefined) {
     throw HTTPError(400, { error: 'Question ID does not refer to a valid question in this quiz' });
   }
+
+  // if (currentQuestion.thumbnailUrl !== undefined) {
+  //   // Delete Thumbnail File
+  //   const urlParts = currentQuestion.thumbnailUrl.split('/');
+  //   const fileName = urlParts[urlParts.length - 1];
+
+  //   const imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
+
+  //   fs.unlinkSync(imagesDirectoryPath);
+  // }
 
   const indexQuestion = currentQuiz.questions.findIndex(
     (id) => id.questionId === questionId

@@ -112,7 +112,7 @@ describe('///////Testing /v2/admin/quiz/transfer////////', () => {
                 correct: true,
               },
             ],
-            thumbnailUrl: quizQuestion1Body.thumbnailUrl
+            thumbnailUrl: expect.any(String),
           },
         ],
         duration: 4,
@@ -173,7 +173,7 @@ describe('///////Testing /v2/admin/quiz/transfer////////', () => {
                 correct: true,
               },
             ],
-            thumbnailUrl: quizQuestion1Body.thumbnailUrl
+            thumbnailUrl: expect.any(String),
           },
           {
             questionId: quizQuestion3.body.newQuestionId,
@@ -194,7 +194,7 @@ describe('///////Testing /v2/admin/quiz/transfer////////', () => {
                 correct: true,
               },
             ],
-            thumbnailUrl: quizQuestion1Body.thumbnailUrl
+            thumbnailUrl: expect.any(String),
           },
           {
             questionId: quizQuestion2.body.questionId,
@@ -215,7 +215,7 @@ describe('///////Testing /v2/admin/quiz/transfer////////', () => {
                 correct: true,
               },
             ],
-            thumbnailUrl: quizQuestion2Body.thumbnailUrl
+            thumbnailUrl: expect.any(String),
           },
         ],
         duration: 10,
