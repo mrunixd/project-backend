@@ -6,6 +6,7 @@ import {
   requestAdminQuizSessionUpdate,
   requestAdminQuizSessionResults,
   requestPlayerJoin,
+  sleepSync,
   deleteRequest,
   OK,
   UNAUTHORISED,
@@ -54,6 +55,7 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid}/results ///
     requestPlayerJoin(session1.body.sessionId, 'Vincent Xian');
     requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
     requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'FINISH_COUNTDOWN');
+    sleepSync(quizQuestion1Body.duration * 1000 + 1000);
     requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'GO_TO_ANSWER');
     requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'GO_TO_FINAL_RESULTS');
   });
