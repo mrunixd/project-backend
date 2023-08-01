@@ -56,7 +56,7 @@ app.use(
   })
 );
 
-export const PORT: number = parseInt(process.env.PORT || config.port);
+const PORT: number = parseInt(process.env.PORT || config.port);
 const HOST: string = process.env.IP || 'localhost';
 
 // for logging errors (print to terminal)

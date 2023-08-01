@@ -3,6 +3,9 @@ import HTTPError from 'http-errors';
 import request from 'sync-request';
 import fs from 'fs';
 import path from 'path';
+import config from './config.json';
+
+const PORT: number = parseInt(process.env.PORT || config.port);
 
 // defining all magic numbers
 const MAXNAME = 30;
@@ -17,6 +20,7 @@ const MINPOINTS = 1;
 const MINANSWERLENGTH = 1;
 const MAXANSWERLENGTH = 30;
 const MAXDURATION = 180;
+let imageUrlOnServer: string;
 
 interface ErrorObject {
   error: string;
@@ -534,7 +538,7 @@ function adminQuizQuestion(
     }
 
     const fileName = `${Date.now()}${Math.random().toString(36).substring(7)}${fileExtension}`;
-    // const imageUrlOnServer = `http://localhost:${PORT}/imgurl/${fileName}`;
+    imageUrlOnServer = `http://localhost:${PORT}/images/${fileName}`;
     const imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
     fs.writeFileSync(imagesDirectoryPath, body, { flag: 'w' });
   }
@@ -564,11 +568,8 @@ function adminQuizQuestion(
     duration: questionBody.duration,
     points: questionBody.points,
     answers: newAnswers,
-    thumbnailUrl: questionBody.thumbnailUrl
+    thumbnailUrl: imageUrlOnServer
   };
-  /// /////////////////////////////////////////////////////////
-  /// /NEED TO SAVE THE THUMBNAILURL HERE INTO A FILE HERE ////
-  /// /////////////////////////////////////////////////////////
 
   data.unclaimedQuestionId++;
   currentQuiz.questions.push(newQuestion);
@@ -861,12 +862,21 @@ function adminQuizQuestionUpdate(
       throw new HTTPError(400, { error: 'Invalid URL: The thumbnailUrl is not of type jpg or png' });
     }
 
-    const fileName = `${Date.now()}${Math.random().toString(36).substring(7)}${fileExtension}`;
-    // const imageUrlOnServer = `http://localhost:${PORT}/imgurl/${fileName}`;
-    const imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
+    let fileName = `${Date.now()}${Math.random().toString(36).substring(7)}${fileExtension}`;
+    let imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
     fs.writeFileSync(imagesDirectoryPath, body, { flag: 'w' });
+    imageUrlOnServer = `http://localhost:${PORT}/imgurl/${fileName}`;
 
-    currentQuestion.thumbnailUrl = questionBody.thumbnailUrl;
+    // Delete the old file
+    const urlParts = currentQuestion.thumbnailUrl.split('/');
+    fileName = urlParts[urlParts.length - 1];
+
+    // Construct the full path to the image file
+    imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
+
+    fs.unlinkSync(imagesDirectoryPath);
+
+    currentQuestion.thumbnailUrl = imageUrlOnServer;
   }
 
   const newAnswers: Answer[] = questionBody.answers.map((answer, index) => {
@@ -890,10 +900,6 @@ function adminQuizQuestionUpdate(
   currentQuestion.duration = questionBody.duration;
   currentQuestion.points = questionBody.points;
   currentQuestion.answers = newAnswers;
-
-  /// /////////////////////////////////////////////////////////
-  // REMOVE THE OLD THUMBNAIL URL FROM FILE AND ADD NEW ONE ////
-  /// /////////////////////////////////////////////////////////
 
   // Update the timeLastEdited for the quiz and duration
   currentQuiz.duration = currentQuiz.questions.reduce(
@@ -939,6 +945,16 @@ function adminQuizQuestionDelete(
     throw HTTPError(400, { error: 'Quiz ID does not refer to a quiz that this user owns' });
   } else if (currentQuestion === undefined) {
     throw HTTPError(400, { error: 'Question ID does not refer to a valid question in this quiz' });
+  }
+
+  if (currentQuestion.thumbnailUrl !== undefined) {
+    // Delete Thumbnail File
+    const urlParts = currentQuestion.thumbnailUrl.split('/');
+    const fileName = urlParts[urlParts.length - 1];
+
+    const imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
+
+    fs.unlinkSync(imagesDirectoryPath);
   }
 
   const indexQuestion = currentQuiz.questions.findIndex(

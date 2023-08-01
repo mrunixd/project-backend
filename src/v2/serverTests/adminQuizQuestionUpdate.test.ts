@@ -125,7 +125,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
                 correct: true,
               },
             ],
-            thumbnailUrl: quizQuestion1Body.thumbnailUrl,
+            thumbnailUrl: expect.any(String),
           },
         ],
         duration: 4,
