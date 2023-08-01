@@ -983,6 +983,8 @@ function adminQuizQuestionDelete(
   return {};
 }
 
+
+
 /**
  * This function copies a quiz and starts a session for it
  *
@@ -1043,14 +1045,6 @@ function adminQuizSessionStart(
   return { sessionId: sessionId };
 }
 
-<<<<<<< HEAD
-/**
- * This function copies a quiz and starts a session for it
- *
- * @param {number} authUserId
- * @param {number} quizId
- * @param {number} autoStartNum
-=======
 // Changes state and then returns TRUE if succesful, or FALSE if unsuccessful
 function changeState(sessionId: number, action: string): boolean {
   const data = getData();
@@ -1094,72 +1088,27 @@ function changeState(sessionId: number, action: string): boolean {
  * @param {number} quizId
  * @param {number} sessionId
  * @param {string} action
->>>>>>> c029da4599904e3446a7b52a5ac8539828891d49
  *
  * @returns {SessionId}
  *
  */
-<<<<<<< HEAD
-function adminQuizThumbnailUpdate(
-  authUserId: number,
-  quizId: number,
-  autoStartNum: number
-): SessionId | ErrorObject {
-=======
 function adminQuizSessionUpdate(
   authUserId: number,
   quizId: number,
   sessionId: number,
   action: string
 ): Record<string, never> | ErrorObject {
->>>>>>> c029da4599904e3446a7b52a5ac8539828891d49
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
-<<<<<<< HEAD
-  const nonEndedQuizzes = data.sessions.map((session) => session.sessionState !== SessionState.END);
-=======
   const currentSession = data.sessions.find((session) => session.sessionId === sessionId);
->>>>>>> c029da4599904e3446a7b52a5ac8539828891d49
 
   // Error-checking block
   if (currentQuiz === undefined) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
   } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a quiz that this user owns' });
-<<<<<<< HEAD
-  } else if (autoStartNum > 50) {
-    throw HTTPError(400, { error: 'autoStartNum is a number greater than 50' });
-  } else if (nonEndedQuizzes.length > 10) {
-    throw HTTPError(400, { error: 'A maximum of 10 sessions that are not in END state currently exist' });
-  } else if (currentQuiz.numQuestions <= 0) {
-    throw HTTPError(400, { error: 'The quiz does not have any questions in it' });
-  }
-
-  // Generates a unique 5 digit number for the new sessionId
-  let uniqueNumberFlag = false;
-  let sessionId = (Math.floor(Math.random() * 90000) + 10000);
-  while (uniqueNumberFlag === false) {
-    // If the generated sessionId already exists, generate a new one
-    if (data.sessions.some((session) => session.sessionId === sessionId)) {
-      sessionId = (Math.floor(Math.random() * 90000) + 10000);
-    } else {
-      uniqueNumberFlag = true;
-    }
-  }
-
-  data.sessions.push({
-    usersRankedByScore: [],
-    questionResults: [],
-    sessionState: SessionState.LOBBY,
-    sessionId: sessionId
-  });
-  setData(data);
-  return { sessionId: sessionId };
-}
-
-=======
   } else if (currentSession === undefined) {
     throw HTTPError(400, { error: 'Session ID does not refer to a valid quiz' });
   } else if (currentSession.metadata.quizId !== quizId) {
@@ -1230,7 +1179,6 @@ function adminQuizSessionStatus(
     metadata: currentSession.metadata
   };
 }
->>>>>>> c029da4599904e3446a7b52a5ac8539828891d49
 
 export {
   adminQuizCreate,
