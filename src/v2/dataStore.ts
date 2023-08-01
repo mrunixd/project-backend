@@ -64,7 +64,7 @@ interface QuestionResult {
   questionId: number;
   questionCorrectBreakDown: QuestionBreakdown[];
   averageAnswerTime: number;
-  percentCorrect: number; 
+  percentCorrect: number;
 }
 
 export interface Player {

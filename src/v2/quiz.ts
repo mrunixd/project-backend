@@ -1,4 +1,4 @@
-import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, STATE, ACTION,  Player } from './dataStore';
+import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, STATE, ACTION, Player } from './dataStore';
 import HTTPError from 'http-errors';
 
 // defining all magic numbers
