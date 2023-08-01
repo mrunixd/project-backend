@@ -23,7 +23,7 @@ let session1: any;
 let info1: any;
 const quizQuestion1Body = {
   question: 'Who is the Monarch of England?',
-  duration: 1,
+  duration: 0.1,
   points: 5,
   answers: [
     {
