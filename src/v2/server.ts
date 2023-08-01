@@ -685,16 +685,6 @@ app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const token = req.headers.token.toString();
   const { questionBody } = req.body;
 
-  // if (!checkValidToken(token)) {
-  //   return res.status(401).json({ error: 'token has invalid structure' });
-  // }
-  // const userId = sessionIdtoUserId(token);
-  // if (userId === -1) {
-  //   return res.status(403).json({
-  //     error:
-  //       'Provided token is valid structure, but is not for a currently logged in session',
-  //   });
-  // }
   const userId = fullTokenCheck(token);
   const response = adminQuizQuestion(userId, quizId, questionBody);
   return res.json(response);
@@ -831,6 +821,17 @@ app.get('/v1/player/:playerid', (req: Request, res: Response) => {
 
   const response = playerStatus(playerId);
 
+  return res.json(response);
+});
+
+// ROUTE: adminQuizThumbnailUpdate
+app.put('/v2/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const token = req.headers.token.toString();
+  const { imgUrl } = req.body;
+
+  const userId = fullTokenCheck(token);
+  const response = adminQuizThumbnailUpdate(userId, quizId, imgUrl);
   return res.json(response);
 });
 
