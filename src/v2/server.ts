@@ -773,15 +773,6 @@ app.post(
   }
 );
 
-// ROUTE: playerJoin
-app.post('/v1/player/join', (req: Request, res: Response) => {
-  const { sessionId, name } = req.body;
-
-  const response = playerJoin(sessionId, name);
-
-  return res.json(response);
-});
-
 // ROUTE: adminQuizSessionUpdate
 app.put(
   '/v1/admin/quiz/:quizid/session/:sessionid',
@@ -812,6 +803,15 @@ app.get(
     return res.json(response);
   }
 );
+
+// ROUTE: playerJoin
+app.post('/v1/player/join', (req: Request, res: Response) => {
+  const { sessionId, name } = req.body;
+
+  const response = playerJoin(sessionId, name);
+
+  return res.json(response);
+});
 
 // ROUTE: playerStatus
 app.get('/v1/player/:playerid', (req: Request, res: Response) => {

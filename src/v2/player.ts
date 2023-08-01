@@ -12,16 +12,16 @@ function playerJoin(sessionId: number, name: string): {playerId: number} | Error
     throw HTTPError(400, { error: 'SessionId does not exist' });
   } else if (session?.sessionState !== STATE.LOBBY) {
     throw HTTPError(400, { error: 'Session has already started' });
-  } else if (session.usersRankedByScore.find(user => user.name === name)) {
+  } else if (session.players.find(user => user.name === name)) {
     throw HTTPError(400, { error: 'Name is already in use' });
-  } else {
-    const player = { name: name, score: 0, playerId: session.usersRankedByScore.length + 1 };
-    session.usersRankedByScore.push(player);
-    session.players.push({ name: name, playerId: session.usersRankedByScore.length });
-    session.players.sort((a, b) => a.name.localeCompare(b.name));
-    setData(data);
-    return { playerId: session.players.length };
   }
+
+  const player = { name: name, score: 0, playerId: session.players.length + 1 };
+  session.players.push(player);
+  // session.players.push({ name: name, playerId: session.usersRankedByScore.length });
+  session.players.sort((a, b) => a.name.localeCompare(b.name));
+  setData(data);
+  return { playerId: session.players.length };
 }
 
 function playerStatus(playerId: number) {

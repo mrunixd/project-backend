@@ -55,7 +55,7 @@ interface NewQuestionId {
 interface sessionStatusReturn {
   state: STATE;
   atQuestion: number;
-  players: Player[];
+  players: string[];
   metadata: Quiz;
 }
 
@@ -1111,10 +1111,13 @@ function adminQuizSessionStatus(
     throw HTTPError(400, { error: 'Session ID isnt the same as quizId' });
   }
 
+  const userNames = currentSession.players.map((player) => player.name);
+  userNames.sort((a, b) => a.localeCompare(b));
+
   return {
     state: currentSession.sessionState,
     atQuestion: currentSession.atQuestion,
-    players: currentSession.players,
+    players: userNames,
     metadata: currentSession.metadata
   };
 }
