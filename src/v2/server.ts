@@ -35,7 +35,8 @@ import {
   adminQuizQuestionDelete,
   adminQuizSessionStart,
   adminQuizSessionUpdate,
-  adminQuizSessionStatus
+  adminQuizSessionStatus,
+  adminQuizSessionResults
 } from './quiz';
 
 import { playerJoin, playerStatus } from './player';
@@ -811,6 +812,21 @@ app.get(
 
     const userId = fullTokenCheck(token);
     const response = adminQuizSessionStatus(userId, quizId, sessionId);
+
+    return res.json(response);
+  }
+);
+
+// ROUTE: adminQuizSessionStatus
+app.get(
+  '/v1/admin/quiz/:quizid/session/:sessionid/results',
+  (req: Request, res: Response) => {
+    const quizId = parseInt(req.params.quizid);
+    const sessionId = parseInt(req.params.sessionid);
+    const token = req.headers.token.toString();
+
+    const userId = fullTokenCheck(token);
+    const response = adminQuizSessionResults(userId, quizId, sessionId);
 
     return res.json(response);
   }

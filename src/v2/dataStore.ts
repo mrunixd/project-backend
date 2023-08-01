@@ -50,28 +50,11 @@ export interface Token {
   authUserId: number;
 }
 
-// interface PlayerScore {
-//   name: string;
-//   score: number;
-//   playerId: number;
-// }
-
 export interface Player {
   name: string;
   playerId: number;
   score: number;
 }
-
-// interface QuestionBreakdown {
-//   answerId: number;
-//   playersCorrect: string[];
-// }
-// interface QuestionResult {
-//   questionId: number;
-//   questionCorrectBreakDown: QuestionBreakdown[];
-//   averageAnswerTime: number;
-//   percentCorrect: number;
-// }
 
 export enum STATE {
   LOBBY = 'LOBBY',
