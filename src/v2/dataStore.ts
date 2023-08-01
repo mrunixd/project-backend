@@ -53,6 +53,7 @@ export interface Token {
 interface PlayerScore {
   name: string;
   score: number;
+  playerId: number;
 }
 
 interface QuestionBreakdown {
@@ -66,21 +67,38 @@ interface QuestionResult {
   percentCorrect: number;
 }
 
-export enum SessionState {
-  LOBBY = 'lobby',
-  QUESTION_COUNTDOWN = 'question_countdown',
-  QUESTION_OPEN = 'question_open',
-  QUESTION_CLOSE = 'question_close',
-  ANSWER_SHOW = 'answer_show',
-  FINAL_RESULTS = 'final_results',
-  END = 'end'
+export interface Player {
+  name: string;
+  playerId: number;
+}
+
+export enum STATE {
+  LOBBY = 'LOBBY',
+  QUESTION_COUNTDOWN = 'QUESTION_COUNTDOWN',
+  QUESTION_OPEN = 'QUESTION_OPEN',
+  QUESTION_CLOSE = 'QUESTION_CLOSE',
+  ANSWER_SHOW = 'ANSWER_SHOW',
+  FINAL_RESULTS = 'FINAL_RESULTS',
+  END = 'END'
+}
+
+export enum ACTION {
+  NEXT_QUESTION = 'NEXT_QUESTION',
+  GO_TO_ANSWER = 'GO_TO_ANSWER',
+  GO_TO_FINAL_RESULTS = 'GO_TO_FINAL_RESULTS',
+  END = 'END',
+  FINISH_COUNTDOWN = 'FINISH_COUNTDOWN'
 }
 
 export interface Session {
+  sessionId: number;
+  autoStartNum: number;
+  sessionState: STATE;
+  atQuestion: number;
+  players: Player[];
+  metadata: Quiz;
   usersRankedByScore: PlayerScore[];
   questionResults: QuestionResult[];
-  sessionState: SessionState;
-  sessionId: number;
 }
 
 export interface SessionId {

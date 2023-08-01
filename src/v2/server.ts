@@ -33,9 +33,12 @@ import {
   adminQuizTrashEmpty,
   adminQuizQuestionUpdate,
   adminQuizQuestionDelete,
-  adminQuizSessionStart
+  adminQuizSessionStart,
+  adminQuizSessionUpdate,
+  adminQuizSessionStatus
 } from './quiz';
 
+import { playerJoin, playerStatus } from './player';
 import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck } from './other';
 import HTTPError from 'http-errors';
 
@@ -781,6 +784,55 @@ app.post(
     return res.json(response);
   }
 );
+
+// ROUTE: playerJoin
+app.post('/v1/player/join', (req: Request, res: Response) => {
+  const { sessionId, name } = req.body;
+
+  const response = playerJoin(sessionId, name);
+
+  return res.json(response);
+});
+
+// ROUTE: adminQuizSessionUpdate
+app.put(
+  '/v1/admin/quiz/:quizid/session/:sessionid',
+  (req: Request, res: Response) => {
+    const quizId = parseInt(req.params.quizid);
+    const sessionId = parseInt(req.params.sessionid);
+    const token = req.headers.token.toString();
+    const { action } = req.body;
+
+    const userId = fullTokenCheck(token);
+    const response = adminQuizSessionUpdate(userId, quizId, sessionId, action.toString());
+
+    return res.json(response);
+  }
+);
+
+// ROUTE: adminQuizSessionStatus
+app.get(
+  '/v1/admin/quiz/:quizid/session/:sessionid',
+  (req: Request, res: Response) => {
+    const quizId = parseInt(req.params.quizid);
+    const sessionId = parseInt(req.params.sessionid);
+    const token = req.headers.token.toString();
+
+    const userId = fullTokenCheck(token);
+    const response = adminQuizSessionStatus(userId, quizId, sessionId);
+
+    return res.json(response);
+  }
+);
+
+// ROUTE: playerStatus
+app.get('/v1/player/:playerid', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+
+  const response = playerStatus(playerId);
+
+  return res.json(response);
+});
 
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================

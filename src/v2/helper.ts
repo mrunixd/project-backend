@@ -151,3 +151,23 @@ export function requestAdminQuizSessionStart(token: string, quizId: string, auto
   const response = postRequest(`/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
   return response;
 }
+
+export function requestAdminQuizSessionUpdate(token: string, quizId: string, sessionId: string, action: string) {
+  const response = putRequest(`/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
+  return response;
+}
+
+export function requestAdminQuizSessionStatus(token: string, quizId: string, sessionId: string) {
+  const response = getRequest(`/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
+  return response;
+}
+
+export function requestPlayerJoin(sessionId: number, name: string) {
+  const response = postRequest('/v1/player/join', { sessionId, name });
+  return response;
+}
+
+export function requestPlayerStatus(playerId: number) {
+  const response = getRequest(`/v1/player/${playerId}`, {}, {});
+  return response;
+}
