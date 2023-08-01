@@ -1,4 +1,4 @@
-import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, STATE, ACTION } from './dataStore';
+import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, STATE, ACTION,  Player } from './dataStore';
 import HTTPError from 'http-errors';
 
 // defining all magic numbers
@@ -55,7 +55,7 @@ interface NewQuestionId {
 interface sessionStatusReturn {
   state: STATE;
   atQuestion: number;
-  players: string[];
+  players: Player[];
   metadata: Quiz;
 }
 
