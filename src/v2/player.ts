@@ -78,7 +78,7 @@ function playerSendMessage(playerId: number, message: string): Record<string, ne
   session.messages.push({
     messageBody: message,
     playerId: playerId,
-    playerName: `${player.name}`,
+    name: `${player.name}`,
     timeSent: Math.floor(Date.now() / 1000)
   });
 
