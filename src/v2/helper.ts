@@ -208,3 +208,4 @@ export function requestAdminQuizSessionResultsCSV(token: string, quizId: string,
   const response = getRequest(`/v1/admin/quiz/${quizId}/session/${sessionId}/results/csv`, {}, { token });
   return response;
 }
+

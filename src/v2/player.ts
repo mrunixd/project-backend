@@ -132,7 +132,7 @@ function playerResults(playerId: number): SessionResultsReturn | ErrorObject {
 }
 
 /**
- * Given a playerId, allows a player to send a message to the session chatroom.
+ * Given a playerId, allows a player to send a message to the session chatroom. 
  *
  * @param {number} playerId
  * @param {string} message
