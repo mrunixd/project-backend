@@ -1,4 +1,4 @@
-import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, STATE, ACTION, Player } from './dataStore';
+import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, STATE, ACTION, QuestionResult } from './dataStore';
 import HTTPError from 'http-errors';
 import request from 'sync-request';
 import fs from 'fs';
@@ -62,9 +62,20 @@ export interface NewQuestionId {
 interface sessionStatusReturn {
   state: STATE;
   atQuestion: number;
-  players: Player[];
+  players: string[];
   metadata: Quiz;
 }
+
+/// /
+interface UserRank {
+  name: string;
+  score: number;
+}
+interface SessionResultsReturn {
+  usersRankedByScore: UserRank[];
+  questionResults: QuestionResult[];
+}
+/// /
 
 enum Colours {
   red = 'red',
@@ -1036,7 +1047,7 @@ function adminQuizSessionStart(
     atQuestion: 0,
     players: [],
     metadata: currentQuiz,
-    usersRankedByScore: [],
+    // usersRankedByScore: [],
     questionResults: []
   });
   setData(data);
@@ -1067,7 +1078,11 @@ function changeState(sessionId: number, action: string): boolean {
   } else if (session.sessionState === 'QUESTION_OPEN') {
     if (action === 'GO_TO_ANSWER') { session.sessionState = STATE.ANSWER_SHOW; }
   } else if (session.sessionState === 'QUESTION_CLOSE') {
-    if (action === 'GO_TO_ANSWER') { session.sessionState = STATE.ANSWER_SHOW; } else if (action === 'GO_TO_FINAL_RESULTS') { session.sessionState = STATE.FINAL_RESULTS; } else if (action === 'NEXT_QUESTION') { session.sessionState = STATE.QUESTION_COUNTDOWN; }
+    if (action === 'GO_TO_ANSWER') {
+      session.sessionState = STATE.ANSWER_SHOW;
+    } else if (action === 'GO_TO_FINAL_RESULTS') {
+      session.sessionState = STATE.FINAL_RESULTS;
+    } else if (action === 'NEXT_QUESTION') { session.sessionState = STATE.QUESTION_COUNTDOWN; }
   } else if (session.sessionState === 'ANSWER_SHOW') {
     if (action === 'GO_TO_FINAL_RESULTS') { session.sessionState = STATE.FINAL_RESULTS; }
   }
@@ -1138,14 +1153,13 @@ function adminQuizSessionUpdate(
 }
 
 /**
- * This function copies a quiz and starts a session for it
+ * This function retrieves the status and info for a current session
  *
  * @param {number} authUserId
  * @param {number} quizId
  * @param {number} sessionId
- * @param {string} action
  *
- * @returns {SessionId}
+ * @returns {sessionStatusReturn}
  *
  */
 function adminQuizSessionStatus(
@@ -1170,16 +1184,19 @@ function adminQuizSessionStatus(
     throw HTTPError(400, { error: 'Session ID isnt the same as quizId' });
   }
 
+  const userNames = currentSession.players.map((player) => player.name);
+  userNames.sort((a, b) => a.localeCompare(b));
+
   return {
     state: currentSession.sessionState,
     atQuestion: currentSession.atQuestion,
-    players: currentSession.players,
+    players: userNames,
     metadata: currentSession.metadata
   };
 }
 
 /**
- * This function updates the thumbnail of a
+ * This function updates the thumbnail of a quiz
  *
  * @param {number} authUserId
  * @param {number} quizId
@@ -1240,6 +1257,52 @@ function adminQuizThumbnailUpdate(
   return {};
 }
 
+/**
+ * This function retrieves the final results for a session
+ *
+ * @param {number} authUserId
+ * @param {number} quizId
+ * @param {number} sessionId
+ *
+ * @returns {SessionResultsReturn}
+ *
+ */
+function adminQuizSessionResults(
+  authUserId: number,
+  quizId: number,
+  sessionId: number
+): SessionResultsReturn | ErrorObject {
+  const data = getData();
+
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
+  const currentSession = data.sessions.find((session) => session.sessionId === sessionId);
+
+  // Error-checking block
+  if (currentQuiz === undefined) {
+    throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
+  } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
+    throw HTTPError(400, { error: 'Quiz ID does not refer to a quiz that this user owns' });
+  } else if (currentSession === undefined) {
+    throw HTTPError(400, { error: 'Session ID does not refer to a valid quiz' });
+  } else if (currentSession.metadata.quizId !== quizId) {
+    throw HTTPError(400, { error: 'Session ID isnt the same as quizId' });
+  } else if (currentSession.sessionState !== 'FINAL_RESULTS') {
+    throw HTTPError(400, { error: 'Session is not in FINAL_RESULTS state' });
+  }
+
+  const userRank = currentSession.players.map((player) => {
+    const { name, score } = player;
+    return { name, score };
+  });
+  userRank.sort((a, b) => b.score - a.score);
+
+  return {
+    usersRankedByScore: userRank,
+    questionResults: currentSession.questionResults
+  };
+}
+
 export {
   adminQuizCreate,
   adminQuizList,
@@ -1259,5 +1322,6 @@ export {
   adminQuizSessionStart,
   adminQuizSessionUpdate,
   adminQuizSessionStatus,
-  adminQuizThumbnailUpdate
+  adminQuizThumbnailUpdate,
+  adminQuizSessionResults
 };

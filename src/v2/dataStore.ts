@@ -50,26 +50,10 @@ export interface Token {
   authUserId: number;
 }
 
-interface PlayerScore {
-  name: string;
-  score: number;
-  playerId: number;
-}
-
-interface QuestionBreakdown {
-  answerId: number;
-  playersCorrect: string[];
-}
-interface QuestionResult {
-  questionId: number;
-  questionCorrectBreakDown: QuestionBreakdown[];
-  averageAnswerTime: number;
-  percentCorrect: number;
-}
-
 export interface Player {
   name: string;
   playerId: number;
+  score: number;
 }
 
 export enum STATE {
@@ -89,6 +73,16 @@ export enum ACTION {
   END = 'END',
   FINISH_COUNTDOWN = 'FINISH_COUNTDOWN'
 }
+interface QuestionBreakdown {
+  answerId: number;
+  playersCorrect: string[];
+}
+export interface QuestionResult {
+  questionId: number;
+  questionCorrectBreakDown: QuestionBreakdown[];
+  averageAnswerTime: number;
+  percentCorrect: number;
+}
 
 export interface Session {
   sessionId: number;
@@ -97,7 +91,7 @@ export interface Session {
   atQuestion: number;
   players: Player[];
   metadata: Quiz;
-  usersRankedByScore: PlayerScore[];
+  // usersRankedByScore: PlayerScore[];
   questionResults: QuestionResult[];
 }
 
