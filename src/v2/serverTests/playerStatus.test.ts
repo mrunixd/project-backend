@@ -12,6 +12,7 @@ import {
 
 let result1: any;
 let result2: any;
+let result3: any;
 let person1: any;
 let quiz1: any;
 let sessionId: any;
@@ -21,6 +22,7 @@ beforeEach(() => {
   result1 = undefined;
   result2 = undefined;
   person1 = undefined;
+  result3 = undefined;
   quiz1 = undefined;
 });
 
@@ -76,6 +78,24 @@ describe('////////TESTING v1/player/:playerid////////', () => {
         atQuestion: expect.any(Number)
       });
       expect(result2.status).toBe(OK);
+    });
+    test('Testing player status of two player session', () => {
+      result1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
+      result2 = requestPlayerJoin(sessionId.body.sessionId, 'Aarnav Sheth');
+      result3 = requestPlayerStatus(result1.body.playerId);
+      result1 = requestPlayerStatus(result2.body.playerId);
+      expect(result1.body).toStrictEqual({
+        state: 'LOBBY',
+        numQuestions: expect.any(Number),
+        atQuestion: expect.any(Number)
+      });
+      expect(result3.body).toStrictEqual({
+        state: 'LOBBY',
+        numQuestions: expect.any(Number),
+        atQuestion: expect.any(Number)
+      });
+      expect(result1.status).toStrictEqual(OK);
+      expect(result3.status).toStrictEqual(OK);
     });
   });
   describe('Testing v1/player/:playerid error cases', () => {
