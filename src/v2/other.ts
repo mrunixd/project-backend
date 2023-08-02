@@ -1,4 +1,4 @@
-import { setData, getData, DataStore } from './dataStore';
+import { setData, getData, DataStore, getSession, setSession, SessionDataStore } from './dataStore';
 import HTTPError from 'http-errors';
 import fs from 'fs';
 import path from 'path';
@@ -12,15 +12,27 @@ import path from 'path';
  *
  */
 function clear() {
+  const sessionData = getSession();
+
+  if (sessionData.timers.length !== 0) {
+    for (const timer of sessionData.timers) {
+      clearTimeout(timer.timeoutId);
+    }
+  }
+  const newSessionData: SessionDataStore = {
+    sessions: [],
+    timers: []
+  };
+
   const clearData: DataStore = {
     users: [],
     quizzes: [],
     tokens: [],
-    sessions: [],
     unclaimedQuestionId: 0,
     quizCounter: 0,
   };
   setData(clearData);
+  setSession(newSessionData);
   const imagesDirectory = path.join(__dirname, '../../images');
   fs.readdirSync(imagesDirectory).forEach((file) => {
     const filePath = path.join(imagesDirectory, file);
@@ -61,15 +73,5 @@ function fullTokenCheck(token: string): number {
   }
   return userId;
 }
-
-// Function to clear all files in the 'images' directory
-// function clearImagesDirectory() {
-//   const imagesDirectory = path.join(__dirname, '../../images');
-
-//   fs.readdirSync(imagesDirectory).forEach((file) => {
-//     const filePath = path.join(imagesDirectory, file);
-//     fs.unlinkSync(filePath);
-//   });
-// }
 
 export { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck };

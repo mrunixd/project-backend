@@ -87,7 +87,7 @@ export interface QuestionResult {
 export interface Session {
   sessionId: number;
   autoStartNum: number;
-  sessionState: STATE;
+  state: string; // /?????
   atQuestion: number;
   players: Player[];
   metadata: Quiz;
@@ -99,17 +99,40 @@ export interface SessionId {
   sessionId: number;
 }
 
+interface TimeOut {
+  timeoutId: any;
+  sessionId: number;
+}
+
 export interface DataStore {
   users: User[];
   quizzes: Quiz[];
   tokens: Token[];
-  sessions: Session[];
+  // sessions: Session[];
   unclaimedQuestionId: number;
   quizCounter: number;
 }
 
 export interface ErrorObject {
   error: string;
+}
+
+export interface SessionDataStore {
+  sessions: Session[];
+  timers: TimeOut[];
+}
+
+let sessionData: SessionDataStore = {
+  sessions: [],
+  timers: []
+};
+
+export function getSession(): SessionDataStore {
+  return sessionData;
+}
+
+export function setSession(newSessions: SessionDataStore) {
+  sessionData = newSessions;
 }
 
 function setData(data: DataStore) {

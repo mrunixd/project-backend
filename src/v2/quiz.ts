@@ -1,4 +1,4 @@
-import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, STATE, ACTION, QuestionResult } from './dataStore';
+import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, STATE, ACTION, QuestionResult, getSession, setSession } from './dataStore';
 import HTTPError from 'http-errors';
 import request from 'sync-request';
 import fs from 'fs';
@@ -60,7 +60,7 @@ export interface NewQuestionId {
 }
 
 interface sessionStatusReturn {
-  state: STATE;
+  state: string;
   atQuestion: number;
   players: string[];
   metadata: Quiz;
@@ -1010,10 +1010,11 @@ function adminQuizSessionStart(
   autoStartNum: number
 ): SessionId | ErrorObject {
   const data = getData();
+  const sessionData = getSession();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
-  const nonEndedQuizzes = data.sessions.map((session) => session.sessionState !== STATE.END);
+  const nonEndedQuizzes = sessionData.sessions.map((session) => session.state !== STATE.END);
 
   // Error-checking block
   if (currentQuiz === undefined) {
@@ -1033,65 +1034,105 @@ function adminQuizSessionStart(
   let sessionId = (Math.floor(Math.random() * 90000) + 10000);
   while (uniqueNumberFlag === false) {
     // If the generated sessionId already exists, generate a new one
-    if (data.sessions.some((session) => session.sessionId === sessionId)) {
+    if (sessionData.sessions.some((session) => session.sessionId === sessionId)) {
       sessionId = (Math.floor(Math.random() * 90000) + 10000);
     } else {
       uniqueNumberFlag = true;
     }
   }
 
-  data.sessions.push({
+  sessionData.sessions.push({
     sessionId: sessionId,
     autoStartNum: autoStartNum,
-    sessionState: STATE.LOBBY,
+    state: 'LOBBY',
     atQuestion: 0,
     players: [],
     metadata: currentQuiz,
     // usersRankedByScore: [],
     questionResults: []
   });
-  setData(data);
+  setSession(sessionData);
   return { sessionId: sessionId };
 }
 
-// Changes state and then returns TRUE if succesful, or FALSE if unsuccessful
-function changeState(sessionId: number, action: string): boolean {
-  const data = getData();
-  const session = data.sessions.find((session) => session.sessionId === sessionId);
-  const initialState = session.sessionState;
+function validState(sessionId: number, action: string): boolean {
+  const sessionData = getSession();
 
-  if (session.sessionState === 'END') {
+  const session = sessionData.sessions.find((session) => session.sessionId === sessionId);
+  if (session.state === 'END') {
     return false;
   } else if (action === 'END') {
-    session.sessionState = STATE.END;
-  } else if (session.sessionState === 'LOBBY') {
-    if (action === 'NEXT_QUESTION') { session.sessionState = STATE.QUESTION_COUNTDOWN; }
-  } else if (session.sessionState === 'QUESTION_COUNTDOWN') {
-    if (action === 'FINISH_COUNTDOWN') {
-      session.sessionState = STATE.QUESTION_OPEN;
-      session.atQuestion++;
-      setTimeout(() => {
-        session.sessionState = STATE.QUESTION_CLOSE;
-        setData(data);
-      }, session.metadata.duration * 1000);
-    }
-  } else if (session.sessionState === 'QUESTION_OPEN') {
-    if (action === 'GO_TO_ANSWER') { session.sessionState = STATE.ANSWER_SHOW; }
-  } else if (session.sessionState === 'QUESTION_CLOSE') {
-    if (action === 'GO_TO_ANSWER') {
-      session.sessionState = STATE.ANSWER_SHOW;
-    } else if (action === 'GO_TO_FINAL_RESULTS') {
-      session.sessionState = STATE.FINAL_RESULTS;
-    } else if (action === 'NEXT_QUESTION') { session.sessionState = STATE.QUESTION_COUNTDOWN; }
-  } else if (session.sessionState === 'ANSWER_SHOW') {
-    if (action === 'GO_TO_FINAL_RESULTS') { session.sessionState = STATE.FINAL_RESULTS; }
+    return true;
+  } else if (session.state === 'LOBBY' && action === 'NEXT_QUESTION') {
+    return true;
+  } else if (session.state === 'QUESTION_COUNTDOWN' && action === 'FINISH_COUNTDOWN') {
+    return true;
+  } else if (session.state === 'QUESTION_OPEN' && action === 'GO_TO_ANSWER') {
+    return true;
+  } else if (session.state === 'QUESTION_CLOSE' && (action === 'GO_TO_ANSWER' || action === 'GO_TO_FINAL_RESULTS' || action === 'NEXT_QUESTION')) {
+    return true;
+  } else if (session.state === 'ANSWER_SHOW' && (action === 'GO_TO_FINAL_RESULTS' || action === 'NEXT_QUESTION')) {
+    return true;
   }
-  // only actions FINAL_RESULTS can do is go to END
-  setData(data);
-  if (session.sessionState === initialState) {
-    return false;
+  return false;
+}
+
+// Changes state and then returns TRUE if succesful, or FALSE if unsuccessful
+function performAction(action: string, state?: string, sessionId?: number): string | undefined {
+  if (state === 'QUESTION_COUNTDOWN' || state === 'QUESTION_OPEN') {
+    const sessionData = getSession();
+    const timeoutIndex = sessionData.timers.findIndex((timeout) => timeout.sessionId === sessionId);
+    clearTimeout(sessionData.timers[timeoutIndex].timeoutId);
+    sessionData.timers.splice(timeoutIndex, 1);
+    setSession(sessionData);
   }
-  return true;
+  if (action === 'END') {
+    return 'END';
+  } else if (action === 'NEXT_QUESTION') {
+    return 'QUESTION_COUNTDOWN';
+  } else if (action === 'FINISH_COUNTDOWN') {
+    return 'QUESTION_OPEN';
+  } else if (action === 'FINISH_DURATION') {
+    return 'QUESTION_CLOSE';
+  } else if (action === 'GO_TO_ANSWER') {
+    return 'ANSWER_SHOW';
+  } else if (action === 'GO_TO_FINAL_RESULTS') {
+    return 'FINAL_RESULTS';
+  }
+}
+
+function createTimeout(sessionId: number) {
+  const COUNTDOWN = 0.1;
+  const sessionData = getSession();
+  const session = sessionData.sessions.find((session) => session.sessionId === sessionId);
+
+  const timers = sessionData.timers;
+  // session.atQuestion++;
+  const countdownTimeout = setTimeout(() => {
+    // session.state = performAction('FINISH_COUNTDOWN');
+
+    session.state = 'QUESTION_OPEN';
+    setSession(sessionData);
+    const timeoutIndex = timers.findIndex((timeout) => timeout.sessionId === sessionId);
+    const durationTimeout = setTimeout(() => {
+      // session.state = performAction('FINISH_DURATION');
+      session.state = 'QUESTION_CLOSE';
+      setSession(sessionData);
+
+      timers.splice(timeoutIndex, 1);
+    }, session.metadata.duration * 1000);
+
+    timers.splice(timeoutIndex, 1, {
+      timeoutId: durationTimeout,
+      sessionId: sessionId
+    });
+  }, COUNTDOWN * 1000);
+
+  timers.push({
+    timeoutId: countdownTimeout,
+    sessionId: sessionId
+  });
+  setSession(sessionData);
 }
 
 /**
@@ -1112,10 +1153,11 @@ function adminQuizSessionUpdate(
   action: string
 ): Record<string, never> | ErrorObject {
   const data = getData();
+  const sessionData = getSession();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
-  const currentSession = data.sessions.find((session) => session.sessionId === sessionId);
+  const currentSession = sessionData.sessions.find((session) => session.sessionId === sessionId);
 
   // Error-checking block
   if (currentQuiz === undefined) {
@@ -1127,28 +1169,18 @@ function adminQuizSessionUpdate(
   } else if (currentSession.metadata.quizId !== quizId) {
     throw HTTPError(400, { error: 'Session ID isnt the same as quizId' });
   } else if (!(action in ACTION)) {
-  // } else if (action !== ('NEXT_QUESTION' || 'GO_TO_ANSWER' || 'GO_TO_FINAL_RESULTS' || 'END' || 'FINISH_COUNTDOWN')) {
     throw HTTPError(400, { error: 'Action provided is not a valid Action enum' });
-  } else if (changeState(sessionId, action) === false) {
+  } else if (!validState(sessionId, action)) {
     throw HTTPError(400, { error: 'Action enum cannot be applied in the current state' });
   }
-  // //Update state based on input
-  // if (action === ACTION.NEXT_QUESTION) {
-  //   currentSession.sessionState = STATE.QUESTION_COUNTDOWN;
+  currentSession.state = performAction(action, currentSession.state, sessionId);
 
-  //   // currentSession.timeoutId = (setTimeout(() => {
-  //   //   currentSession.sessionState === STATE.QUESTION_OPEN;
-  //   //   currentSession.atQuestion++;
-  //   //   setData(data);
+  if (currentSession.state === 'QUESTION_COUNTDOWN') {
+    currentSession.atQuestion++;
+    setSession(sessionData);
+    createTimeout(sessionId);
+  }
 
-  //   //   currentSession.timeoutId = (setTimeout(() => {
-  //   //     currentSession.sessionState === STATE.QUESTION_CLOSE;
-  //   //     currentSession.timeoutId = undefined;
-  //   //     setData(data);
-  //   //     return {};
-  //   //   }, currentSession.metadata.duration * 1000));
-
-  //   // }, COUNTDOWN * 1000));
   return {};
 }
 
@@ -1168,10 +1200,11 @@ function adminQuizSessionStatus(
   sessionId: number
 ): sessionStatusReturn | ErrorObject {
   const data = getData();
+  const sessionData = getSession();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
-  const currentSession = data.sessions.find((session) => session.sessionId === sessionId);
+  const currentSession = sessionData.sessions.find((session) => session.sessionId === sessionId);
 
   // Error-checking block
   if (currentQuiz === undefined) {
@@ -1188,7 +1221,7 @@ function adminQuizSessionStatus(
   userNames.sort((a, b) => a.localeCompare(b));
 
   return {
-    state: currentSession.sessionState,
+    state: currentSession.state,
     atQuestion: currentSession.atQuestion,
     players: userNames,
     metadata: currentSession.metadata
@@ -1273,10 +1306,11 @@ function adminQuizSessionResults(
   sessionId: number
 ): SessionResultsReturn | ErrorObject {
   const data = getData();
+  const sessionData = getSession();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
-  const currentSession = data.sessions.find((session) => session.sessionId === sessionId);
+  const currentSession = sessionData.sessions.find((session) => session.sessionId === sessionId);
 
   // Error-checking block
   if (currentQuiz === undefined) {
@@ -1287,7 +1321,7 @@ function adminQuizSessionResults(
     throw HTTPError(400, { error: 'Session ID does not refer to a valid quiz' });
   } else if (currentSession.metadata.quizId !== quizId) {
     throw HTTPError(400, { error: 'Session ID isnt the same as quizId' });
-  } else if (currentSession.sessionState !== 'FINAL_RESULTS') {
+  } else if (currentSession.state !== 'FINAL_RESULTS') {
     throw HTTPError(400, { error: 'Session is not in FINAL_RESULTS state' });
   }
 
