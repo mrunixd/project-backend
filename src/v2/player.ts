@@ -60,7 +60,7 @@ function createName(): string {
   return name;
 }
 
-export function playerSendMessage(playerId: number, message: string): Record<string, never> | ErrorObject {
+function playerSendMessage(playerId: number, message: string): Record<string, never> | ErrorObject {
   const data = getData();
 
   if (message.length < 2 || message.length > 100) {
