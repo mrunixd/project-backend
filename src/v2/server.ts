@@ -40,7 +40,7 @@ import {
   adminQuizSessionResults
 } from './quiz';
 
-import { playerJoin, playerStatus } from './player';
+import { playerJoin, playerStatus, playerSendMessage } from './player';
 import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck } from './other';
 import HTTPError from 'http-errors';
 
@@ -838,6 +838,15 @@ app.get('/v1/player/:playerid', (req: Request, res: Response) => {
 
   const response = playerStatus(playerId);
 
+  return res.json(response);
+});
+
+// ROUTE: playerSendMessage
+app.post('/v1/player/:playerid/chat', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const { message } = req.body;
+
+  const response = playerSendMessage(playerId, message);
   return res.json(response);
 });
 

@@ -177,6 +177,11 @@ export function requestPlayerStatus(playerId: number) {
   return response;
 }
 
+export function requestPlayerSendMessage(playerId: number, message: string) {
+  const response = postRequest(`/v1/player/${playerId}/chat`, { message });
+  return response;
+}
+
 export function requestAdminQuizThumbnailUpdate(quizId: string, token: string, imgUrl: string) {
   const response = putRequest(`/v1/admin/quiz/${quizId}/thumbnail`, { imgUrl }, { token });
   return response;
