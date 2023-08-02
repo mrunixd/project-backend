@@ -1,4 +1,5 @@
 import { getData, setData, ErrorObject, STATE } from './dataStore';
+import { SessionResultsReturn } from './quiz';
 import HTTPError from 'http-errors';
 
 function playerJoin(sessionId: number, name: string): {playerId: number} | ErrorObject {
@@ -60,6 +61,49 @@ function createName(): string {
   return name;
 }
 
+/**
+ * This function retrieves the final results for a session
+ *
+ * @param {number} playerId
+ *
+ * @returns {SessionResultsReturn}
+ *
+ */
+function playerResults(
+  playerId: number
+): SessionResultsReturn | ErrorObject {
+  const data = getData();
+
+  let player;
+  let currentSession;
+
+  for (const session of data.sessions) {
+    player = session.players.find((player) => player.playerId === playerId);
+    if (player) {
+      currentSession = session;
+      break;
+    }
+  }
+
+  // Error-checking block
+  if (player === undefined) {
+    throw HTTPError(400, { error: 'Player ID does not refer to a valid player' });
+  } else if (currentSession.sessionState !== 'FINAL_RESULTS') {
+    throw HTTPError(400, { error: 'Session is not in FINAL_RESULTS state' });
+  }
+
+  const userRank = currentSession.players.map((player) => {
+    const { name, score } = player;
+    return { name, score };
+  });
+  userRank.sort((a, b) => b.score - a.score);
+
+  return {
+    usersRankedByScore: userRank,
+    questionResults: currentSession.questionResults
+  };
+}
+
 function playerSendMessage(playerId: number, message: string): Record<string, never> | ErrorObject {
   const data = getData();
 
@@ -87,4 +131,4 @@ function playerSendMessage(playerId: number, message: string): Record<string, ne
   return {};
 }
 
-export { playerJoin, playerStatus, playerSendMessage };
+export { playerJoin, playerStatus, playerResults, playerSendMessage };

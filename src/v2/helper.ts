@@ -193,3 +193,8 @@ export function sleepSync(ms: number) {
     // zzzZZ
   }
 }
+
+export function requestPlayerResults(playerId: number) {
+  const response = getRequest(`/v1/player/${playerId}/results`, {}, {});
+  return response;
+}
