@@ -24,7 +24,10 @@ function clear() {
   const imagesDirectory = path.join(__dirname, '../../images');
   fs.readdirSync(imagesDirectory).forEach((file) => {
     const filePath = path.join(imagesDirectory, file);
-    fs.unlinkSync(filePath);
+    const fileExtension = path.extname(filePath).toLowerCase();
+    if (fileExtension === '.jpg' || fileExtension === '.png') {
+      fs.unlinkSync(filePath);  
+    }
   });
   return {};
 }
