@@ -1,4 +1,5 @@
 import { getData, setData, ErrorObject, STATE } from './dataStore';
+import { SessionResultsReturn } from './quiz'
 import HTTPError from 'http-errors';
 
 function playerJoin(sessionId: number, name: string): {playerId: number} | ErrorObject {
@@ -68,19 +69,18 @@ function createName(): string {
  *
  */
 function playerResults(
-  authUserId: number,
-  quizId: number,
   playerId: number
 ): SessionResultsReturn | ErrorObject {
   const data = getData();
 
-  const user = data.users.find((user) => user.authUserId === authUserId);
-  const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
+  let player;
+  let currentSession;
 
   for (const session of data.sessions) {
-    const player = session.players.find((player) => player.playerId === playerId);
+    player = session.players.find((player) => player.playerId === playerId);
     if (player) {
-      const currentSession = session;
+      currentSession = session;
+      break;
     }
   }
 

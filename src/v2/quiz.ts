@@ -66,16 +66,15 @@ interface sessionStatusReturn {
   metadata: Quiz;
 }
 
-/// /
 interface UserRank {
   name: string;
   score: number;
 }
-interface SessionResultsReturn {
+
+export interface SessionResultsReturn {
   usersRankedByScore: UserRank[];
   questionResults: QuestionResult[];
 }
-/// /
 
 enum Colours {
   red = 'red',
