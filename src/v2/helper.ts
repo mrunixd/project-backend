@@ -204,8 +204,7 @@ export function requestAdminQuizSessionResultsCSV(token: string, quizId: string,
   return response;
 }
 
-
 export function requestPlayerQuestionInfo(playerId: number, questionPosition: number) {
   const response = getRequest(`/v1/player/${playerId}/question/${questionPosition}`, {}, {});
   return response;
-} 
+}

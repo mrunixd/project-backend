@@ -11,22 +11,18 @@ import {
   INPUT_ERROR,
 } from '../helper';
 let result1: any;
-let result2: any;
 let person1: any;
 let quiz1: any;
 let sessionId: any;
 let player1: any;
-let player2: any;
 
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
   result1 = undefined;
-  result2 = undefined;
   person1 = undefined;
   quiz1 = undefined;
   sessionId = undefined;
   player1 = undefined;
-  player2 = undefined;
 });
 
 const quizQuestion1Body = {
@@ -83,7 +79,7 @@ describe('////////TESTING /v1/player/:playerid/question/:questionposition///////
       `${person1.body.token}`,
       quizQuestion1Body
     );
-		requestAdminQuizQuestion(
+    requestAdminQuizQuestion(
       `${quiz1.body.quizId}`,
       `${person1.body.token}`,
       quizQuestion2Body
@@ -131,41 +127,41 @@ describe('////////TESTING /v1/player/:playerid/question/:questionposition///////
   describe('Testing /v1/player/:playerid/question/:questionposition errors', () => {
     test('CASE 400: PlayerId does not exist', () => {
       result1 = requestPlayerQuestionInfo(player1.body.playerId + 1, 1);
-			expect(result1.body).toStrictEqual({ error: expect.any(String) });
-			expect(result1.status).toStrictEqual(INPUT_ERROR);
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE 400: Question position is not valid for the session the player is in', () => {
-			requestAdminQuizSessionUpdate(
+      requestAdminQuizSessionUpdate(
         `${person1.body.token}`,
         `${quiz1.body.quizId}`,
         `${sessionId.body.sessionId}`,
         'NEXT_QUESTION'
       );
-			result1 = requestPlayerQuestionInfo(player1.body.playerId, 3);
-			expect(result1.body).toStrictEqual({ error: expect.any(String) });
-			expect(result1.status).toStrictEqual(INPUT_ERROR);
+      result1 = requestPlayerQuestionInfo(player1.body.playerId, 3);
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE 400: session is not currently on this question', () => {
-			requestAdminQuizSessionUpdate(
+      requestAdminQuizSessionUpdate(
         `${person1.body.token}`,
         `${quiz1.body.quizId}`,
         `${sessionId.body.sessionId}`,
         'NEXT_QUESTION'
       );
-			result1 = requestPlayerQuestionInfo(player1.body.playerId, 2);
-			expect(result1.body).toStrictEqual({ error: expect.any(String) });
-			expect(result1.status).toStrictEqual(INPUT_ERROR);
+      result1 = requestPlayerQuestionInfo(player1.body.playerId, 2);
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE 400: Session is in Lobby or end state', () => {
-			requestAdminQuizSessionUpdate(
+      requestAdminQuizSessionUpdate(
         `${person1.body.token}`,
         `${quiz1.body.quizId}`,
         `${sessionId.body.sessionId}`,
         'END'
       );
-			result1 = requestPlayerQuestionInfo(player1.body.playerId , 1);
-			expect(result1.body).toStrictEqual({ error: expect.any(String) });
-			expect(result1.status).toStrictEqual(INPUT_ERROR);
+      result1 = requestPlayerQuestionInfo(player1.body.playerId, 1);
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
   });
 });
