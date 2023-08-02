@@ -1416,6 +1416,10 @@ function adminQuizSessionList(quizId: number): {
     }
   });
 
+  // Sort both arrays in ascending order
+  activeSessionIds.sort((a, b) => a - b);
+  inactiveSessionIds.sort((a, b) => a - b);
+
   return {
     activeSessions: activeSessionIds,
     inactiveSessions: inactiveSessionIds,
