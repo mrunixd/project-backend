@@ -26,7 +26,7 @@ beforeEach(() => {
 
 const quizQuestion1Body = {
   question: 'Who is the Monarch of England?',
-  duration: 4,
+  duration: 1,
   points: 5,
   answers: [
     {

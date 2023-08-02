@@ -1,4 +1,4 @@
-import { getData, setData, ErrorObject, STATE } from './dataStore';
+import { ErrorObject, STATE, getSession, setSession } from './dataStore';
 import { SessionResultsReturn } from './quiz';
 import HTTPError from 'http-errors';
 
@@ -7,11 +7,12 @@ function playerJoin(sessionId: number, name: string): {playerId: number} | Error
     name = createName();
   }
 
-  const data = getData();
-  const session = data.sessions.find(session => session.sessionId === sessionId);
+  const sessionData = getSession();
+
+  const session = sessionData.sessions.find(session => session.sessionId === sessionId);
   if (session === undefined) {
     throw HTTPError(400, { error: 'SessionId does not exist' });
-  } else if (session?.sessionState !== STATE.LOBBY) {
+  } else if (session?.state !== STATE.LOBBY) {
     throw HTTPError(400, { error: 'Session has already started' });
   } else if (session.players.find(user => user.name === name)) {
     throw HTTPError(400, { error: 'Name is already in use' });
@@ -21,18 +22,18 @@ function playerJoin(sessionId: number, name: string): {playerId: number} | Error
   session.players.push(player);
 
   session.players.sort((a, b) => a.name.localeCompare(b.name));
-  setData(data);
+  setSession(sessionData);
   return { playerId: session.players.length };
 }
 
 function playerStatus(playerId: number) {
-  const data = getData();
-  const session = data.sessions.find(session => session.players.find(player => player.playerId === playerId));
+  const sessionData = getSession();
+  const session = sessionData.sessions.find(session => session.players.find(player => player.playerId === playerId));
   if (session === undefined) {
     throw HTTPError(400, { error: 'Player ID does not exit' });
   }
   const status = {
-    state: session.sessionState,
+    state: session.state,
     numQuestions: session.metadata.numQuestions,
     atQuestion: session.atQuestion
   };
@@ -72,12 +73,12 @@ function createName(): string {
 function playerResults(
   playerId: number
 ): SessionResultsReturn | ErrorObject {
-  const data = getData();
+  const sessionData = getSession();
 
   let player;
   let currentSession;
 
-  for (const session of data.sessions) {
+  for (const session of sessionData.sessions) {
     player = session.players.find((player) => player.playerId === playerId);
     if (player) {
       currentSession = session;
@@ -88,7 +89,7 @@ function playerResults(
   // Error-checking block
   if (player === undefined) {
     throw HTTPError(400, { error: 'Player ID does not refer to a valid player' });
-  } else if (currentSession.sessionState !== 'FINAL_RESULTS') {
+  } else if (currentSession.state !== 'FINAL_RESULTS') {
     throw HTTPError(400, { error: 'Session is not in FINAL_RESULTS state' });
   }
 
@@ -105,13 +106,13 @@ function playerResults(
 }
 
 function playerSendMessage(playerId: number, message: string): Record<string, never> | ErrorObject {
-  const data = getData();
+  const sessionData = getSession();
 
   if (message.length < 2 || message.length > 100) {
     throw HTTPError(400, { error: 'Message is either less than 1 character or more than 100 characters' });
   }
 
-  const session = data.sessions.find(session => session.players.some(player => player.playerId === playerId));
+  const session = sessionData.sessions.find(session => session.players.some(player => player.playerId === playerId));
 
   if (!session) {
     throw HTTPError(400, { error: 'Player ID does not exist' });
@@ -126,8 +127,7 @@ function playerSendMessage(playerId: number, message: string): Record<string, ne
     timeSent: Math.floor(Date.now() / 1000)
   });
 
-  setData(data);
-
+  setSession(sessionData);
   return {};
 }
 
