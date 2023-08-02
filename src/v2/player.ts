@@ -1,7 +1,22 @@
-import { getData, setData, ErrorObject, STATE } from './dataStore';
+import { getData, setData, ErrorObject, message, STATE } from './dataStore';
 import { SessionResultsReturn } from './quiz';
 import HTTPError from 'http-errors';
 
+interface Status {
+  state: string;
+  numQuestions: number;
+  atQuestion: number;
+}
+
+/**
+ * Given a session ID and a name, this allows a player to join a game.
+ *
+ * @param {number} playerId
+ * @param {string} name
+ *
+ * @returns {number} playerId
+ *
+ */
 function playerJoin(sessionId: number, name: string): {playerId: number} | ErrorObject {
   if (name === '') {
     name = createName();
@@ -25,7 +40,15 @@ function playerJoin(sessionId: number, name: string): {playerId: number} | Error
   return { playerId: session.players.length };
 }
 
-function playerStatus(playerId: number) {
+/**
+ * This function retrieves the status of a given player
+ *
+ * @param {number} playerId
+ *
+ * @returns {Status}
+ *
+ */
+function playerStatus(playerId: number): Status | ErrorObject {
   const data = getData();
   const session = data.sessions.find(session => session.players.find(player => player.playerId === playerId));
   if (session === undefined) {
@@ -39,6 +62,12 @@ function playerStatus(playerId: number) {
   return status;
 }
 
+/**
+ * Generates a random name.
+ *
+ * @returns {string}
+ *
+ */
 function createName(): string {
   let letters = 'abcdefghijklmnopqrstuvwxyz';
   let numbers = '0123456789';
@@ -69,9 +98,7 @@ function createName(): string {
  * @returns {SessionResultsReturn}
  *
  */
-function playerResults(
-  playerId: number
-): SessionResultsReturn | ErrorObject {
+function playerResults(playerId: number): SessionResultsReturn | ErrorObject {
   const data = getData();
 
   let player;
@@ -104,6 +131,15 @@ function playerResults(
   };
 }
 
+/**
+ * Given a playerId, allows a player to send a message to the session chatroom. 
+ *
+ * @param {number} playerId
+ * @param {string} message
+ *
+ * @returns {}
+ *
+ */
 function playerSendMessage(playerId: number, message: string): Record<string, never> | ErrorObject {
   const data = getData();
 
@@ -131,4 +167,32 @@ function playerSendMessage(playerId: number, message: string): Record<string, ne
   return {};
 }
 
-export { playerJoin, playerStatus, playerResults, playerSendMessage };
+/**
+ * Given a playerId, allows a player to view the session's chatroom.
+ *
+ * @param {number} playerId
+ *
+ * @returns {Message[]}
+ *
+ */
+function playerViewMessages(playerId: number): Message[] | ErrorObject {
+  const data = getData();
+  const session = data.sessions.find(session => session.players.some(player => player.playerId === playerId));
+
+  if (!session) {
+    throw HTTPError(400, 'Player ID does not exist');
+  }
+
+  const player = session.players.find(player => player.playerId === playerId);
+
+  // An object containing messages which are arrays.
+  const sessionMessages: message[] | message = { message: [] };
+
+  for (const currentMessage of session.messages) {
+    sessionMessages.message.push(currentMessage);
+  }
+
+  return sessionMessages;
+}
+
+export { playerJoin, playerStatus, playerResults, playerSendMessage, playerViewMessages };
