@@ -172,7 +172,7 @@ export function requestPlayerStatus(playerId: number) {
   return response;
 }
 
-export function requestAdminQuizThumbnailUpdate(quizId: string, token: string, thumbnailUrl: string) {
-  const response = putRequest(`/v1/admin/quiz/${quizId}/thumbnail`, { thumbnailUrl }, { token });
+export function requestAdminQuizThumbnailUpdate(quizId: string, token: string, imgUrl: string) {
+  const response = putRequest(`/v1/admin/quiz/${quizId}/thumbnail`, { imgUrl }, { token });
   return response;
 }

@@ -1,1 +1,0 @@
-// file created to add images directory to gitlab

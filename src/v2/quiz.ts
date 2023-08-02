@@ -1179,7 +1179,7 @@ function adminQuizSessionStatus(
 }
 
 /**
- * This function updates the status of a session
+ * This function updates the thumbnail of a
  *
  * @param {number} authUserId
  * @param {number} quizId
@@ -1197,42 +1197,49 @@ function adminQuizThumbnailUpdate(
 
   const user = data.users.find((user) => user.authUserId === authUserId);
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
-  const currentSession = data.sessions.find((session) => session.sessionId === sessionId);
 
   // Error-checking block
   if (currentQuiz === undefined) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
   } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a quiz that this user owns' });
-  } else if (currentSession === undefined) {
-    throw HTTPError(400, { error: 'Session ID does not refer to a valid quiz' });
-  } else if (currentSession.metadata.quizId !== quizId) {
-    throw HTTPError(400, { error: 'Session ID isnt the same as quizId' });
-  } else if (!(action in ACTION)) {
-  // } else if (action !== ('NEXT_QUESTION' || 'GO_TO_ANSWER' || 'GO_TO_FINAL_RESULTS' || 'END' || 'FINISH_COUNTDOWN')) {
-    throw HTTPError(400, { error: 'Action provided is not a valid Action enum' });
-  } else if (changeState(sessionId, action) === false) {
-    throw HTTPError(400, { error: 'Action enum cannot be applied in the current state' });
   }
-  // //Update state based on input
-  // if (action === ACTION.NEXT_QUESTION) {
-  //   currentSession.sessionState = STATE.QUESTION_COUNTDOWN;
 
-  //   // currentSession.timeoutId = (setTimeout(() => {
-  //   //   currentSession.sessionState === STATE.QUESTION_OPEN;
-  //   //   currentSession.atQuestion++;
-  //   //   setData(data);
+  let imagesDirectoryPath;
 
-  //   //   currentSession.timeoutId = (setTimeout(() => {
-  //   //     currentSession.sessionState === STATE.QUESTION_CLOSE;
-  //   //     currentSession.timeoutId = undefined;
-  //   //     setData(data);
-  //   //     return {};
-  //   //   }, currentSession.metadata.duration * 1000));
+  if (currentQuiz.thumbnailUrl !== undefined && currentQuiz.thumbnailUrl !== '') {
+    const urlParts = currentQuiz.thumbnailUrl.split('/');
+    const fileName = urlParts[urlParts.length - 1];
 
-  //   // }, COUNTDOWN * 1000));
+    // Construct the full path to the image file
+    imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
+
+    fs.unlinkSync(imagesDirectoryPath);
+  }
+
+  const res = request('GET', `${imgUrl}`);
+  const body = res.getBody();
+
+  // Check if the request was successful and the response is not empty
+  if (res.statusCode !== 200 || body.length === 0) {
+    throw HTTPError(400, { error: 'Invalid URL: The thumbnailUrl did not return a valid file.' });
+  }
+
+  const fileExtension = path.extname(imgUrl).toLowerCase();
+  if (fileExtension !== '.jpg' && fileExtension !== '.png' && fileExtension !== '.jpeg') {
+    throw HTTPError(400, { error: 'Invalid URL: The thumbnailUrl is not of type jpg or png' });
+  }
+
+  const fileName = `${Date.now()}${Math.random().toString(36).substring(7)}${fileExtension}`;
+  imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
+  fs.writeFileSync(imagesDirectoryPath, body, { flag: 'w' });
+  imageUrlOnServer = `http://localhost:${PORT}/imgurl/${fileName}`;
+
+  currentQuiz.thumbnailUrl = imageUrlOnServer;
+
   return {};
 }
+
 export {
   adminQuizCreate,
   adminQuizList,
@@ -1251,5 +1258,6 @@ export {
   adminQuizQuestionDelete,
   adminQuizSessionStart,
   adminQuizSessionUpdate,
-  adminQuizSessionStatus
+  adminQuizSessionStatus,
+  adminQuizThumbnailUpdate
 };

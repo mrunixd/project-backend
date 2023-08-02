@@ -35,7 +35,8 @@ import {
   adminQuizQuestionDelete,
   adminQuizSessionStart,
   adminQuizSessionUpdate,
-  adminQuizSessionStatus
+  adminQuizSessionStatus,
+  adminQuizThumbnailUpdate
 } from './quiz';
 
 import { playerJoin, playerStatus } from './player';
@@ -825,7 +826,7 @@ app.get('/v1/player/:playerid', (req: Request, res: Response) => {
 });
 
 // ROUTE: adminQuizThumbnailUpdate
-app.put('/v2/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
+app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const token = req.headers.token.toString();
   const { imgUrl } = req.body;
