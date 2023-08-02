@@ -100,7 +100,7 @@ export interface Session {
   metadata: Quiz;
   // usersRankedByScore: PlayerScore[];
   questionResults: QuestionResult[];
-  messages: message[];
+  messages: Message[];
 }
 
 export interface SessionId {
