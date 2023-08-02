@@ -203,3 +203,14 @@ export function sleepSync(ms: number) {
     // zzzZZ
   }
 }
+
+export function requestPlayerResults(playerId: number) {
+  const response = getRequest(`/v1/player/${playerId}/results`, {}, {});
+  return response;
+}
+
+export function requestAdminQuizSessionResultsCSV(token: string, quizId: string, sessionId: string) {
+  const response = getRequest(`/v1/admin/quiz/${quizId}/session/${sessionId}/results/csv`, {}, { token });
+  return response;
+}
+
