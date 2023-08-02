@@ -4,7 +4,8 @@
     "noImplicitAny": true,
     "noEmit": true,
     "resolveJsonModule": true,
-    "allowJs": true
+    "allowJs": true,
+    "target": "es5",
   },
   "exclude": [
     "**/**_broken.ts"

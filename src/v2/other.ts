@@ -37,7 +37,7 @@ function clear() {
   fs.readdirSync(imagesDirectory).forEach((file) => {
     const filePath = path.join(imagesDirectory, file);
     const fileExtension = path.extname(filePath).toLowerCase();
-    if (fileExtension === '.jpg' || fileExtension === '.png') {
+    if (fileExtension === '.jpg' || fileExtension === '.png' || fileExtension === '.csv') {
       fs.unlinkSync(filePath);
     }
   });
