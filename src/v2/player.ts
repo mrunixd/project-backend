@@ -58,4 +58,49 @@ function createName(): string {
 
   return name;
 }
-export { playerJoin, playerStatus };
+
+/**
+ * This function retrieves the final results for a session
+ *
+ * @param {number} playerId
+ *
+ * @returns {SessionResultsReturn}
+ *
+ */
+function playerResults(
+  authUserId: number,
+  quizId: number,
+  playerId: number
+): SessionResultsReturn | ErrorObject {
+  const data = getData();
+
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
+
+  for (const session of data.sessions) {
+    const player = session.players.find((player) => player.playerId === playerId);
+    if (player) {
+      const currentSession = session;
+    }
+  }
+
+  // Error-checking block
+  if (player === undefined) {
+    throw HTTPError(400, { error: 'Player ID does not refer to a valid player' });
+  } else if (currentSession.sessionState !== 'FINAL_RESULTS') {
+    throw HTTPError(400, { error: 'Session is not in FINAL_RESULTS state' });
+  }
+
+  const userRank = currentSession.players.map((player) => {
+    const { name, score } = player;
+    return { name, score };
+  });
+  userRank.sort((a, b) => b.score - a.score);
+
+  return {
+    usersRankedByScore: userRank,
+    questionResults: currentSession.questionResults
+  };
+}
+
+export { playerJoin, playerStatus, playerResults };
