@@ -1349,10 +1349,11 @@ function adminQuizSessionResultsCSV(
   sessionId: number
 ): CSVSessionResult | ErrorObject {
   const data = getData();
+  const sessionData = getSession();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
-  const currentSession = data.sessions.find((session) => session.sessionId === sessionId);
+  const currentSession = sessionData.sessions.find((session) => session.sessionId === sessionId);
 
   // Error-checking block
   if (currentQuiz === undefined) {
@@ -1363,7 +1364,7 @@ function adminQuizSessionResultsCSV(
     throw HTTPError(400, { error: 'Session ID does not refer to a valid quiz' });
   } else if (currentSession.metadata.quizId !== quizId) {
     throw HTTPError(400, { error: 'Session ID isnt the same as quizId' });
-  } else if (currentSession.sessionState !== 'FINAL_RESULTS') {
+  } else if (currentSession.state !== 'FINAL_RESULTS') {
     throw HTTPError(400, { error: 'Session is not in FINAL_RESULTS state' });
   }
 

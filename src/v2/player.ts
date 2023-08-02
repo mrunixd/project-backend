@@ -1,4 +1,4 @@
-import { getData, setData, ErrorObject, STATE, getSession, setSession } from './dataStore';
+import { ErrorObject, STATE, getSession, setSession } from './dataStore';
 import { SessionResultsReturn } from './quiz';
 import HTTPError from 'http-errors';
 
@@ -73,7 +73,6 @@ function createName(): string {
 function playerResults(
   playerId: number
 ): SessionResultsReturn | ErrorObject {
-  const data = getData();
   const sessionData = getSession();
 
   let player;
