@@ -37,7 +37,8 @@ import {
   adminQuizSessionUpdate,
   adminQuizSessionStatus,
   adminQuizThumbnailUpdate,
-  adminQuizSessionResults
+  adminQuizSessionResults,
+  adminQuizSessionResultsCSV
 } from './quiz';
 
 import { playerJoin, playerStatus, playerResults, playerSendMessage } from './player';
@@ -823,6 +824,21 @@ app.get(
   }
 );
 
+// ROUTE: adminQuizSessionResultsCSV
+app.get(
+  '/v1/admin/quiz/:quizid/session/:sessionid/results/csv',
+  (req: Request, res: Response) => {
+    const quizId = parseInt(req.params.quizid);
+    const sessionId = parseInt(req.params.sessionid);
+    const token = req.headers.token.toString();
+
+    const userId = fullTokenCheck(token);
+    const response = adminQuizSessionResultsCSV(userId, quizId, sessionId);
+
+    return res.json(response);
+  }
+);
+
 // ROUTE: playerJoin
 app.post('/v1/player/join', (req: Request, res: Response) => {
   const { sessionId, name } = req.body;
@@ -833,7 +849,7 @@ app.post('/v1/player/join', (req: Request, res: Response) => {
 });
 
 // ROUTE: playerStatus
-app.get('/v1/player/:playerid', (req: Request, res: Response) => {
+app.get('/v1/playeode r/:playerid', (req: Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
 
   const response = playerStatus(playerId);
