@@ -4,6 +4,7 @@ import request from 'sync-request';
 import fs from 'fs';
 import path from 'path';
 import config from './config.json';
+import { createObjectCsvStringifier } from 'csv-writer';
 
 const PORT: number = parseInt(process.env.PORT || config.port);
 
@@ -76,6 +77,10 @@ export interface SessionResultsReturn {
   questionResults: QuestionResult[];
 }
 /// /
+
+interface CSVSessionResult {
+  url: string;
+}
 
 enum Colours {
   red = 'red',
@@ -1304,6 +1309,60 @@ function adminQuizSessionResults(
   };
 }
 
+function adminQuizSessionResultsCSV(
+  authUserId: number,
+  quizId: number,
+  sessionId: number
+): CSVSessionResult | ErrorObject {
+  const data = getData();
+
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
+  const currentSession = data.sessions.find((session) => session.sessionId === sessionId);
+
+  // Error-checking block
+  if (currentQuiz === undefined) {
+    throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
+  } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
+    throw HTTPError(400, { error: 'Quiz ID does not refer to a quiz that this user owns' });
+  } else if (currentSession === undefined) {
+    throw HTTPError(400, { error: 'Session ID does not refer to a valid quiz' });
+  } else if (currentSession.metadata.quizId !== quizId) {
+    throw HTTPError(400, { error: 'Session ID isnt the same as quizId' });
+  } else if (currentSession.sessionState !== 'FINAL_RESULTS') {
+    throw HTTPError(400, { error: 'Session is not in FINAL_RESULTS state' });
+  }
+
+  const userRank = currentSession.players.map((player) => {
+    const { name, score } = player;
+    return { name, score };
+  });
+  userRank.sort((a, b) => b.score - a.score);
+
+  // Create CSV content
+  const csvStringifier = createObjectCsvStringifier({
+    header: [
+      { id: 'name', title: 'Player Name' },
+      { id: 'score', title: 'Score' },
+    ],
+  });
+  const csvContent = csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(userRank);
+
+  // Create a CSV file
+  const csvFilePath = path.join(__dirname, '../../images', `quiz_${quizId}_session_${sessionId}.csv`);
+  try {
+    fs.writeFileSync(csvFilePath, csvContent, { flag: 'w' });
+    console.log('CSV file created successfully.');
+  } catch (error) {
+    console.error('Error writing CSV file:', error);
+    throw HTTPError(500, { error: 'Failed to generate CSV file' });
+  }
+
+  // Return the link to the generated CSV file
+  const fileUrl = `http://localhost:${PORT}/results/quiz_${quizId}_session_${sessionId}.csv`;
+  return { url: fileUrl };
+}
+
 export {
   adminQuizCreate,
   adminQuizList,
@@ -1324,5 +1383,6 @@ export {
   adminQuizSessionUpdate,
   adminQuizSessionStatus,
   adminQuizThumbnailUpdate,
-  adminQuizSessionResults
+  adminQuizSessionResults,
+  adminQuizSessionResultsCSV
 };
