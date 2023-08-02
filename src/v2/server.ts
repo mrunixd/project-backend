@@ -40,7 +40,7 @@ import {
   adminQuizSessionResults
 } from './quiz';
 
-import { playerJoin, playerStatus, playerResults, playerSendMessage } from './player';
+import { playerJoin, playerStatus, playerResults, playerSendMessage, playerViewMessages } from './player';
 import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck } from './other';
 import HTTPError from 'http-errors';
 
@@ -850,6 +850,23 @@ app.post('/v1/player/:playerid/chat', (req: Request, res: Response) => {
   return res.json(response);
 });
 
+// ROUTE: playerResults
+app.get('/v1/player/:playerid/results', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+
+  const response = playerResults(playerId);
+
+  return res.json(response);
+});
+
+// ROUTE: playerViewMessages
+app.get('/v1/player/:playerid/chat', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  
+  const response = playerViewMessages(playerId);
+  return res.json(response);
+});
+
 // ROUTE: adminQuizThumbnailUpdate
 app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
@@ -861,14 +878,7 @@ app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
   return res.json(response);
 });
 
-// ROUTE: playerResults
-app.get('/v1/player/:playerid/results', (req: Request, res: Response) => {
-  const playerId = parseInt(req.params.playerid);
 
-  const response = playerResults(playerId);
-
-  return res.json(response);
-});
 
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
