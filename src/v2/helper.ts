@@ -177,6 +177,11 @@ export function requestPlayerStatus(playerId: number) {
   return response;
 }
 
+export function requestAdminQuizThumbnailUpdate(quizId: string, token: string, imgUrl: string) {
+  const response = putRequest(`/v1/admin/quiz/${quizId}/thumbnail`, { imgUrl }, { token });
+  return response;
+}
+
 export function sleepSync(ms: number) {
   const startTime = new Date().getTime();
   while (new Date().getTime() - startTime < ms) {

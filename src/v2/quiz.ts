@@ -1196,6 +1196,68 @@ function adminQuizSessionStatus(
 }
 
 /**
+ * This function updates the thumbnail of a quiz
+ *
+ * @param {number} authUserId
+ * @param {number} quizId
+ * @param {string} imgUrl
+ *
+ * @returns {}
+ *
+ */
+function adminQuizThumbnailUpdate(
+  authUserId: number,
+  quizId: number,
+  imgUrl: string
+): Record<string, never> | ErrorObject {
+  const data = getData();
+
+  const user = data.users.find((user) => user.authUserId === authUserId);
+  const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
+
+  // Error-checking block
+  if (currentQuiz === undefined) {
+    throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
+  } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
+    throw HTTPError(400, { error: 'Quiz ID does not refer to a quiz that this user owns' });
+  }
+
+  let imagesDirectoryPath;
+
+  if (currentQuiz.thumbnailUrl !== undefined && currentQuiz.thumbnailUrl !== '') {
+    const urlParts = currentQuiz.thumbnailUrl.split('/');
+    const fileName = urlParts[urlParts.length - 1];
+
+    // Construct the full path to the image file
+    imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
+
+    fs.unlinkSync(imagesDirectoryPath);
+  }
+
+  const res = request('GET', `${imgUrl}`);
+  const body = res.getBody();
+
+  // Check if the request was successful and the response is not empty
+  if (res.statusCode !== 200 || body.length === 0) {
+    throw HTTPError(400, { error: 'Invalid URL: The thumbnailUrl did not return a valid file.' });
+  }
+
+  const fileExtension = path.extname(imgUrl).toLowerCase();
+  if (fileExtension !== '.jpg' && fileExtension !== '.png' && fileExtension !== '.jpeg') {
+    throw HTTPError(400, { error: 'Invalid URL: The thumbnailUrl is not of type jpg or png' });
+  }
+
+  const fileName = `${Date.now()}${Math.random().toString(36).substring(7)}${fileExtension}`;
+  imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
+  fs.writeFileSync(imagesDirectoryPath, body, { flag: 'w' });
+  imageUrlOnServer = `http://localhost:${PORT}/imgurl/${fileName}`;
+
+  currentQuiz.thumbnailUrl = imageUrlOnServer;
+
+  return {};
+}
+
+/**
  * This function retrieves the final results for a session
  *
  * @param {number} authUserId
@@ -1260,5 +1322,6 @@ export {
   adminQuizSessionStart,
   adminQuizSessionUpdate,
   adminQuizSessionStatus,
+  adminQuizThumbnailUpdate,
   adminQuizSessionResults
 };
