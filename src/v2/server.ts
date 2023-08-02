@@ -38,7 +38,8 @@ import {
   adminQuizSessionStatus,
   adminQuizThumbnailUpdate,
   adminQuizSessionResults,
-  adminQuizSessionResultsCSV
+  adminQuizSessionResultsCSV,
+  adminQuizSessionList
 } from './quiz';
 
 import { playerJoin, playerStatus, playerResults, playerSendMessage } from './player';
@@ -885,6 +886,20 @@ app.get('/v1/player/:playerid/results', (req: Request, res: Response) => {
 
   return res.json(response);
 });
+
+// ROUTE: adminQuizSessionResults
+app.get(
+  '/v1/admin/quiz/:quizid/sessions',
+  (req: Request, res: Response) => {
+    const quizId = parseInt(req.params.quizid);
+    const token = req.headers.token.toString();
+
+    fullTokenCheck(token);
+    const response = adminQuizSessionList(quizId);
+
+    return res.json(response);
+  }
+);
 
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
