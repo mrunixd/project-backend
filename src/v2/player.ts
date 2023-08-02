@@ -1,4 +1,4 @@
-import { getData, setData, ErrorObject, message, STATE } from './dataStore';
+import { getData, setData, ErrorObject, Message, STATE } from './dataStore';
 import { SessionResultsReturn } from './quiz';
 import HTTPError from 'http-errors';
 
@@ -132,7 +132,7 @@ function playerResults(playerId: number): SessionResultsReturn | ErrorObject {
 }
 
 /**
- * Given a playerId, allows a player to send a message to the session chatroom. 
+ * Given a playerId, allows a player to send a message to the session chatroom.
  *
  * @param {number} playerId
  * @param {string} message
@@ -183,10 +183,7 @@ function playerViewMessages(playerId: number): Message[] | ErrorObject {
     throw HTTPError(400, 'Player ID does not exist');
   }
 
-  const player = session.players.find(player => player.playerId === playerId);
-
-  // An object containing messages which are arrays.
-  const sessionMessages: message[] | message = { message: [] };
+  const sessionMessages: Message[] | Message = { message: [] };
 
   for (const currentMessage of session.messages) {
     sessionMessages.message.push(currentMessage);

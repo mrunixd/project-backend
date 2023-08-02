@@ -862,7 +862,7 @@ app.get('/v1/player/:playerid/results', (req: Request, res: Response) => {
 // ROUTE: playerViewMessages
 app.get('/v1/player/:playerid/chat', (req: Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
-  
+
   const response = playerViewMessages(playerId);
   return res.json(response);
 });
@@ -877,8 +877,6 @@ app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
   const response = adminQuizThumbnailUpdate(userId, quizId, imgUrl);
   return res.json(response);
 });
-
-
 
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================

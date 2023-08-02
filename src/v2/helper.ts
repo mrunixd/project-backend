@@ -187,7 +187,7 @@ export function requestPlayerResults(playerId: number) {
   return response;
 }
 
-export function requestPlayerViewMessages(playerId: number) { 
+export function requestPlayerViewMessages(playerId: number) {
   const response = getRequest(`/v1/player/${playerId}/chat`, {}, {});
   return response;
 }
@@ -203,5 +203,3 @@ export function sleepSync(ms: number) {
     // zzzZZ
   }
 }
-
-
