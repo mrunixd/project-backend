@@ -60,16 +60,15 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid} ///////', (
 
   describe('/////// Testing v1/admin/quiz/{quizid}/session/{sessionid} success', () => {
     test('CASE: success 1 quiz 1 session, question automatically closes', () => {
-      requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
-      result1 = requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'FINISH_COUNTDOWN');
+      result1 = requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
 
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
-      sleepSync(quizQuestion1Body.duration * 1000);
+      sleepSync(quizQuestion1Body.duration * 1000 + 2000);
 
       result2 = requestAdminQuizSessionStatus(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
       expect(result2.body).toStrictEqual({
-        state: 'QUESTION_CLOSE', // CHANGE LATER
+        state: 'QUESTION_CLOSE',
         atQuestion: 1,
         players: [],
         metadata: info1.body
@@ -87,29 +86,24 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid} ///////', (
       info1 = requestAdminQuizInfo(`${quiz3.body.quizId}`, `${person2.body.token}`);
 
       requestAdminQuizSessionUpdate(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
-      requestAdminQuizSessionUpdate(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`, 'FINISH_COUNTDOWN');
-      sleepSync(quizQuestion1Body.duration * 1000 + 1000);
+      sleepSync(quizQuestion1Body.duration * 1000 + 2000);
       requestAdminQuizSessionUpdate(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
-      requestAdminQuizSessionUpdate(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`, 'FINISH_COUNTDOWN');
-      sleepSync(quizQuestion1Body.duration * 1000 + 1000);
       requestAdminQuizSessionUpdate(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`, 'GO_TO_ANSWER');
       requestAdminQuizSessionUpdate(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`, 'GO_TO_FINAL_RESULTS');
-      result1 = requestAdminQuizSessionUpdate(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`, 'END');
 
+      result1 = requestAdminQuizSessionUpdate(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`, 'END');
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
+      sleepSync(quizQuestion1Body.duration * 1000 + 2000);
       result2 = requestAdminQuizSessionStatus(`${person2.body.token}`, `${quiz3.body.quizId}`, `${session1.body.sessionId}`);
       expect(result2.body).toStrictEqual({
-        state: 'END', // CHANGE LATER
+        state: 'END',
         atQuestion: 2,
         players: [],
         metadata: info1.body
       });
     });
-    /// /////////////////////////////////////////////////////////
-    /// /more tests for when PLAYERS is complete to check state/////
-    /// /////////////////////////////////////////////////////////
   });
 
   describe('/////// Testing v1/admin/quiz/{quizid}/session/{sessionid} errors', () => {

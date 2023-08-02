@@ -10,7 +10,8 @@ import {
   UNAUTHORISED,
   FORBIDDEN,
   INPUT_ERROR,
-  requestAdminQuizInfo
+  requestAdminQuizInfo,
+  sleepSync
 } from '../helper';
 
 let result1: any;
@@ -67,12 +68,12 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid} INFO///////
 
     test('CASE: success 1 quiz 1 session, info correct after status update', () => {
       requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
-
+      sleepSync(quizQuestion1Body.duration * 1000 + 2000);
       const info1 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person1.body.token}`);
       result1 = requestAdminQuizSessionStatus(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
       expect(result1.body).toStrictEqual({
-        state: 'QUESTION_COUNTDOWN',
-        atQuestion: 0,
+        state: 'QUESTION_CLOSE',
+        atQuestion: 1,
         players: [],
         metadata: info1.body
       });

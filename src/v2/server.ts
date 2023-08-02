@@ -849,7 +849,7 @@ app.post('/v1/player/join', (req: Request, res: Response) => {
 });
 
 // ROUTE: playerStatus
-app.get('/v1/playeode r/:playerid', (req: Request, res: Response) => {
+app.get('/v1/player/:playerid', (req: Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
 
   const response = playerStatus(playerId);
