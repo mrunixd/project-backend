@@ -1,7 +1,7 @@
 import validator from 'validator';
 import { getData, setData, ErrorObject } from './dataStore';
 import HTTPError from 'http-errors';
-
+import { hashPassword } from './other';
 const MAXNAMELENGTH = 20;
 const MINNAMELENGTH = 2;
 const MINPASSWORD = 8;
@@ -74,7 +74,7 @@ function adminAuthRegister(
   const name = nameFirst.concat(' ', nameLast);
   data.users.push({
     email: email,
-    password: password,
+    password: hashPassword(password),
     pastPasswords: [],
     name: name,
     authUserId: authUserId,
@@ -122,7 +122,7 @@ function adminAuthLogin(
   password: string
 ): TokenReturn | ErrorObject {
   const data = getData();
-
+  password = hashPassword(password);
   const selectedUser = data.users.find(
     (user) => user.email.toLowerCase() === email.toLowerCase()
   );
@@ -275,30 +275,31 @@ function adminAuthUpdateDetails(userId: number, email: string, nameFirst: string
  */
 function adminAuthUpdatePassword(userId: number, oldPassword: string, newPassword: string): Record<string, never> | ErrorObject {
   const data = getData();
-
   const user = data.users.find(user => user.authUserId === userId);
-  user.pastPasswords.push(oldPassword);
-
+  if (user.password != hashPassword(oldPassword)) {
+    throw HTTPError(400, { error: 'Incorrect old password' });
+  }
+  
   if (newPassword === oldPassword) {
     throw HTTPError(400, { error: 'New password must not be the correct old password' });
   }
-
+  
   for (const password of user.pastPasswords) {
-    if (newPassword === password) {
+    if (hashPassword(newPassword) === password) {
       throw HTTPError(400, { error: 'New password has already been used before by this user' });
     }
   }
-
+  
   if (newPassword.length < MINPASSWORD) {
     throw HTTPError(400, { error: 'New password is less than 8 characters' });
   }
-
+  
   if (/\d/.test(newPassword) === false || /[a-zA-Z]/.test(newPassword) === false) {
     throw HTTPError(400, { error: 'New password does not contain at least one number and at least one letter' });
   }
+  user.pastPasswords.push(hashPassword(oldPassword));
 
-  user.password = newPassword;
-
+  user.password = hashPassword(newPassword);
   setData(data);
   return {};
 }
