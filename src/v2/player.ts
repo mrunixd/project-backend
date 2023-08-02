@@ -55,7 +55,7 @@ function playerStatus(playerId: number) {
   if (session === undefined) {
     throw HTTPError(400, { error: 'Player ID does not exit' });
   }
-  const status = {
+  const status: Status = {
     state: session.state,
     numQuestions: session.metadata.numQuestions,
     atQuestion: session.atQuestion
@@ -134,7 +134,7 @@ function playerResults(
 }
 
 /**
- * Given a playerId, allows a player to send a message to the session chatroom. 
+ * Given a playerId, allows a player to send a message to the session chatroom.
  *
  * @param {number} playerId
  * @param {string} message
@@ -177,7 +177,7 @@ function playerSendMessage(playerId: number, message: string): Record<string, ne
  *
  */
 function playerViewMessages(playerId: number): Message[] | ErrorObject {
-  const data = getData();
+  const data = getSession();
   const session = data.sessions.find(session => session.players.some(player => player.playerId === playerId));
 
   if (!session) {
