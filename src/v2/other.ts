@@ -2,7 +2,7 @@ import { setData, getData, DataStore, getSession, setSession, SessionDataStore }
 import HTTPError from 'http-errors';
 import fs from 'fs';
 import path from 'path';
-
+const crypto = require('crypto');
 /**
  * This function resets the state of the application back to the start
  *
@@ -74,4 +74,20 @@ function fullTokenCheck(token: string): number {
   return userId;
 }
 
-export { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck };
+function hashPassword(password: string): string {
+  const sha256Hash = crypto.createHash('sha256');
+  sha256Hash.update(password);
+  return sha256Hash.digest('hex');
+}
+
+// Function to clear all files in the 'images' directory
+// function clearImagesDirectory() {
+//   const imagesDirectory = path.join(__dirname, '../../images');
+
+//   fs.readdirSync(imagesDirectory).forEach((file) => {
+//     const filePath = path.join(imagesDirectory, file);
+//     fs.unlinkSync(filePath);
+//   });
+// }
+
+export { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck, hashPassword };
