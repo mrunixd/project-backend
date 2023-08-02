@@ -66,15 +66,16 @@ interface sessionStatusReturn {
   metadata: Quiz;
 }
 
+/// /
 interface UserRank {
   name: string;
   score: number;
 }
-
 export interface SessionResultsReturn {
   usersRankedByScore: UserRank[];
   questionResults: QuestionResult[];
 }
+/// /
 
 enum Colours {
   red = 'red',
@@ -1047,7 +1048,8 @@ function adminQuizSessionStart(
     players: [],
     metadata: currentQuiz,
     // usersRankedByScore: [],
-    questionResults: []
+    questionResults: [],
+    messages: []
   });
   setData(data);
   return { sessionId: sessionId };

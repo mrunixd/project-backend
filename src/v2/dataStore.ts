@@ -56,6 +56,13 @@ export interface Player {
   score: number;
 }
 
+export interface Message {
+  messageBody: string;
+  playerId: number;
+  name: string;
+  timeSent: number;
+}
+
 export enum STATE {
   LOBBY = 'LOBBY',
   QUESTION_COUNTDOWN = 'QUESTION_COUNTDOWN',
@@ -93,6 +100,7 @@ export interface Session {
   metadata: Quiz;
   // usersRankedByScore: PlayerScore[];
   questionResults: QuestionResult[];
+  messages: Message[];
 }
 
 export interface SessionId {

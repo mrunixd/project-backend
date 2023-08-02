@@ -42,7 +42,6 @@ beforeEach(() => {
   quiz1 = undefined;
   session1 = undefined;
 });
-// afterEach(() => deleteRequest('/v1/clear', {}));
 
 describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid}/results ///////', () => {
   beforeEach(() => {

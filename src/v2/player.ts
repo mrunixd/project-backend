@@ -103,4 +103,31 @@ function playerResults(
   };
 }
 
-export { playerJoin, playerStatus, playerResults };
+function playerSendMessage(playerId: number, message: string): Record<string, never> | ErrorObject {
+  const data = getData();
+
+  if (message.length < 2 || message.length > 100) {
+    throw HTTPError(400, { error: 'Message is either less than 1 character or more than 100 characters' });
+  }
+
+  const session = data.sessions.find(session => session.players.some(player => player.playerId === playerId));
+
+  if (!session) {
+    throw HTTPError(400, { error: 'Player ID does not exist' });
+  }
+
+  const player = session.players.find(player => player.playerId === playerId);
+
+  session.messages.push({
+    messageBody: message,
+    playerId: playerId,
+    name: `${player.name}`,
+    timeSent: Math.floor(Date.now() / 1000)
+  });
+
+  setData(data);
+
+  return {};
+}
+
+export { playerJoin, playerStatus, playerResults, playerSendMessage };
