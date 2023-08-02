@@ -26,7 +26,7 @@ function clear() {
     const filePath = path.join(imagesDirectory, file);
     const fileExtension = path.extname(filePath).toLowerCase();
     if (fileExtension === '.jpg' || fileExtension === '.png') {
-      fs.unlinkSync(filePath);  
+      fs.unlinkSync(filePath);
     }
   });
   return {};
