@@ -1,5 +1,5 @@
 import { getData, setData, ErrorObject, STATE } from './dataStore';
-import { SessionResultsReturn } from './quiz'
+import { SessionResultsReturn } from './quiz';
 import HTTPError from 'http-errors';
 
 function playerJoin(sessionId: number, name: string): {playerId: number} | ErrorObject {

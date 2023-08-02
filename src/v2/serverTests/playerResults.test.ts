@@ -4,21 +4,17 @@ import {
   requestAdminQuizCreate,
   requestAdminQuizQuestion,
   requestAdminQuizSessionUpdate,
-  requestAdminQuizSessionResults,
   requestPlayerJoin,
   requestPlayerResults,
   sleepSync,
   deleteRequest,
   OK,
-  UNAUTHORISED,
-  FORBIDDEN,
   INPUT_ERROR,
 } from '../helper';
 
 let result1: any;
 let person1: any;
 let player1: any;
-let person2: any;
 let quiz1: any;
 let session1: any;
 const quizQuestion1Body = {
@@ -42,7 +38,6 @@ beforeEach(() => {
   deleteRequest('/v1/clear', {});
   result1 = undefined;
   person1 = undefined;
-  person2 = undefined;
   player1 = undefined;
   quiz1 = undefined;
   session1 = undefined;
