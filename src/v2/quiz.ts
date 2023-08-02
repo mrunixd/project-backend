@@ -71,7 +71,7 @@ interface UserRank {
   name: string;
   score: number;
 }
-interface SessionResultsReturn {
+export interface SessionResultsReturn {
   usersRankedByScore: UserRank[];
   questionResults: QuestionResult[];
 }
@@ -1049,7 +1049,8 @@ function adminQuizSessionStart(
     players: [],
     metadata: currentQuiz,
     // usersRankedByScore: [],
-    questionResults: []
+    questionResults: [],
+    messages: []
   });
   setSession(sessionData);
   return { sessionId: sessionId };

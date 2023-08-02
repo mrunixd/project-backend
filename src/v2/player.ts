@@ -1,4 +1,5 @@
 import { getData, setData, ErrorObject, STATE, getSession, setSession } from './dataStore';
+import { SessionResultsReturn } from './quiz';
 import HTTPError from 'http-errors';
 
 function playerJoin(sessionId: number, name: string): {playerId: number} | ErrorObject {
@@ -19,6 +20,7 @@ function playerJoin(sessionId: number, name: string): {playerId: number} | Error
 
   const player = { name: name, score: 0, playerId: session.players.length + 1 };
   session.players.push(player);
+
   session.players.sort((a, b) => a.name.localeCompare(b.name));
   setSession(sessionData);
   return { playerId: session.players.length };
@@ -43,13 +45,14 @@ function createName(): string {
   let numbers = '0123456789';
   let name = '';
 
-  // create  random 5 digit alphabet
+  // Randomises a string of five different alphabet characters.
   for (let i = 0; i < 5; i++) {
     const randomLetterIndex = Math.floor(Math.random() * letters.length);
     name += letters[randomLetterIndex];
     letters = letters.slice(0, randomLetterIndex) + letters.slice(randomLetterIndex + 1);
   }
 
+  // Randomises a string of three different numeric characters.
   for (let i = 0; i < 3; i++) {
     const randomNumberIndex = Math.floor(Math.random() * numbers.length);
     name += numbers[randomNumberIndex];
@@ -58,4 +61,75 @@ function createName(): string {
 
   return name;
 }
-export { playerJoin, playerStatus };
+
+/**
+ * This function retrieves the final results for a session
+ *
+ * @param {number} playerId
+ *
+ * @returns {SessionResultsReturn}
+ *
+ */
+function playerResults(
+  playerId: number
+): SessionResultsReturn | ErrorObject {
+  const data = getData();
+  const sessionData = getSession();
+
+  let player;
+  let currentSession;
+
+  for (const session of sessionData.sessions) {
+    player = session.players.find((player) => player.playerId === playerId);
+    if (player) {
+      currentSession = session;
+      break;
+    }
+  }
+
+  // Error-checking block
+  if (player === undefined) {
+    throw HTTPError(400, { error: 'Player ID does not refer to a valid player' });
+  } else if (currentSession.state !== 'FINAL_RESULTS') {
+    throw HTTPError(400, { error: 'Session is not in FINAL_RESULTS state' });
+  }
+
+  const userRank = currentSession.players.map((player) => {
+    const { name, score } = player;
+    return { name, score };
+  });
+  userRank.sort((a, b) => b.score - a.score);
+
+  return {
+    usersRankedByScore: userRank,
+    questionResults: currentSession.questionResults
+  };
+}
+
+function playerSendMessage(playerId: number, message: string): Record<string, never> | ErrorObject {
+  const sessionData = getSession();
+
+  if (message.length < 2 || message.length > 100) {
+    throw HTTPError(400, { error: 'Message is either less than 1 character or more than 100 characters' });
+  }
+
+  const session = sessionData.sessions.find(session => session.players.some(player => player.playerId === playerId));
+
+  if (!session) {
+    throw HTTPError(400, { error: 'Player ID does not exist' });
+  }
+
+  const player = session.players.find(player => player.playerId === playerId);
+
+  session.messages.push({
+    messageBody: message,
+    playerId: playerId,
+    name: `${player.name}`,
+    timeSent: Math.floor(Date.now() / 1000)
+  });
+
+  setSession(sessionData);
+  return {};
+}
+
+export { playerJoin, playerStatus, playerResults, playerSendMessage };

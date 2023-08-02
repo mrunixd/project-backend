@@ -40,7 +40,7 @@ import {
   adminQuizSessionResults
 } from './quiz';
 
-import { playerJoin, playerStatus } from './player';
+import { playerJoin, playerStatus, playerResults, playerSendMessage } from './player';
 import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck } from './other';
 import HTTPError from 'http-errors';
 
@@ -841,6 +841,15 @@ app.get('/v1/player/:playerid', (req: Request, res: Response) => {
   return res.json(response);
 });
 
+// ROUTE: playerSendMessage
+app.post('/v1/player/:playerid/chat', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const { message } = req.body;
+
+  const response = playerSendMessage(playerId, message);
+  return res.json(response);
+});
+
 // ROUTE: adminQuizThumbnailUpdate
 app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
@@ -849,6 +858,15 @@ app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
 
   const userId = fullTokenCheck(token);
   const response = adminQuizThumbnailUpdate(userId, quizId, imgUrl);
+  return res.json(response);
+});
+
+// ROUTE: playerResults
+app.get('/v1/player/:playerid/results', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+
+  const response = playerResults(playerId);
+
   return res.json(response);
 });
 
