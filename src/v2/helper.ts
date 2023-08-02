@@ -186,5 +186,5 @@ export function sleepSync(ms: number) {
   const startTime = new Date().getTime();
   while (new Date().getTime() - startTime < ms) {
     // zzzZZ
-  } 
+  }
 }
