@@ -180,7 +180,7 @@ function playerSendMessage(playerId: number, message: string): Record<string, ne
  * @returns {Message[]}
  *
  */
-function playerViewMessages(playerId: number): Message[] | ErrorObject {
+function playerViewMessages(playerId: number): Messages | ErrorObject {
   const data = getSession();
   const session = data.sessions.find(session => session.players.some(player => player.playerId === playerId));
 
