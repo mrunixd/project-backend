@@ -1,4 +1,4 @@
-import { getData, setData, QuizIds, Quiz, Question, Answer, SessionId, STATE, ACTION, QuestionResult, getSession, setSession } from './dataStore';
+import { getData, setData, QuizIds, Quiz, Question, Answer, Session, SessionId, STATE, ACTION, QuestionResult, getSession, setSession } from './dataStore';
 import HTTPError from 'http-errors';
 import request from 'sync-request';
 import fs from 'fs';
@@ -1398,6 +1398,34 @@ function adminQuizSessionResultsCSV(
   return { url: fileUrl };
 }
 
+function adminQuizSessionList(quizId: number): {
+  activeSessions: number[];
+  inactiveSessions: number[];
+} {
+  const sessionData = getSession();
+  const inactiveSessionIds: number[] = [];
+  const activeSessionIds: number[] = [];
+
+  sessionData.sessions.forEach((session: Session) => {
+    if (session.metadata.quizId === quizId) {
+      if (session.state === 'END') {
+        inactiveSessionIds.push(session.sessionId);
+      } else {
+        activeSessionIds.push(session.sessionId);
+      }
+    }
+  });
+
+  // Sort both arrays in ascending order
+  activeSessionIds.sort((a, b) => a - b);
+  inactiveSessionIds.sort((a, b) => a - b);
+
+  return {
+    activeSessions: activeSessionIds,
+    inactiveSessions: inactiveSessionIds,
+  };
+}
+
 export {
   adminQuizCreate,
   adminQuizList,
@@ -1419,5 +1447,6 @@ export {
   adminQuizSessionStatus,
   adminQuizThumbnailUpdate,
   adminQuizSessionResults,
-  adminQuizSessionResultsCSV
+  adminQuizSessionResultsCSV,
+  adminQuizSessionList
 };

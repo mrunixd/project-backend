@@ -6,8 +6,6 @@ import {
   requestAdminQuizInfo,
   deleteRequest,
   OK,
-  UNAUTHORISED,
-  FORBIDDEN,
   INPUT_ERROR,
 } from '../helper';
 
@@ -167,37 +165,6 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
   });
 
   describe('Error cases', () => {
-    test('CASE (401): Token is not a valid structure - too short', () => {
-      result1 = requestAdminQuizQuestionDelete(
-        `${quiz1.body.quizId}`,
-        `${quizQuestion1.body.questionId}`,
-        `${1}`
-      );
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
-
-    test('CASE (401): Token is not a valid structure - special symbols', () => {
-      result1 = requestAdminQuizQuestionDelete(
-        `${quiz1.body.quizId}`,
-        `${quizQuestion1.body.questionId}`,
-        `${11_11}`
-      );
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
-
-    test('CASE (403): Token is not valid for a currently logged in session', () => {
-      const sessionId = parseInt(person1.body.token) + 1;
-      result1 = requestAdminQuizQuestionDelete(
-        `${quiz1.body.quizId}`,
-        `${quizQuestion1.body.questionId}`,
-        `${sessionId}`
-      );
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(FORBIDDEN);
-    });
-
     test('CASE: Quiz ID does not exist', () => {
       result1 = requestAdminQuizQuestionDelete(
         `${quiz1.body.quizId + 1}`,

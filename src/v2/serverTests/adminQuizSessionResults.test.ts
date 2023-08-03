@@ -5,6 +5,7 @@ import {
   requestAdminQuizQuestion,
   requestAdminQuizSessionUpdate,
   requestAdminQuizSessionResults,
+  requestAdminQuizSessionResultsCSV,
   requestPlayerJoin,
   sleepSync,
   deleteRequest,
@@ -71,6 +72,11 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid}/results ///
         questionResults: []
       });
       expect(result1.status).toStrictEqual(OK);
+
+      const result2 = requestAdminQuizSessionResultsCSV(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
+
+      expect(result2.body).toStrictEqual({ url: expect.any(String) });
+      expect(result2.status).toStrictEqual(OK);
     });
     /// /////////////////////////////////////////////////////////
     /// /more tests for when PLAYERS is complete to check state/////
@@ -81,11 +87,17 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid}/results ///
       result1 = requestAdminQuizSessionResults(`${parseInt(person1.body.token) - 1}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(FORBIDDEN);
+      const result2 = requestAdminQuizSessionResultsCSV(`${parseInt(person1.body.token) - 1}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
+      expect(result2.body).toStrictEqual({ error: expect.any(String) });
+      expect(result2.status).toStrictEqual(FORBIDDEN);
     });
     test('CASE (401): token is not valid structure', () => {
       result1 = requestAdminQuizSessionResults('hi!!!', `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(UNAUTHORISED);
+      const result2 = requestAdminQuizSessionResultsCSV('hi!!!', `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
+      expect(result2.body).toStrictEqual({ error: expect.any(String) });
+      expect(result2.status).toStrictEqual(UNAUTHORISED);
     });
     test('CASE (401): token is not valid structure', () => {
       result1 = requestAdminQuizSessionResults('a1aaa', `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
@@ -96,24 +108,37 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid}/results ///
       result1 = requestAdminQuizSessionResults(`${person1.body.token}`, `${quiz1.body.quizId + 1}`, `${session1.body.sessionId}`);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
+      const result2 = requestAdminQuizSessionResultsCSV(`${person1.body.token}`, `${quiz1.body.quizId + 1}`, `${session1.body.sessionId}`);
+      expect(result2.body).toStrictEqual({ error: expect.any(String) });
+      expect(result2.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (400): Quiz ID does not refer to a quiz that this user owns', () => {
       person2 = requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal');
       result1 = requestAdminQuizSessionResults(`${person2.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
+      const result2 = requestAdminQuizSessionResultsCSV(`${person2.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
+      expect(result2.body).toStrictEqual({ error: expect.any(String) });
+      expect(result2.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (400): Session ID does not refer to a valid quiz', () => {
       const newSessionId = parseInt(session1.body.sessionId) + 1;
       result1 = requestAdminQuizSessionResults(`${person1.body.token}`, `${quiz1.body.quizId}`, `${newSessionId}`);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
+      const result2 = requestAdminQuizSessionResultsCSV(`${person1.body.token}`, `${quiz1.body.quizId}`, `${newSessionId}`);
+      expect(result2.body).toStrictEqual({ error: expect.any(String) });
+      expect(result2.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (400): Session is not in FINAL_RESULTS state', () => {
       requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'END');
       result1 = requestAdminQuizSessionResults(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
+      const result2 = requestAdminQuizSessionResultsCSV(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
+      expect(result2.body).toStrictEqual({ error: expect.any(String) });
+      expect(result2.status).toStrictEqual(INPUT_ERROR);
     });
   });
 });
+deleteRequest('/v1/clear', {});

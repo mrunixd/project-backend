@@ -27,7 +27,7 @@ beforeEach(() => {
 
 const quizQuestion1Body = {
   question: 'Who is the Monarch of England?',
-  duration: 1,
+  duration: 0.1,
   points: 5,
   answers: [
     {
@@ -45,7 +45,7 @@ const quizQuestion1Body = {
 
 const quizQuestion2Body = {
   question: 'Who is the Goat?',
-  duration: 1,
+  duration: 0.1,
   points: 5,
   answers: [
     {
@@ -103,7 +103,7 @@ describe('////////TESTING /v1/player/:playerid/question/:questionposition///////
       expect(result1.body).toStrictEqual({
         questionId: expect.any(Number),
         question: 'Who is the Monarch of England?',
-        duration: 1,
+        duration: 0.1,
         thumbnailUrl: expect.any(String),
         points: 5,
         answers: [

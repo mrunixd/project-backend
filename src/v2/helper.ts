@@ -204,6 +204,11 @@ export function requestAdminQuizSessionResultsCSV(token: string, quizId: string,
   return response;
 }
 
+export function requestAdminQuizSessionList(token: string, quizId: string) {
+  const response = getRequest(`/v1/admin/quiz/${quizId}/sessions`, {}, { token });
+  return response;
+}
+
 export function requestPlayerQuestionInfo(playerId: number, questionPosition: number) {
   const response = getRequest(`/v1/player/${playerId}/question/${questionPosition}`, {}, {});
   return response;

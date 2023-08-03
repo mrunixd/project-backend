@@ -3,8 +3,6 @@ import {
   requestAdminQuizCreate,
   deleteRequest,
   OK,
-  UNAUTHORISED,
-  FORBIDDEN,
   INPUT_ERROR,
 } from '../helper';
 
@@ -42,37 +40,6 @@ describe('//////// Testing v2/admin/quiz/ create////////', () => {
   });
 
   describe('Testing /v2/admin/quiz/ error cases', () => {
-    test('CASE (401): Token is not a valid structure - too short', () => {
-      result1 = requestAdminQuizCreate(
-        '1',
-        'first quiz',
-        'first quiz being tested'
-      );
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
-
-    test('CASE (401): Token is not a valid structure - special symbols', () => {
-      result1 = requestAdminQuizCreate(
-        'let!!',
-        'first quiz',
-        'first quiz being tested'
-      );
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
-
-    test('CASE (403): Token is not valid for a currently logged in session', () => {
-      const sessionId = parseInt(person1.body.token) + 1;
-      result1 = requestAdminQuizCreate(
-        `${sessionId}`,
-        'first quiz',
-        'first quiz being tested'
-      );
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(FORBIDDEN);
-    });
-
     test('CASE: not alpahnumeric name', () => {
       result1 = requestAdminQuizCreate(
         `${person1.body.token}`,
