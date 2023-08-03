@@ -120,7 +120,6 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid}/results ///
       const result2 = requestAdminQuizSessionResultsCSV(`${person2.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`);
       expect(result2.body).toStrictEqual({ error: expect.any(String) });
       expect(result2.status).toStrictEqual(INPUT_ERROR);
-      
     });
     test('CASE (400): Session ID does not refer to a valid quiz', () => {
       const newSessionId = parseInt(session1.body.sessionId) + 1;
