@@ -184,7 +184,7 @@ function playerViewMessages(playerId: number): Message[] | ErrorObject {
     throw HTTPError(400, 'Player ID does not exist');
   }
 
-  const sessionMessages = { message: [] };
+  const sessionMessages: Message[] = { message: [] };
 
   for (const currentMessage of session.messages) {
     sessionMessages.message.push(currentMessage);
