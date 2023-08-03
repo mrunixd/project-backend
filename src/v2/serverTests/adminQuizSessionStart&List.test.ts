@@ -4,6 +4,8 @@ import {
   requestAdminQuizCreate,
   requestAdminQuizQuestion,
   requestAdminQuizQuestionDelete,
+  requestAdminQuizSessionList,
+  requestAdminQuizSessionUpdate,
   deleteRequest,
   OK,
   UNAUTHORISED,
@@ -33,7 +35,7 @@ const quizQuestion1Body = {
     },
   ],
   thumbnailUrl:
-    'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
+    'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
 };
 
 beforeEach(() => {
@@ -116,5 +118,24 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/start ///////', () => {
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
+  });
+
+  test('CASE: ADMINQUIZSESSIONLIST SUCCESS CASE', () => {
+    const session1 = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 1);
+    requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'END');
+  
+    const session2 = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 1);
+  
+    const result2 = requestAdminQuizSessionList(`${person1.body.token}`, `${quiz1.body.quizId}`);
+  
+    expect(result2.body).toStrictEqual({
+      activeSessions: [
+        session2.body.sessionId
+      ],
+      inactiveSessions: [
+        session1.body.sessionId
+      ]
+    });
+    expect(result2.status).toStrictEqual(OK);
   });
 });

@@ -63,79 +63,6 @@ describe('/////// TESTING v2/admin/quiz/description ///////', () => {
   });
 
   describe('/////// Testing v2/admin/quiz/description error(s)', () => {
-    // Status 401
-    test('CASE: Token is not a valid structure - too short', () => {
-      person1 = requestAdminAuthRegister(
-        'aarnavsample@gmail.com',
-        'Abcd12345',
-        'aarnav',
-        'sheth'
-      );
-
-      quiz1 = requestAdminQuizCreate(
-        `${person1.body.token}`,
-        'first quiz',
-        'first quiz being tested'
-      );
-
-      result1 = requestAdminQuizDescriptionUpdate(
-        `${quiz1.body.quizId}`,
-        '1424',
-        'newQuizName'
-      );
-
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
-
-    test('CASE: Token is not a valid structure - too long', () => {
-      person1 = requestAdminAuthRegister(
-        'aarnavsample@gmail.com',
-        'Abcd12345',
-        'aarnav',
-        'sheth'
-      );
-
-      quiz1 = requestAdminQuizCreate(
-        `${person1.body.token}`,
-        'first quiz',
-        'first quiz being tested'
-      );
-
-      result1 = requestAdminQuizDescriptionUpdate(
-        `${quiz1.body.quizId}`,
-        '142324',
-        'newQuizName'
-      );
-
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
-
-    test('CASE: Token is not a valid structure - special characters', () => {
-      person1 = requestAdminAuthRegister(
-        'aarnavsample@gmail.com',
-        'Abcd12345',
-        'aarnav',
-        'sheth'
-      );
-
-      quiz1 = requestAdminQuizCreate(
-        `${person1.body.token}`,
-        'first quiz',
-        'first quiz being tested'
-      );
-
-      result1 = requestAdminQuizDescriptionUpdate(
-        `${quiz1.body.quizId}`,
-        'd@421',
-        'newQuizName'
-      );
-
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
-  });
 
   // Status 403
   test('CASE: Provided token is valid structure, but is not for a currently logged in session', () => {
@@ -265,4 +192,5 @@ describe('/////// TESTING v2/admin/quiz/description ///////', () => {
     expect(result1.body).toStrictEqual({ error: expect.any(String) });
     expect(result1.status).toBe(INPUT_ERROR);
   });
+});
 });

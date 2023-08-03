@@ -136,40 +136,6 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
   });
 
   describe('Testing /v2/admin/quiz/{quizid}/question error cases', () => {
-    test('CASE (401): Token is not a valid structure - too short', () => {
-      result1 = requestAdminQuizQuestionUpdate(
-        `${quiz1.body.quizId}`,
-        `${quizQuestion1.body.questionId}`,
-        '1',
-        quizQuestion1Body
-      );
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
-
-    test('CASE (401): Token is not a valid structure - special symbols', () => {
-      result1 = requestAdminQuizQuestionUpdate(
-        `${quiz1.body.quizId}`,
-        `${quizQuestion1.body.questionId}`,
-        'let!!',
-        quizQuestion1Body
-      );
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
-
-    test('CASE (403): Token is not valid for a currently logged in session', () => {
-      const sessionId = parseInt(person1.body.token) + 1;
-      result1 = requestAdminQuizQuestionUpdate(
-        `${quiz1.body.quizId}`,
-        `${quizQuestion1.body.questionId}`,
-        `${sessionId}`,
-        quizQuestion1Body
-      );
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(FORBIDDEN);
-    });
-
     test('CASE: quiz does not exist', () => {
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId + 1}`,

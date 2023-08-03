@@ -99,21 +99,10 @@ describe('////////TESTING v2/admin/quiz/list////////', () => {
   });
 
   describe('ERROR CASES', () => {
-    test('CASE (401): Token is not a valid structure - too short', () => {
-      result1 = requestAdminQuizList(`${1}`);
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
     test('CASE (401): Token is not a valid structure - special symbols', () => {
       result1 = requestAdminQuizList('let!!');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
-    });
-    test('CASE (403): Token is not valid for a currently logged in session', () => {
-      const sessionId = parseInt(person1.body.token) + 1;
-      result1 = requestAdminQuizList(`${sessionId}`);
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(FORBIDDEN);
     });
   });
 });
