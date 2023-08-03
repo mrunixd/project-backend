@@ -5,7 +5,6 @@ import {
   deleteRequest,
   OK,
   UNAUTHORISED,
-  FORBIDDEN,
 } from '../helper';
 
 let result1: any;

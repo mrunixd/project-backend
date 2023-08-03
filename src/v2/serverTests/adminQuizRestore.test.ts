@@ -6,8 +6,6 @@ import {
   requestAdminQuizRestore,
   deleteRequest,
   OK,
-  UNAUTHORISED,
-  FORBIDDEN,
   INPUT_ERROR,
 } from '../helper';
 

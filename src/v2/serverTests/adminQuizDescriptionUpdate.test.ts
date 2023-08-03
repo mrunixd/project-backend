@@ -5,7 +5,6 @@ import {
   requestAdminQuizInfo,
   deleteRequest,
   OK,
-  UNAUTHORISED,
   FORBIDDEN,
   INPUT_ERROR,
 } from '../helper';
@@ -63,134 +62,133 @@ describe('/////// TESTING v2/admin/quiz/description ///////', () => {
   });
 
   describe('/////// Testing v2/admin/quiz/description error(s)', () => {
-
   // Status 403
-  test('CASE: Provided token is valid structure, but is not for a currently logged in session', () => {
-    person1 = requestAdminAuthRegister(
-      'aarnavsample@gmail.com',
-      'Abcd12345',
-      'aarnav',
-      'sheth'
-    );
+    test('CASE: Provided token is valid structure, but is not for a currently logged in session', () => {
+      person1 = requestAdminAuthRegister(
+        'aarnavsample@gmail.com',
+        'Abcd12345',
+        'aarnav',
+        'sheth'
+      );
 
-    quiz1 = requestAdminQuizCreate(
+      quiz1 = requestAdminQuizCreate(
       `${person1.body.token}`,
       'first quiz',
       'first quiz being tested'
-    );
+      );
 
-    result1 = requestAdminQuizDescriptionUpdate(
+      result1 = requestAdminQuizDescriptionUpdate(
       `${quiz1.body.quizId}`,
       '12345',
       'newDescription'
-    );
+      );
 
-    expect(result1.body).toStrictEqual({ error: expect.any(String) });
-    expect(result1.status).toBe(FORBIDDEN);
-  });
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(FORBIDDEN);
+    });
 
-  // Status 400
-  test('CASE: quizId does not refer to a valid quiz', () => {
-    person1 = requestAdminAuthRegister(
-      'aarnavsample@gmail.com',
-      'Abcd12345',
-      'aarnav',
-      'sheth'
-    );
+    // Status 400
+    test('CASE: quizId does not refer to a valid quiz', () => {
+      person1 = requestAdminAuthRegister(
+        'aarnavsample@gmail.com',
+        'Abcd12345',
+        'aarnav',
+        'sheth'
+      );
 
-    quiz1 = requestAdminQuizCreate(
+      quiz1 = requestAdminQuizCreate(
       `${person1.body.token}`,
       'first quiz',
       'first quiz being tested'
-    );
+      );
 
-    result1 = requestAdminQuizDescriptionUpdate(
+      result1 = requestAdminQuizDescriptionUpdate(
       `${quiz1.body.quizId + 1}`,
       `${person1.body.token}`,
       'newDescription'
-    );
+      );
 
-    expect(result1.body).toStrictEqual({ error: expect.any(String) });
-    expect(result1.status).toBe(INPUT_ERROR);
-  });
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
 
-  test('CASE: quizId does not refer to a quiz that this user owns', () => {
-    person1 = requestAdminAuthRegister(
-      'aarnavsample@gmail.com',
-      'Abcd12345',
-      'aarnav',
-      'sheth'
-    );
+    test('CASE: quizId does not refer to a quiz that this user owns', () => {
+      person1 = requestAdminAuthRegister(
+        'aarnavsample@gmail.com',
+        'Abcd12345',
+        'aarnav',
+        'sheth'
+      );
 
-    quiz1 = requestAdminQuizCreate(
+      quiz1 = requestAdminQuizCreate(
       `${person1.body.token}`,
       'first quiz',
       'first quiz being tested'
-    );
+      );
 
-    person2 = requestAdminAuthRegister(
-      'zhizhao@gmail.com',
-      'Abcd12345',
-      'Zhi',
-      'Zhao'
-    );
+      person2 = requestAdminAuthRegister(
+        'zhizhao@gmail.com',
+        'Abcd12345',
+        'Zhi',
+        'Zhao'
+      );
 
-    result1 = requestAdminQuizDescriptionUpdate(
+      result1 = requestAdminQuizDescriptionUpdate(
       `${quiz1.body.quizId}`,
       `${person2.body.token}`,
       'newDescription'
-    );
+      );
 
-    expect(result1.body).toStrictEqual({ error: expect.any(String) });
-    expect(result1.status).toBe(INPUT_ERROR);
-  });
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
 
-  test('CASE: Description is longer than 100 characters', () => {
-    person1 = requestAdminAuthRegister(
-      'aarnavsample@gmail.com',
-      'Abcd12345',
-      'aarnav',
-      'sheth'
-    );
+    test('CASE: Description is longer than 100 characters', () => {
+      person1 = requestAdminAuthRegister(
+        'aarnavsample@gmail.com',
+        'Abcd12345',
+        'aarnav',
+        'sheth'
+      );
 
-    quiz1 = requestAdminQuizCreate(
+      quiz1 = requestAdminQuizCreate(
       `${person1.body.token}`,
       'first quiz',
       'first quiz being tested'
-    );
+      );
 
-    result1 = requestAdminQuizDescriptionUpdate(
+      result1 = requestAdminQuizDescriptionUpdate(
       `${quiz1.body.quizId}`,
       `${person1.body.token}`,
       'zhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzhzh'
-    );
+      );
 
-    expect(result1.body).toStrictEqual({ error: expect.any(String) });
-    expect(result1.status).toBe(INPUT_ERROR);
-  });
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
 
-  test('CASE: More than 100 empty spaces', () => {
-    person1 = requestAdminAuthRegister(
-      'aarnavsample@gmail.com',
-      'Abcd12345',
-      'aarnav',
-      'sheth'
-    );
+    test('CASE: More than 100 empty spaces', () => {
+      person1 = requestAdminAuthRegister(
+        'aarnavsample@gmail.com',
+        'Abcd12345',
+        'aarnav',
+        'sheth'
+      );
 
-    quiz1 = requestAdminQuizCreate(
+      quiz1 = requestAdminQuizCreate(
       `${person1.body.token}`,
       'first quiz',
       'first quiz being tested'
-    );
+      );
 
-    result1 = requestAdminQuizDescriptionUpdate(
+      result1 = requestAdminQuizDescriptionUpdate(
       `${quiz1.body.quizId}`,
       `${person1.body.token}`,
       '                                                                                                      '
-    );
+      );
 
-    expect(result1.body).toStrictEqual({ error: expect.any(String) });
-    expect(result1.status).toBe(INPUT_ERROR);
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
   });
-});
 });

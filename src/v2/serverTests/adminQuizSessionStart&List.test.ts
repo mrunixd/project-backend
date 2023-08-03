@@ -123,11 +123,11 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/start ///////', () => {
   test('CASE: ADMINQUIZSESSIONLIST SUCCESS CASE', () => {
     const session1 = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 1);
     requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'END');
-  
+
     const session2 = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 1);
-  
+
     const result2 = requestAdminQuizSessionList(`${person1.body.token}`, `${quiz1.body.quizId}`);
-  
+
     expect(result2.body).toStrictEqual({
       activeSessions: [
         session2.body.sessionId
