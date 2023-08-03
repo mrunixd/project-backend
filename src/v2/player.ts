@@ -8,6 +8,10 @@ interface Status {
   atQuestion: number;
 }
 
+interface Messages {
+  message: Message[]
+}
+
 /**
  * Given a session ID and a name, this allows a player to join a game.
  *
@@ -184,7 +188,7 @@ function playerViewMessages(playerId: number): Message[] | ErrorObject {
     throw HTTPError(400, 'Player ID does not exist');
   }
 
-  const sessionMessages = { message: [] };
+  const sessionMessages: Messages = { message: [] };
 
   for (const currentMessage of session.messages) {
     sessionMessages.message.push(currentMessage);
