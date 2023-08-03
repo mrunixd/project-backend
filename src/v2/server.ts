@@ -41,7 +41,7 @@ import {
   adminQuizSessionResultsCSV
 } from './quiz';
 
-import { playerJoin, playerStatus, playerResults, playerSendMessage, playerViewMessages } from './player';
+import { playerJoin, playerStatus, playerResults, playerSendMessage, playerViewMessages, playerQuestionInfo } from './player';
 import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck } from './other';
 import HTTPError from 'http-errors';
 
@@ -891,6 +891,25 @@ app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
 
   const userId = fullTokenCheck(token);
   const response = adminQuizThumbnailUpdate(userId, quizId, imgUrl);
+  return res.json(response);
+});
+
+// ROUTE: playerResults
+app.get('/v1/player/:playerid/results', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+
+  const response = playerResults(playerId);
+
+  return res.json(response);
+});
+
+// ROUTE: playerQuestionInfo
+app.get('/v1/player/:playerid/question/:questionposition', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const questionPos = parseInt(req.params.questionposition);
+
+  const response = playerQuestionInfo(playerId, questionPos);
+
   return res.json(response);
 });
 

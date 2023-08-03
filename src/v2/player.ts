@@ -193,4 +193,25 @@ function playerViewMessages(playerId: number): Message[] | ErrorObject {
   return sessionMessages;
 }
 
-export { playerJoin, playerStatus, playerResults, playerSendMessage, playerViewMessages };
+function playerQuestionInfo(playerId: number, questionPosition: number) {
+  const sessiondata = getSession();
+  const session = sessiondata.sessions.find((session) =>
+    session.players.find((player) => player.playerId === playerId)
+  );
+  if (session === undefined) {
+    throw HTTPError(400, { error: 'Player ID does not exit' });
+  } else if (
+    session.state === STATE.LOBBY ||
+    session.state === STATE.END
+  ) {
+    throw HTTPError(400, { error: 'Session has not started or has already finished' });
+  } else if (questionPosition > session.metadata.numQuestions) {
+    throw HTTPError(400, { error: 'Question position is not valid for this current session' });
+  } else if (questionPosition !== session.atQuestion) {
+    throw HTTPError(400, { error: 'Session is not currently at this question' });
+  } else {
+    return session.metadata.questions[questionPosition - 1];
+  }
+}
+
+export { playerJoin, playerStatus, playerResults, playerSendMessage, playerViewMessages, playerQuestionInfo };
