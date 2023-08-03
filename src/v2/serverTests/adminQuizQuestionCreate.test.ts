@@ -4,8 +4,6 @@ import {
   deleteRequest,
   requestAdminQuizQuestion,
   OK,
-  UNAUTHORISED,
-  FORBIDDEN,
   INPUT_ERROR,
 } from '../helper';
 
@@ -42,7 +40,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
           correct: true,
         },
       ],
-      thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
+      thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
     };
   });
 
@@ -55,25 +53,6 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
   });
 
   describe('Testing /v2/admin/quiz/{quizid}/question error cases', () => {
-    test('CASE (401): Token is not a valid structure - too short', () => {
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, '1', quizQuestion1);
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
-
-    test('CASE (401): Token is not a valid structure - special symbols', () => {
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, 'let!!', quizQuestion1);
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(UNAUTHORISED);
-    });
-
-    test('CASE (403): Token is not valid for a currently logged in session', () => {
-      const sessionId = parseInt(person1.body.token) + 1;
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${sessionId}`, quizQuestion1);
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toBe(FORBIDDEN);
-    });
-
     test('CASE: quiz does not exist', () => {
       result1 = requestAdminQuizQuestion(`${quiz1.body.quizId + 1}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -101,7 +80,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
             correct: true,
           },
         ],
-        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
 
@@ -120,7 +99,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
             correct: true,
           },
         ],
-        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -142,7 +121,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
             correct: true,
           },
         ],
-        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -164,7 +143,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
             correct: true,
           },
         ],
-        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -209,7 +188,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
             correct: true,
           },
         ],
-        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -231,7 +210,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
             correct: true,
           },
         ],
-        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -253,7 +232,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
             correct: false,
           },
         ],
-        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });

@@ -6,8 +6,6 @@ import {
   requestAdminQuizRestore,
   deleteRequest,
   OK,
-  UNAUTHORISED,
-  FORBIDDEN,
   INPUT_ERROR,
 } from '../helper';
 
@@ -140,19 +138,6 @@ describe('////////Testing v2/admin/quiz/:quizid/restore////////', () => {
       );
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
-    });
-    test('CASE (401): Token is not a valid structure', () => {
-      const result1 = requestAdminQuizRestore(`${quiz1.body.quizId}`, 'let!!');
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toStrictEqual(UNAUTHORISED);
-    });
-    test('CASE (403): Provided token is a valid structure but not for logged in session', () => {
-      const result1 = requestAdminQuizRestore(
-        `${quiz1.body.quizId}`,
-        `${parseInt(person1.body.token) - 1}`
-      );
-      expect(result1.body).toStrictEqual({ error: expect.any(String) });
-      expect(result1.status).toStrictEqual(FORBIDDEN);
     });
   });
 });

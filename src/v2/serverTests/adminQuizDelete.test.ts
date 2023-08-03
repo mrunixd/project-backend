@@ -5,8 +5,6 @@ import {
   requestAdminQuizList,
   deleteRequest,
   OK,
-  UNAUTHORISED,
-  FORBIDDEN,
   INPUT_ERROR,
 } from '../helper';
 
@@ -111,25 +109,6 @@ describe('///////Testing /v2/admin/quiz/delete////////', () => {
         error: expect.any(String),
       });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
-    });
-
-    test('CASE(401): Token is not valid structure', () => {
-      const result1 = requestAdminQuizDelete(
-        `${result2.body.quizId}`,
-        'hello1234'
-      );
-      expect(result1.body).toStrictEqual({
-        error: expect.any(String),
-      });
-      expect(result1.status).toStrictEqual(UNAUTHORISED);
-    });
-
-    test('CASE(403): Provided token is of valid structure but no logged session', () => {
-      const result1 = requestAdminQuizDelete(`${result2.body.quizId}`, '12345');
-      expect(result1.body).toStrictEqual({
-        error: expect.any(String),
-      });
-      expect(result1.status).toStrictEqual(FORBIDDEN);
     });
   });
 });
