@@ -43,7 +43,7 @@ const quizQuestion1Body = {
     },
   ],
   thumbnailUrl:
-    'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
+    'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
 };
 
 describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', () => {
@@ -83,7 +83,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
+          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -225,7 +225,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png',
+          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -249,7 +249,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png',
+          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -277,7 +277,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png',
+          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -305,7 +305,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png',
+          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -333,7 +333,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png',
+          'hhttps://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -362,7 +362,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png',
+          'hhttps://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -390,7 +390,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png',
+          'hhttps://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -417,7 +417,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'https://media.sproutsocial.com/uploads/Hompage_Integrations-Grid@x2.png',
+          'hhttps://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
