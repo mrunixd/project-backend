@@ -1,7 +1,26 @@
-import { ErrorObject, STATE, getSession, setSession } from './dataStore';
+import { ErrorObject, Message, STATE, getSession, setSession } from './dataStore';
 import { SessionResultsReturn } from './quiz';
 import HTTPError from 'http-errors';
 
+interface Status {
+  state: string;
+  numQuestions: number;
+  atQuestion: number;
+}
+
+interface Messages {
+  message: Message[]
+}
+
+/**
+ * Given a session ID and a name, this allows a player to join a game.
+ *
+ * @param {number} playerId
+ * @param {string} name
+ *
+ * @returns {number} playerId
+ *
+ */
 function playerJoin(sessionId: number, name: string): {playerId: number} | ErrorObject {
   if (name === '') {
     name = createName();
@@ -26,13 +45,21 @@ function playerJoin(sessionId: number, name: string): {playerId: number} | Error
   return { playerId: session.players.length };
 }
 
+/**
+ * This function retrieves the status of a given player
+ *
+ * @param {number} playerId
+ *
+ * @returns {Status}
+ *
+ */
 function playerStatus(playerId: number) {
   const sessionData = getSession();
   const session = sessionData.sessions.find(session => session.players.find(player => player.playerId === playerId));
   if (session === undefined) {
     throw HTTPError(400, { error: 'Player ID does not exit' });
   }
-  const status = {
+  const status: Status = {
     state: session.state,
     numQuestions: session.metadata.numQuestions,
     atQuestion: session.atQuestion
@@ -40,6 +67,12 @@ function playerStatus(playerId: number) {
   return status;
 }
 
+/**
+ * Generates a random name.
+ *
+ * @returns {string}
+ *
+ */
 function createName(): string {
   let letters = 'abcdefghijklmnopqrstuvwxyz';
   let numbers = '0123456789';
@@ -74,7 +107,6 @@ function playerResults(
   playerId: number
 ): SessionResultsReturn | ErrorObject {
   const sessionData = getSession();
-
   let player;
   let currentSession;
 
@@ -105,6 +137,15 @@ function playerResults(
   };
 }
 
+/**
+ * Given a playerId, allows a player to send a message to the session chatroom.
+ *
+ * @param {number} playerId
+ * @param {string} message
+ *
+ * @returns {}
+ *
+ */
 function playerSendMessage(playerId: number, message: string): Record<string, never> | ErrorObject {
   const sessionData = getSession();
 
@@ -131,16 +172,41 @@ function playerSendMessage(playerId: number, message: string): Record<string, ne
   return {};
 }
 
+/**
+ * Given a playerId, allows a player to view the session's chatroom.
+ *
+ * @param {number} playerId
+ *
+ * @returns {Message[]}
+ *
+ */
+function playerViewMessages(playerId: number): Messages | ErrorObject {
+  const sessionData = getSession();
+  const session = sessionData.sessions.find(session => session.players.some(player => player.playerId === playerId));
+
+  if (!session) {
+    throw HTTPError(400, 'Player ID does not exist');
+  }
+
+  const sessionMessages: Messages = { message: [] };
+
+  for (const currentMessage of session.messages) {
+    sessionMessages.message.push(currentMessage);
+  }
+
+  return sessionMessages;
+}
+
 function playerQuestionInfo(playerId: number, questionPosition: number) {
-  const sessiondata = getSession();
-  const session = sessiondata.sessions.find((session) =>
+  const sessionData = getSession();
+  const session = sessionData.sessions.find((session) =>
     session.players.find((player) => player.playerId === playerId)
   );
   if (session === undefined) {
     throw HTTPError(400, { error: 'Player ID does not exit' });
   } else if (
-    session.state === STATE.LOBBY ||
-    session.state === STATE.END
+    session.state === 'STATE.LOBBY' ||
+    session.state === 'STATE.END'
   ) {
     throw HTTPError(400, { error: 'Session has not started or has already finished' });
   } else if (questionPosition > session.metadata.numQuestions) {
@@ -152,4 +218,4 @@ function playerQuestionInfo(playerId: number, questionPosition: number) {
   }
 }
 
-export { playerJoin, playerStatus, playerResults, playerSendMessage, playerQuestionInfo };
+export { playerJoin, playerStatus, playerResults, playerSendMessage, playerViewMessages, playerQuestionInfo };
