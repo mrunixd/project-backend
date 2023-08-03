@@ -181,8 +181,8 @@ function playerSendMessage(playerId: number, message: string): Record<string, ne
  *
  */
 function playerViewMessages(playerId: number): Messages | ErrorObject {
-  const data = getSession();
-  const session = data.sessions.find(session => session.players.some(player => player.playerId === playerId));
+  const sessionData = getSession();
+  const session = sessionData.sessions.find(session => session.players.some(player => player.playerId === playerId));
 
   if (!session) {
     throw HTTPError(400, 'Player ID does not exist');
@@ -198,15 +198,15 @@ function playerViewMessages(playerId: number): Messages | ErrorObject {
 }
 
 function playerQuestionInfo(playerId: number, questionPosition: number) {
-  const sessiondata = getSession();
-  const session = sessiondata.sessions.find((session) =>
+  const sessionData = getSession();
+  const session = sessionData.sessions.find((session) =>
     session.players.find((player) => player.playerId === playerId)
   );
   if (session === undefined) {
     throw HTTPError(400, { error: 'Player ID does not exit' });
   } else if (
-    session.state === STATE.LOBBY ||
-    session.state === STATE.END
+    session.state === 'STATE.LOBBY' ||
+    session.state === 'STATE.END'
   ) {
     throw HTTPError(400, { error: 'Session has not started or has already finished' });
   } else if (questionPosition > session.metadata.numQuestions) {

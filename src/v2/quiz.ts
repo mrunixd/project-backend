@@ -72,6 +72,7 @@ interface UserRank {
   name: string;
   score: number;
 }
+
 export interface SessionResultsReturn {
   usersRankedByScore: UserRank[];
   questionResults: QuestionResult[];
