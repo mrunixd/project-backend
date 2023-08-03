@@ -41,7 +41,7 @@ const quizQuestion1Body = {
     },
   ],
   thumbnailUrl:
-    'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
+    'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
 };
 
 describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', () => {
@@ -81,7 +81,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
+          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -189,7 +189,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
+          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -213,7 +213,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
+          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -241,7 +241,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
+          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -269,7 +269,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
+          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -297,7 +297,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'hhttps://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
+          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -326,7 +326,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'hhttps://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
+          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -353,8 +353,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
             correct: true,
           },
         ],
-        thumbnailUrl:
-          'hhttps://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
+        thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
@@ -381,7 +380,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
           },
         ],
         thumbnailUrl:
-          'hhttps://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
+          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
       result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,

@@ -35,7 +35,7 @@ const quizQuestion1Body = {
     },
   ],
   thumbnailUrl:
-    'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
+    'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
 };
 
 beforeEach(() => {

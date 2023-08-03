@@ -35,7 +35,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
       result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId}`,
           `${person1.body.token}`,
-          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png'
+          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
       );
 
       expect(result1.body).toStrictEqual({});
@@ -60,7 +60,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
       requestAdminQuizThumbnailUpdate(
         `${quiz1.body.quizId}`,
         `${person1.body.token}`,
-        'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png'
+        'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
       );
       result1 = requestAdminQuizThumbnailUpdate(
         `${quiz1.body.quizId}`,
@@ -93,7 +93,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
       result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId + 1}`,
           `${person1.body.token}`,
-          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png'
+          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
       );
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -111,7 +111,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
       result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId}`,
           `${person2.body.token}`,
-          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png'
+          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
       );
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -122,7 +122,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
       result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId}`,
           `${1}`,
-          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png'
+          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
       );
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -133,7 +133,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
       result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId}`,
           'let!!',
-          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png'
+          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
       );
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -144,7 +144,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
       result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId}`,
           `${12121322}`,
-          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png'
+          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
       );
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
@@ -155,7 +155,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
       result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId}`,
           `${12345}`,
-          'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png'
+          'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
       );
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
