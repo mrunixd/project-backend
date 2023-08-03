@@ -5,6 +5,7 @@ import {
   requestAdminQuizQuestion,
   requestAdminQuizSessionStart,
   requestPlayerJoin,
+  requestPlayerSendMessage,
   OK,
   INPUT_ERROR,
 } from '../helper';
@@ -38,10 +39,10 @@ const quizQuestion1Body = {
     },
   ],
   thumbnailUrl:
-    'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
+    'https://upload.wikimedia.org/wikipedia/en/4/49/Creeper_%28Minecraft%29.png',
 };
 
-describe('////////TESTING v1/player/join////////', () => {
+describe('////////TESTING v1/player/join&sendmessage////////', () => {
   beforeEach(() => {
     person1 = requestAdminAuthRegister(
       'manan.j2450@gmail.com',
@@ -80,6 +81,44 @@ describe('////////TESTING v1/player/join////////', () => {
       console.log(result1.body);
       expect(result2.body).toStrictEqual({ error: expect.any(String) });
       expect(result2.status).toBe(INPUT_ERROR);
+    });
+  });
+
+  describe('TESTING /v1/player/:playerid/chat (Send message)', () => {
+    beforeEach(() => {
+      result1 = requestPlayerJoin(sessionId.body.sessionId, 'Zhi Zhao');
+    });
+
+    describe('Testing /v1/player/:playerid/chat success', () => {
+      test('adminQuizSendMessage runs without error', () => {
+        result2 = requestPlayerSendMessage(result1.body.playerId, 'Hello world');
+
+        expect(result2.body).toStrictEqual({});
+        expect(result2.status).toBe(OK);
+      });
+    });
+
+    describe('Testing /v1/player/:playerid/chat errors', () => {
+      test('CASE (400): Message is less than 1 character', () => {
+        result2 = requestPlayerSendMessage(result1.body.playerId, 'H');
+
+        expect(result2.body).toStrictEqual({ error: expect.any(String) });
+        expect(result2.status).toBe(INPUT_ERROR);
+      });
+
+      test('CASE (400): Message is more than 100 characters', () => {
+        result2 = requestPlayerSendMessage(result1.body.playerId, 'Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World');
+
+        expect(result2.body).toStrictEqual({ error: expect.any(String) });
+        expect(result2.status).toBe(INPUT_ERROR);
+      });
+
+      test('CASE (400): Player ID does not exist in this session', () => {
+        result2 = requestPlayerSendMessage(1234, 'Hello World');
+
+        expect(result2.body).toStrictEqual({ error: expect.any(String) });
+        expect(result2.status).toBe(INPUT_ERROR);
+      });
     });
   });
 });
