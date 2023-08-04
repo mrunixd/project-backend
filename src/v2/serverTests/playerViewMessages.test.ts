@@ -36,7 +36,7 @@ const quizQuestion1Body = {
 let person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
 let quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 let sessionId = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 3);
-const result1 = requestPlayerJoin(sessionId.body.sessionId, 'Zhi Zhao');
+let result1 = requestPlayerJoin(sessionId.body.sessionId, 'Zhi Zhao');
 
 describe('/////// TESTING /v1/player/:playerid/chat (Show Messages) ///////', () => {
   beforeEach(() => {
@@ -44,7 +44,7 @@ describe('/////// TESTING /v1/player/:playerid/chat (Show Messages) ///////', ()
     quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
     requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
     sessionId = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 3);
-    const result1 = requestPlayerJoin(sessionId.body.sessionId, 'Zhi Zhao');
+    result1 = requestPlayerJoin(sessionId.body.sessionId, 'Zhi Zhao');
     requestPlayerSendMessage(result1.body.playerId, 'Hello World');
   });
 
