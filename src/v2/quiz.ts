@@ -83,13 +83,7 @@ function adminQuizList(authUserId: number): {quizzes: []} | {quizzes: QuizIds[]}
   const data = getData();
   const user = data.users.find((user) => user.authUserId === authUserId);
 
-  if (user.quizIds) {
-    return { quizzes: user.quizIds.map((quiz) => quiz) };
-  }
-
-  return {
-    quizzes: [],
-  };
+  return { quizzes: user.quizIds.map((quiz) => quiz) };
 }
 
 /**
@@ -185,9 +179,6 @@ function adminQuizRemove(
   user.trash.push(removedQuiz);
 
   const quizDetails = data.quizzes.find((id) => id.quizId === quizId);
-  if (quizDetails === undefined) {
-    throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
-  }
   quizDetails.timeLastEdited = Math.floor(Date.now() / 1000);
   setData(data);
   return {};
@@ -489,12 +480,11 @@ function adminQuizQuestion(
   } else if (!questionBody.answers.some((answer) => answer.correct)) {
     throw HTTPError(400, { error: 'Question must have at least one correct answer' });
   }
+  if (questionBody.thumbnailUrl === '') {
+    throw HTTPError(400, { error: 'ThumbnailUrl cannot be empty string' });
+  }
 
   if (questionBody.thumbnailUrl !== undefined) {
-    if (questionBody.thumbnailUrl === '') {
-      throw HTTPError(400, { error: 'ThumbnailUrl cannot be empty string' });
-    }
-
     const res = request('GET', `${questionBody.thumbnailUrl}`);
     const body = res.getBody();
 
@@ -1301,7 +1291,21 @@ function adminQuizSessionResults(
   };
 }
 
-function adminQuizSessionResultsCSV(authUserId: number, quizId: number, sessionId: number): {url: string} | ErrorObject {
+/**
+ * This function gives results but in CSV file
+ *
+ * @param {number} authUserId
+ * @param {number} quizId
+ * @param {string} imgUrl
+ *
+ * @returns {}
+ *
+ */
+function adminQuizSessionResultsCSV(
+  authUserId: number,
+  quizId: number,
+  sessionId: number
+): {url: string} | ErrorObject {
   const data = getData();
   const sessionData = getSession();
 

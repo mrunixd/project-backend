@@ -6,6 +6,7 @@ import {
   requestAdminQuizSessionStart,
   requestPlayerJoin,
   requestPlayerSendMessage,
+  requestAdminQuizSessionUpdate,
   OK,
   INPUT_ERROR,
 } from '../helper';
@@ -68,7 +69,7 @@ describe('////////TESTING v1/player/join&sendmessage////////', () => {
   });
   describe('TESTING v1/player/join success', () => {
     test('player joins empty game successfully', () => {
-      result1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
+      result1 = requestPlayerJoin(sessionId.body.sessionId, '');
       expect(result1.body).toStrictEqual({ playerId: expect.any(Number) });
       expect(result1.status).toBe(OK);
     });
@@ -79,6 +80,17 @@ describe('////////TESTING v1/player/join&sendmessage////////', () => {
       result2 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
       expect(result2.body).toStrictEqual({ error: expect.any(String) });
       expect(result2.status).toBe(INPUT_ERROR);
+    });
+    test('CASE 400: sessionId not valid', () => {
+      result1 = requestPlayerJoin(-56, 'Manan Jaiswal');
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
+    });
+    test('CASE 400: sessionId already started', () => {
+      requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${sessionId.body.sessionId}`, 'NEXT_QUESTION');
+      result1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
+      expect(result1.body).toStrictEqual({ error: expect.any(String) });
+      expect(result1.status).toBe(INPUT_ERROR);
     });
   });
 

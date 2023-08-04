@@ -2,7 +2,6 @@ import { ErrorObject, STATE, getSession, setSession, Message, Question } from '.
 import { SessionResultsReturn, createTimeout } from './quiz';
 import HTTPError from 'http-errors';
 
-
 export interface Status {
   state: string;
   numQuestions: number;
@@ -220,7 +219,30 @@ function playerViewMessages(playerId: number): Message[] | ErrorObject {
   return sessionMessages;
 }
 
-function playerQuestionInfo(playerId: number, questionPosition: number): Question {
+/**
+ * This function provides information about the selected player
+ *
+ * @param {number} authUserId
+ * @param {number} quizId
+ * @param {string} imgUrl
+ *
+ * @returns {
+ * "questionId": number,
+ * "question": string,
+ * "duration": number,
+ * "thumbnailUrl": string,
+ * "points": 5,
+ * "answers": [
+ *    {
+ *      "answerId": number,
+ *      "answer": "Prince Charles",
+ *      "colour": "red"
+ *    }
+ *  ]
+ * }
+ *
+ */
+function playerQuestionInfo(playerId: number, questionPosition: number) {
   const sessionData = getSession();
   const session = sessionData.sessions.find((session) =>
     session.players.find((player) => player.playerId === playerId)
@@ -238,7 +260,17 @@ function playerQuestionInfo(playerId: number, questionPosition: number): Questio
   }
 }
 
-function playerQuestionAnswer(playerId: number, questionPosition: number, answerIds: number[]): Record<string, never> | ErrorObject {
+/**
+ * function that handles player answering quiz questions
+ *
+ * @param {number} playerId
+ * @param {number} questionPosition
+ * @param {number[]} answerIds
+ *
+ * @returns {}
+ *
+ */
+function playerQuestionAnswer(playerId: number, questionPosition: number, answerIds: number[]) {
   const sessionData = getSession();
   const session = sessionData.sessions.find((session) => session.players.find((player) => player.playerId === playerId));
   if (session === undefined) {
@@ -302,6 +334,13 @@ function playerQuestionAnswer(playerId: number, questionPosition: number, answer
   return {};
 }
 
+/** function checks a given array of numbers for duplicates
+ *
+ * @params {number[]} array
+ *
+ * @returns {SetConstructor}
+ *
+ */
 function hasDuplicates(arr: number[]) {
   return new Set(arr).size !== arr.length;
 }
