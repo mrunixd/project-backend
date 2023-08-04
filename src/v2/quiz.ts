@@ -67,17 +67,21 @@ interface sessionStatusReturn {
   metadata: Quiz;
 }
 
-/// /
 interface UserRank {
   name: string;
   score: number;
 }
+interface QuestionResultReturn {
+  questionId: number;
+  questionCorrectBreakdown: QuestionBreakdown[];
+  averageAnswerTime: number;
+  percentCorrect: number;
+}
 
 export interface SessionResultsReturn {
   usersRankedByScore: UserRank[];
-  questionResults: QuestionResult[];
+  questionResults: QuestionResultReturn[];
 }
-/// /
 
 interface CSVSessionResult {
   url: string;
@@ -1313,9 +1317,13 @@ function adminQuizSessionResults(
   });
   userRank.sort((a, b) => b.score - a.score);
 
+  const questionResults = currentSession.questionResults.map((result) => {
+    const { questionId, questionCorrectBreakdown, averageAnswerTime, percentCorrect } = result;
+    return { questionId, questionCorrectBreakdown, averageAnswerTime, percentCorrect };
+  });
   return {
     usersRankedByScore: userRank,
-    questionResults: currentSession.questionResults
+    questionResults: questionResults
   };
 }
 

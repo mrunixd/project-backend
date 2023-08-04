@@ -138,9 +138,7 @@ function playerResults(playerId: number): SessionResultsReturn | ErrorObject {
 
   // Error-checking block
   if (player === undefined) {
-    throw HTTPError(400, {
-      error: 'Player ID does not refer to a valid player',
-    });
+    throw HTTPError(400, { error: 'Player ID does not refer to a valid player' });
   } else if (currentSession.state !== 'FINAL_RESULTS') {
     throw HTTPError(400, { error: 'Session is not in FINAL_RESULTS state' });
   }
@@ -151,9 +149,13 @@ function playerResults(playerId: number): SessionResultsReturn | ErrorObject {
   });
   userRank.sort((a, b) => b.score - a.score);
 
+  const questionResults = currentSession.questionResults.map((result) => {
+    const { questionId, questionCorrectBreakdown, averageAnswerTime, percentCorrect } = result;
+    return { questionId, questionCorrectBreakdown, averageAnswerTime, percentCorrect };
+  });
   return {
     usersRankedByScore: userRank,
-    questionResults: currentSession.questionResults,
+    questionResults: questionResults,
   };
 }
 
@@ -252,17 +254,11 @@ function playerQuestionInfo(playerId: number, questionPosition: number) {
   if (session === undefined) {
     throw HTTPError(400, { error: 'Player ID does not exit' });
   } else if (session.state === STATE.LOBBY || session.state === STATE.END) {
-    throw HTTPError(400, {
-      error: 'Session has not started or has already finished',
-    });
+    throw HTTPError(400, { error: 'Session has not started or has already finished' });
   } else if (questionPosition > session.metadata.numQuestions) {
-    throw HTTPError(400, {
-      error: 'Question position is not valid for this current session',
-    });
+    throw HTTPError(400, { error: 'Question position is not valid for this current session' });
   } else if (questionPosition !== session.atQuestion) {
-    throw HTTPError(400, {
-      error: 'Session is not currently at this question',
-    });
+    throw HTTPError(400, { error: 'Session is not currently at this question' });
   } else {
     return session.metadata.questions[questionPosition - 1];
   }
@@ -284,20 +280,17 @@ function playerQuestionAnswer(playerId: number, questionPosition: number, answer
   if (session === undefined) {
     throw HTTPError(400, { error: 'PlayerId does not exist' });
   } else if (session.state !== 'QUESTION_OPEN') {
-    throw HTTPError(500, { error: 'Session status is not question open' });
+    throw HTTPError(400, { error: 'Session status is not question open' });
   } else if (questionPosition > session.metadata.numQuestions) {
-    throw HTTPError(400, {
-      error: 'Question position is not valid for this current session',
-    });
+    throw HTTPError(400, { error: 'Question position is not valid for this current session' });
   } else if (questionPosition !== session.atQuestion) {
-    throw HTTPError(400, {
-      error: 'Session is not currently at this question',
-    });
+    throw HTTPError(400, { error: 'Session is not currently at this question' });
   } else if (answerIds.length < 1) {
     throw HTTPError(400, { error: 'Less than 1 answer ID was submitted' });
   } else if (hasDuplicates(answerIds)) {
     throw HTTPError(400, { error: 'There are duplicate answer IDs submitted' });
   }
+
   // For every answer they submitted: if submitted ID doesn't match any question answer, return error
   const question = session.metadata.questions[questionPosition - 1];
   for (const id of answerIds) {
@@ -306,7 +299,7 @@ function playerQuestionAnswer(playerId: number, questionPosition: number, answer
     }
   }
   const correctAnswers = question.answers.filter((answer) => answer.correct === true);
-  const correctAnswerIds = (correctAnswers.map((answer) => answer.answerId)).sort();
+  const correctAnswerIds = (correctAnswers.map((answer) => answer.answerId));
   const answersGiven = answerIds.sort();
   const questionResult = session.questionResults[questionPosition - 1];
 
@@ -319,7 +312,14 @@ function playerQuestionAnswer(playerId: number, questionPosition: number, answer
 
   // If player got all of the answers correct, increase score & numPlayersCorrect
   const player = session.players.find((player) => player.playerId === playerId);
-  if (correctAnswerIds === answersGiven) {
+  let allAnswersCorrect = true;
+  for (const id of answerIds) {
+    if (!correctAnswerIds.find((correctId) => correctId === id)) {
+      allAnswersCorrect = false;
+    }
+  }
+
+  if (allAnswersCorrect) {
     const scalingFactor = 1 / questionResult.numPlayerAnswers;
     player.score = player.score + session.metadata.questions[questionPosition - 1].points * scalingFactor;
     questionResult.numPlayersCorrect++;
@@ -333,7 +333,7 @@ function playerQuestionAnswer(playerId: number, questionPosition: number, answer
   }
 
   // calculate percent correct
-  questionResult.percentCorrect = Math.round((questionResult.numPlayersCorrect / session.players.length) * 100);
+  questionResult.percentCorrect = Math.round((questionResult.numPlayersCorrect / questionResult.numPlayerAnswers) * 100);
   setSession(sessionData);
   return {};
 }

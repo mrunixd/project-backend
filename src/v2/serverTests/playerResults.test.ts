@@ -52,14 +52,14 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid}/results ///
     question1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
     session1 = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 10);
     player1 = requestPlayerJoin(session1.body.sessionId, 'Vincent Xian');
-    requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
-    sleepSync(quizQuestion1Body.duration * 1000 + 2000);
-    requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'GO_TO_ANSWER');
-    requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'GO_TO_FINAL_RESULTS');
   });
 
   describe('/////// Testing v1/player/{playerid}/session/{sessionid}/results success', () => {
     test('CASE: success results 1 session 1 player 0 answers', () => {
+      requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
+      sleepSync(100);
+      requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'GO_TO_ANSWER');
+      requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'GO_TO_FINAL_RESULTS');
       result1 = requestPlayerResults(player1.body.playerId);
 
       expect(result1.body).toStrictEqual({
@@ -74,9 +74,7 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid}/results ///
             playersCorrect: []
           }],
           averageAnswerTime: 0,
-          percentCorrect: 0,
-          numPlayerAnswers: 0,
-          numPlayersCorrect: 0
+          percentCorrect: 0
         }]
       });
       expect(result1.status).toStrictEqual(OK);
