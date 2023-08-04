@@ -74,7 +74,6 @@ describe('////////TESTING v1/player/join&sendmessage////////', () => {
   describe('TESTING v1/player/join success', () => {
     test('player joins empty game successfully', () => {
       result1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
-      console.log(result1.body);
       expect(result1.body).toStrictEqual({ playerId: expect.any(Number) });
       expect(result1.status).toBe(OK);
     });

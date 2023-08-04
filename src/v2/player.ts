@@ -1,6 +1,10 @@
-import { ErrorObject, Message, STATE, getSession, setSession } from './dataStore';
-import { SessionResultsReturn } from './quiz';
+import { ErrorObject, STATE, getSession, setSession, Message } from './dataStore';
+import { SessionResultsReturn, createTimeout } from './quiz';
 import HTTPError from 'http-errors';
+
+// interface answerIds {
+//   answerIds: number[];
+// }
 
 interface Status {
   state: string;
@@ -28,21 +32,39 @@ function playerJoin(sessionId: number, name: string): {playerId: number} | Error
 
   const sessionData = getSession();
 
-  const session = sessionData.sessions.find(session => session.sessionId === sessionId);
+  const session = sessionData.sessions.find((session) => session.sessionId === sessionId);
   if (session === undefined) {
     throw HTTPError(400, { error: 'SessionId does not exist' });
   } else if (session?.state !== STATE.LOBBY) {
     throw HTTPError(400, { error: 'Session has already started' });
-  } else if (session.players.find(user => user.name === name)) {
+  } else if (session.players.find((user) => user.name === name)) {
     throw HTTPError(400, { error: 'Name is already in use' });
   }
 
-  const player = { name: name, score: 0, playerId: session.players.length + 1 };
+  // Generates a unique 5 digit number for the new sessionId
+  let uniqueNumberFlag = false;
+  let uniqueId = (Math.floor(Math.random() * 90000) + 10000);
+  while (uniqueNumberFlag === false) {
+    // If the generated uniqueId already exists, generate a new one
+    if (session.players.find(player => player.playerId === uniqueId)) {
+      uniqueId = (Math.floor(Math.random() * 90000) + 10000);
+    } else {
+      uniqueNumberFlag = true;
+    }
+  }
+
+  const player = { name: name, score: 0, playerId: uniqueId };
   session.players.push(player);
 
   session.players.sort((a, b) => a.name.localeCompare(b.name));
   setSession(sessionData);
-  return { playerId: session.players.length };
+  if (session.players.length === session.autoStartNum) {
+    session.state = 'QUESTION_COUNTDOWN';
+    session.atQuestion++;
+    setSession(sessionData);
+    createTimeout(sessionId);
+  }
+  return { playerId: uniqueId };
 }
 
 /**
@@ -53,16 +75,18 @@ function playerJoin(sessionId: number, name: string): {playerId: number} | Error
  * @returns {Status}
  *
  */
-function playerStatus(playerId: number) {
+function playerStatus(playerId: number): Status {
   const sessionData = getSession();
-  const session = sessionData.sessions.find(session => session.players.find(player => player.playerId === playerId));
+  const session = sessionData.sessions.find((session) =>
+    session.players.find((player) => player.playerId === playerId)
+  );
   if (session === undefined) {
     throw HTTPError(400, { error: 'Player ID does not exit' });
   }
   const status: Status = {
     state: session.state,
     numQuestions: session.metadata.numQuestions,
-    atQuestion: session.atQuestion
+    atQuestion: session.atQuestion,
   };
   return status;
 }
@@ -103,9 +127,7 @@ function createName(): string {
  * @returns {SessionResultsReturn}
  *
  */
-function playerResults(
-  playerId: number
-): SessionResultsReturn | ErrorObject {
+function playerResults(playerId: number): SessionResultsReturn | ErrorObject {
   const sessionData = getSession();
   let player;
   let currentSession;
@@ -120,7 +142,9 @@ function playerResults(
 
   // Error-checking block
   if (player === undefined) {
-    throw HTTPError(400, { error: 'Player ID does not refer to a valid player' });
+    throw HTTPError(400, {
+      error: 'Player ID does not refer to a valid player',
+    });
   } else if (currentSession.state !== 'FINAL_RESULTS') {
     throw HTTPError(400, { error: 'Session is not in FINAL_RESULTS state' });
   }
@@ -133,7 +157,7 @@ function playerResults(
 
   return {
     usersRankedByScore: userRank,
-    questionResults: currentSession.questionResults
+    questionResults: currentSession.questionResults,
   };
 }
 
@@ -150,22 +174,26 @@ function playerSendMessage(playerId: number, message: string): Record<string, ne
   const sessionData = getSession();
 
   if (message.length < 2 || message.length > 100) {
-    throw HTTPError(400, { error: 'Message is either less than 1 character or more than 100 characters' });
+    throw HTTPError(400, {
+      error: 'Message is either less than 1 character or more than 100 characters',
+    });
   }
 
-  const session = sessionData.sessions.find(session => session.players.some(player => player.playerId === playerId));
+  const session = sessionData.sessions.find((session) =>
+    session.players.some((player) => player.playerId === playerId)
+  );
 
   if (!session) {
     throw HTTPError(400, { error: 'Player ID does not exist' });
   }
 
-  const player = session.players.find(player => player.playerId === playerId);
+  const player = session.players.find((player) => player.playerId === playerId);
 
   session.messages.push({
     messageBody: message,
     playerId: playerId,
     name: `${player.name}`,
-    timeSent: Math.floor(Date.now() / 1000)
+    timeSent: Math.floor(Date.now() / 1000),
   });
 
   setSession(sessionData);
@@ -204,18 +232,92 @@ function playerQuestionInfo(playerId: number, questionPosition: number) {
   );
   if (session === undefined) {
     throw HTTPError(400, { error: 'Player ID does not exit' });
-  } else if (
-    session.state === 'STATE.LOBBY' ||
-    session.state === 'STATE.END'
-  ) {
-    throw HTTPError(400, { error: 'Session has not started or has already finished' });
+  } else if (session.state === STATE.LOBBY || session.state === STATE.END) {
+    throw HTTPError(400, {
+      error: 'Session has not started or has already finished',
+    });
   } else if (questionPosition > session.metadata.numQuestions) {
-    throw HTTPError(400, { error: 'Question position is not valid for this current session' });
+    throw HTTPError(400, {
+      error: 'Question position is not valid for this current session',
+    });
   } else if (questionPosition !== session.atQuestion) {
-    throw HTTPError(400, { error: 'Session is not currently at this question' });
+    throw HTTPError(400, {
+      error: 'Session is not currently at this question',
+    });
   } else {
     return session.metadata.questions[questionPosition - 1];
   }
 }
 
-export { playerJoin, playerStatus, playerResults, playerSendMessage, playerViewMessages, playerQuestionInfo };
+function playerQuestionAnswer(playerId: number, questionPosition: number, answerIds: number[]) {
+  const sessionData = getSession();
+  const session = sessionData.sessions.find((session) => session.players.find((player) => player.playerId === playerId));
+  if (session === undefined) {
+    throw HTTPError(400, { error: 'PlayerId does not exist' });
+  } else if (session.state !== 'QUESTION_OPEN') {
+    throw HTTPError(500, { error: 'Session status is not question open' });
+  } else if (questionPosition > session.metadata.numQuestions) {
+    throw HTTPError(400, {
+      error: 'Question position is not valid for this current session',
+    });
+  } else if (questionPosition !== session.atQuestion) {
+    throw HTTPError(400, {
+      error: 'Session is not currently at this question',
+    });
+  } else if (answerIds.length < 1) {
+    throw HTTPError(400, { error: 'Less than 1 answer ID was submitted' });
+  } else if (hasDuplicates(answerIds)) {
+    throw HTTPError(400, { error: 'There are duplicate answer IDs submitted' });
+  }
+  // For every answer they submitted: if submitted ID doesn't match any question answer, return error
+  const question = session.metadata.questions[questionPosition - 1];
+  for (const id of answerIds) {
+    if (!question.answers.find((answer) => answer.answerId === id)) {
+      throw HTTPError(400, { error: 'answerIds are not valid for this particular question' });
+    }
+  }
+  const correctAnswers = question.answers.filter((answer) => answer.correct === true);
+  const correctAnswerIds = (correctAnswers.map((answer) => answer.answerId)).sort();
+  const answersGiven = answerIds.sort();
+  const questionResult = session.questionResults[questionPosition - 1];
+
+  // set numPlayerAnswers
+  questionResult.numPlayerAnswers++;
+
+  // set average time taken
+  const timeTaken = Math.floor(Date.now() / 1000) - session.currentQuestionOpenTime;
+  questionResult.averageAnswerTime = (questionResult.averageAnswerTime * (questionResult.numPlayerAnswers - 1) + timeTaken) / questionResult.numPlayerAnswers;
+
+  // If player got all of the answers correct, increase score & numPlayersCorrect
+  const player = session.players.find((player) => player.playerId === playerId);
+  if (correctAnswerIds === answersGiven) {
+    const scalingFactor = 1 / questionResult.numPlayerAnswers;
+    player.score = player.score + session.metadata.questions[questionPosition - 1].points * scalingFactor;
+    questionResult.numPlayersCorrect++;
+  }
+
+  // For every correctAnswer, check if any of the submitted answers match -> add player to playerCorrect
+  for (const correctAnswer of questionResult.questionCorrectBreakdown) {
+    if (answersGiven.find((givenAnswer) => givenAnswer === correctAnswer.answerId)) {
+      correctAnswer.playersCorrect.push(player.name);
+    }
+  }
+
+  // calculate percent correct
+  questionResult.percentCorrect = Math.round((questionResult.numPlayersCorrect / session.players.length) * 100);
+  setSession(sessionData);
+  return {};
+}
+
+function hasDuplicates(arr: number[]) {
+  return new Set(arr).size !== arr.length;
+}
+export {
+  playerJoin,
+  playerStatus,
+  playerResults,
+  playerSendMessage,
+  playerQuestionInfo,
+  playerQuestionAnswer,
+  playerViewMessages
+};

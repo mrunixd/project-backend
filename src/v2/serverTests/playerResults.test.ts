@@ -17,6 +17,7 @@ let person1: any;
 let player1: any;
 let quiz1: any;
 let session1: any;
+let question1: any;
 const quizQuestion1Body = {
   question: 'Who is the Monarch of England?',
   duration: 0.1,
@@ -41,13 +42,14 @@ beforeEach(() => {
   player1 = undefined;
   quiz1 = undefined;
   session1 = undefined;
+  question1 = undefined;
 });
 
 describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid}/results ///////', () => {
   beforeEach(() => {
     person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
     quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
-    requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
+    question1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
     session1 = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 10);
     player1 = requestPlayerJoin(session1.body.sessionId, 'Vincent Xian');
     requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
@@ -65,13 +67,20 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid}/results ///
           name: 'Vincent Xian',
           score: 0
         }],
-        questionResults: []
+        questionResults: [{
+          questionId: question1.body.questionId,
+          questionCorrectBreakdown: [{
+            answerId: expect.any(Number),
+            playersCorrect: []
+          }],
+          averageAnswerTime: 0,
+          percentCorrect: 0,
+          numPlayerAnswers: 0,
+          numPlayersCorrect: 0
+        }]
       });
       expect(result1.status).toStrictEqual(OK);
     });
-    /// /////////////////////////////////////////////////////////
-    /// /more tests for when PLAYERS is complete to check state/////
-    /// /////////////////////////////////////////////////////////
   });
   describe('/////// Testing v1/admin/player/{playerid}/results errors', () => {
     test('CASE (400): player ID does not refer to a player', () => {
