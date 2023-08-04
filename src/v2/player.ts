@@ -75,7 +75,7 @@ function playerJoin(sessionId: number, name: string): {playerId: number} | Error
  * @returns {Status}
  *
  */
-function playerStatus(playerId: number) {
+function playerStatus(playerId: number): Status {
   const sessionData = getSession();
   const session = sessionData.sessions.find((session) =>
     session.players.find((player) => player.playerId === playerId)
@@ -276,55 +276,11 @@ function playerQuestionAnswer(playerId: number, questionPosition: number, answer
       throw HTTPError(400, { error: 'answerIds are not valid for this particular question' });
     }
   }
-  // let counter = 0;
-  // for (let i = 0; i < answerIds.answerIds.length; i++) {
-  //   for (let j = 0; j < question.answers.length; j++) {
-  //     if (
-  //       answerIds.answerIds[i] !==
-  //       session.metadata.questions[questionPosition - 1].answers[j].answerId
-  //     ) {
-  //       counter++;
-  //     }
-  //   }
-  //   if (counter === session.metadata.questions[questionPosition - 1].answers.length) {
-  //     throw HTTPError(400, {
-  //       error: 'answerIds are not valid for this particular question',
-  //     });
-  //   }
-  // }
-
   const correctAnswers = question.answers.filter((answer) => answer.correct === true);
   const correctAnswerIds = (correctAnswers.map((answer) => answer.answerId)).sort();
   const answersGiven = answerIds.sort();
-
-  // if (question.questionCorrectBreakDown === undefined) {
-  //   question.questionCorrectBreakDown = {
-  //     answerId: [],
-  //     playersCorrect: []
-  //   }
-  // }
-  // const questionCorrectBreakDown = question.questionCorrectBreakDown[questionPosition - 1];
-
-  // // check for undefined
-  // if (question.numPlayerAnswers === undefined) {
-  //   question.numPlayerAnswers = 0;
-  // }
-
-  // if (question.averageAnswerTime === undefined) {
-  //   question.averageAnswerTime = 0;
-  // }
-
-  // if (question.percentCorrect === undefined) {
-  //   question.percentCorrect = 0;
-  // }
-
-  // if (questionCorrectBreakDown.playersCorrect === undefined) {
-  //   questionCorrectBreakDown.playersCorrect = [];
-  // }
-  // // set correctanswerIds in answerId
-  // questionCorrectBreakDown.answerId = correctanswerIds;
-
   const questionResult = session.questionResults[questionPosition - 1];
+
   // set numPlayerAnswers
   questionResult.numPlayerAnswers++;
 

@@ -20,6 +20,7 @@ let person1: any;
 let person2: any;
 let quiz1: any;
 let session1: any;
+let question1: any;
 const quizQuestion1Body = {
   question: 'Who is the Monarch of England?',
   duration: 0.1,
@@ -44,18 +45,18 @@ beforeEach(() => {
   person2 = undefined;
   quiz1 = undefined;
   session1 = undefined;
+  question1 = undefined;
 });
-// afterEach(() => deleteRequest('/v1/clear', {}));
 
 describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid}/results ///////', () => {
   beforeEach(() => {
     person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
     quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
-    requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
+    question1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
     session1 = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 10);
     requestPlayerJoin(session1.body.sessionId, 'Vincent Xian');
     requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'NEXT_QUESTION');
-    sleepSync(quizQuestion1Body.duration * 1000 + 1000);
+    sleepSync(quizQuestion1Body.duration * 1000);
     requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'GO_TO_ANSWER');
     requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'GO_TO_FINAL_RESULTS');
   });
@@ -69,7 +70,17 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid}/results ///
           name: 'Vincent Xian',
           score: 0
         }],
-        questionResults: []
+        questionResults: [{
+          questionId: question1.body.questionId,
+          questionCorrectBreakdown: [{
+            answerId: expect.any(Number),
+            playersCorrect: []
+          }],
+          averageAnswerTime: 0,
+          percentCorrect: 0,
+          numPlayerAnswers: 0,
+          numPlayersCorrect: 0
+        }]
       });
       expect(result1.status).toStrictEqual(OK);
 

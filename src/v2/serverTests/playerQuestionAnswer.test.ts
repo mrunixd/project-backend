@@ -5,7 +5,6 @@ import {
   requestAdminQuizQuestion,
   requestAdminQuizSessionStart,
   requestPlayerJoin,
-  requestAdminQuizInfo,
   requestPlayerQuestionAnswer,
   requestPlayerQuestionInfo,
   OK,
