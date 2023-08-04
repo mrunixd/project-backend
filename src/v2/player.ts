@@ -1,4 +1,4 @@
-import { ErrorObject, STATE, getSession, setSession, Message, Question } from './dataStore';
+import { ErrorObject, STATE, getSession, setSession, Message } from './dataStore';
 import { SessionResultsReturn, createTimeout } from './quiz';
 import HTTPError from 'http-errors';
 
@@ -6,6 +6,9 @@ export interface Status {
   state: string;
   numQuestions: number;
   atQuestion: number;
+}
+interface Messages {
+  message: Message[]
 }
 
 /**
@@ -34,16 +37,7 @@ function playerJoin(sessionId: number, name: string): {playerId: number} | Error
   }
 
   // Generates a unique 5 digit number for the new sessionId
-  let uniqueNumberFlag = false;
-  let uniqueId = (Math.floor(Math.random() * 90000) + 10000);
-  while (uniqueNumberFlag === false) {
-    // If the generated uniqueId already exists, generate a new one
-    if (session.players.find(player => player.playerId === uniqueId)) {
-      uniqueId = (Math.floor(Math.random() * 90000) + 10000);
-    } else {
-      uniqueNumberFlag = true;
-    }
-  }
+  const uniqueId = (Math.floor(Math.random() * 90000) + 10000);
 
   const player = { name: name, score: 0, playerId: uniqueId };
   session.players.push(player);
@@ -199,10 +193,10 @@ function playerSendMessage(playerId: number, message: string): Record<string, ne
  *
  * @param {number} playerId
  *
- * @returns {Message[]}
+ * @returns {Messages}
  *
  */
-function playerViewMessages(playerId: number): Message[] | ErrorObject {
+function playerViewMessages(playerId: number): Messages | ErrorObject {
   const sessionData = getSession();
   const session = sessionData.sessions.find(session => session.players.some(player => player.playerId === playerId));
 

@@ -1,4 +1,7 @@
-import { getData, setData, QuizIds, Quiz, Question, Answer, Session, SessionId, STATE, ACTION, QuestionResult, QuestionBreakdown, getSession, setSession, ErrorObject, SessionListReturn, sessionStatusReturn } from './dataStore';
+import {
+  getData, setData, QuizIds, Quiz, Question, Answer, Session, SessionId, ACTION,
+  QuestionResult, QuestionBreakdown, getSession, setSession, ErrorObject
+} from './dataStore';
 import HTTPError from 'http-errors';
 import request from 'sync-request';
 import fs from 'fs';
@@ -22,6 +25,17 @@ const MINANSWERLENGTH = 1;
 const MAXANSWERLENGTH = 30;
 const MAXDURATION = 180;
 let imageUrlOnServer: string;
+
+interface SessionListReturn {
+  activeSessions: number[];
+  inactiveSessions: number[];
+}
+interface sessionStatusReturn {
+  state: string;
+  atQuestion: number;
+  players: string[];
+  metadata: Quiz;
+}
 
 export interface answerInput {
   answer: string;
@@ -937,7 +951,7 @@ function adminQuizSessionStart(
 
   const user = data.users.find((user) => user.authUserId === authUserId);
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
-  const nonEndedQuizzes = sessionData.sessions.map((session) => session.state !== STATE.END);
+  const nonEndedQuizzes = sessionData.sessions.map((session) => session.state !== 'END');
 
   // Error-checking block
   if (currentQuiz === undefined) {
@@ -953,16 +967,7 @@ function adminQuizSessionStart(
   }
 
   // Generates a unique 5 digit number for the new sessionId
-  let uniqueNumberFlag = false;
-  let sessionId = (Math.floor(Math.random() * 90000) + 10000);
-  while (uniqueNumberFlag === false) {
-    // If the generated sessionId already exists, generate a new one
-    if (sessionData.sessions.some((session) => session.sessionId === sessionId)) {
-      sessionId = (Math.floor(Math.random() * 90000) + 10000);
-    } else {
-      uniqueNumberFlag = true;
-    }
-  }
+  const sessionId = (Math.floor(Math.random() * 90000) + 10000);
 
   // For every question in the new Session, initialise values
   const questionResults: QuestionResult[] = [];

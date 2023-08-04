@@ -9,21 +9,8 @@ import {
   INPUT_ERROR,
 } from '../helper';
 
-let result1: any;
-let result2: any;
-let person1: any;
-let person2: any;
-let quiz1: any;
-let quizQuestion1: any;
-
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
-  result1 = undefined;
-  result2 = undefined;
-  person1 = undefined;
-  person2 = undefined;
-  quiz1 = undefined;
-  quizQuestion1 = undefined;
 });
 
 const quizQuestion1Body = {
@@ -61,6 +48,22 @@ const quizQuestion2Body = {
     'https://media.sproutsocial.com/uploads/PI_Analytics_Instagram_Competitors_Report.png',
 };
 
+let person1 = requestAdminAuthRegister(
+  'aarnavsample@gmail.com',
+  'Abcd12345',
+  'aarnav',
+  'sheth'
+);
+let quiz1 = requestAdminQuizCreate(
+  `${person1.body.token}`,
+  'first quiz',
+  'first quiz being tested'
+);
+let quizQuestion1 = requestAdminQuizQuestion(
+  `${quiz1.body.quizId}`,
+  `${person1.body.token}`,
+  quizQuestion1Body
+);
 describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
   beforeEach(() => {
     person1 = requestAdminAuthRegister(
@@ -83,7 +86,7 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
 
   describe('Success cases', () => {
     test('CASE: Successful delete 1 quiz question', () => {
-      result1 = requestAdminQuizQuestionDelete(
+      const result1 = requestAdminQuizQuestionDelete(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`
@@ -92,7 +95,7 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
-      result2 = requestAdminQuizInfo(
+      const result2 = requestAdminQuizInfo(
         `${quiz1.body.quizId}`,
         `${person1.body.token}`
       );
@@ -116,14 +119,14 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
         `${person1.body.token}`,
         quizQuestion2Body
       );
-      result1 = requestAdminQuizQuestionDelete(
+      const result1 = requestAdminQuizQuestionDelete(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`
       );
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
-      result2 = requestAdminQuizInfo(
+      const result2 = requestAdminQuizInfo(
         `${quiz1.body.quizId}`,
         `${person1.body.token}`
       );
@@ -166,7 +169,7 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
 
   describe('Error cases', () => {
     test('CASE: Quiz ID does not exist', () => {
-      result1 = requestAdminQuizQuestionDelete(
+      const result1 = requestAdminQuizQuestionDelete(
         `${quiz1.body.quizId + 1}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`
@@ -176,13 +179,13 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
     });
 
     test('CASE: Quiz ID does not refer to a quiz that this user owns', () => {
-      person2 = requestAdminAuthRegister(
+      const person2 = requestAdminAuthRegister(
         'vincent@gmail.com',
         'password1',
         'vincent',
         'xian'
       );
-      result1 = requestAdminQuizQuestionDelete(
+      const result1 = requestAdminQuizQuestionDelete(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person2.body.token}`
@@ -193,7 +196,7 @@ describe('////////TESTING ADMINQUIZQUESTIONDELETE////////', () => {
     });
 
     test('CASE: Question ID does not refer to a valid quesion within this quiz', () => {
-      result1 = requestAdminQuizQuestionDelete(
+      const result1 = requestAdminQuizQuestionDelete(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId + 1}`,
         `${person1.body.token}`

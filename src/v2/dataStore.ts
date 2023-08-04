@@ -1,12 +1,5 @@
 import fs from 'fs';
-import { SessionResultsReturn } from './quiz';
-import { Status } from './player';
 
-export interface QuizIds {
-  quizId: number;
-  name: string;
-}
-//SUS ONESSS
 export interface GetDetailsReturn {
   user: {
     userId: number;
@@ -16,22 +9,12 @@ export interface GetDetailsReturn {
     numFailedPasswordsSinceLastLogin: number;
   };
 }
-export interface SessionListReturn {
-  activeSessions: number[];
-  inactiveSessions: number[];
-}
-export interface sessionStatusReturn {
-  state: string;
-  atQuestion: number;
-  players: string[];
-  metadata: Quiz;
-}
-export const RESPONSE: ErrorObject | {} | Record<string, never> | GetDetailsReturn | {quizzes: []} |
-  {quizzes: QuizIds[]} | {quizId: number} | Quiz | {questionId: number} | {newQuestionId: number} |
-  SessionListReturn | SessionId | sessionStatusReturn | SessionResultsReturn | {url: string} |
-  {playerId: number} | Status | Question | Message[] = undefined;
 
-//
+export interface QuizIds {
+  quizId: number;
+  name: string;
+}
+
 export interface User {
   email: string;
   password: string;
@@ -43,7 +26,6 @@ export interface User {
   quizIds: QuizIds[];
   trash: QuizIds[];
 }
-
 
 export interface Answer {
   answerId: number;
@@ -138,7 +120,7 @@ export interface SessionId {
 }
 
 interface TimeOut {
-  timeoutId: any;
+  timeoutId: ReturnType<typeof setTimeout>;
   sessionId: number;
 }
 

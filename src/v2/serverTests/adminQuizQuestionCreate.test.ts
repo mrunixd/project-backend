@@ -7,28 +7,34 @@ import {
   INPUT_ERROR,
 } from '../helper';
 
-let result1: any;
-let person1: any;
-let person2: any;
-let quiz1: any;
-let quizQuestion1: any;
-
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
-  result1 = undefined;
-  person1 = undefined;
-  person2 = undefined;
-  quiz1 = undefined;
-  quizQuestion1 = undefined;
 });
-
+let person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+let quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
+let quizQuestion1 = {
+  question: 'Who is the Monarch of England?',
+  duration: 1,
+  points: 5,
+  answers: [
+    {
+      answer: 'Prince Charles',
+      correct: false,
+    },
+    {
+      answer: 'King Charles',
+      correct: true,
+    },
+  ],
+  thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
+};
 describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
   beforeEach(() => {
     person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
     quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
     quizQuestion1 = {
       question: 'Who is the Monarch of England?',
-      duration: 4,
+      duration: 1,
       points: 5,
       answers: [
         {
@@ -46,7 +52,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
 
   describe('Testing /v2/admin/quiz/{quizid}/question success cases', () => {
     test('Successful adminQuizQuestionCreate 1 quiz question', () => {
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
+      const result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ questionId: expect.any(Number) });
       expect(result1.status).toBe(OK);
     });
@@ -54,14 +60,14 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
 
   describe('Testing /v2/admin/quiz/{quizid}/question error cases', () => {
     test('CASE: quiz does not exist', () => {
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId + 1}`, `${person1.body.token}`, quizQuestion1);
+      const result1 = requestAdminQuizQuestion(`${quiz1.body.quizId + 1}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE: quiz does not exist for user', () => {
-      person2 = requestAdminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person2.body.token}`, quizQuestion1);
+      const person2 = requestAdminAuthRegister('vincent@gmail.com', 'password1', 'vincent', 'xian');
+      const result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person2.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
@@ -82,7 +88,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
         ],
         thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
+      const result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
 
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
@@ -101,7 +107,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
         ],
         thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
+      const result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
@@ -123,7 +129,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
         ],
         thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
+      const result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
@@ -145,7 +151,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
         ],
         thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
+      const result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
@@ -167,7 +173,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
         ],
         thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
       };
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
+      const result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
@@ -190,7 +196,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
         ],
         thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
+      const result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
@@ -212,7 +218,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
         ],
         thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
+      const result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
@@ -234,7 +240,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
         ],
         thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
+      const result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
@@ -256,7 +262,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
         ],
         thumbnailUrl: '',
       };
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion3Body);
+      const result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion3Body);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
@@ -278,7 +284,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
         ],
         thumbnailUrl: 'https://NOT_AREAL_URL.png'
       };
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion3Body);
+      const result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion3Body);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
@@ -300,7 +306,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
         ],
         thumbnailUrl: 'https://www.wix.com/'
       };
-      result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion3Body);
+      const result1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion3Body);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });

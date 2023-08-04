@@ -12,20 +12,36 @@ import {
   INPUT_ERROR,
 } from '../helper';
 
-let person1: any;
-let person2: any;
-let quiz1: any;
-let quiz2: any;
-let quiz3: any;
-
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
-  person1 = undefined;
-  person2 = undefined;
-  quiz1 = undefined;
-  quiz2 = undefined;
-  quiz3 = undefined;
 });
+let person1 = requestAdminAuthRegister(
+  'manan.j2450@gmail.com',
+  'Abcd12345',
+  'Manan',
+  'Jaiswal'
+);
+let person2 = requestAdminAuthRegister(
+  'test@gmail.com',
+  'Abcd12345',
+  'Fake',
+  'Name'
+);
+let quiz1 = requestAdminQuizCreate(
+  `${person1.body.token}`,
+  'first quiz',
+  'first quiz being tested'
+);
+let quiz2 = requestAdminQuizCreate(
+  `${person1.body.token}`,
+  'second quiz',
+  'second quiz being tested'
+);
+let quiz3 = requestAdminQuizCreate(
+  `${person1.body.token}`,
+  'third quiz',
+  'second quiz being tested'
+);
 
 describe('////////Testing /v2/admin/quiz/trash/empty', () => {
   beforeEach(() => {

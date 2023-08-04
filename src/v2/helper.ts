@@ -10,7 +10,6 @@ export const port = config.port;
 export const url = config.url;
 export const SERVER_URL = `${url}:${port}`;
 
-
 export function postRequest(route: string, json: any, headers: IncomingHttpHeaders = {}) {
   const res = request('POST', `${SERVER_URL}${route}`, { json: json, headers: headers });
   return {
