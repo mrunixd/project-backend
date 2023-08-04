@@ -931,16 +931,6 @@ function adminQuizQuestionDelete(
     throw HTTPError(400, { error: 'Question ID does not refer to a valid question in this quiz' });
   }
 
-  // if (currentQuestion.thumbnailUrl !== undefined) {
-  //   // Delete Thumbnail File
-  //   const urlParts = currentQuestion.thumbnailUrl.split('/');
-  //   const fileName = urlParts[urlParts.length - 1];
-
-  //   const imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
-
-  //   fs.unlinkSync(imagesDirectoryPath);
-  // }
-
   const indexQuestion = currentQuiz.questions.findIndex(
     (id) => id.questionId === questionId
   );
@@ -1330,6 +1320,16 @@ function adminQuizSessionResults(
   };
 }
 
+/**
+ * This function gives results but in CSV file
+ *
+ * @param {number} authUserId
+ * @param {number} quizId
+ * @param {string} imgUrl
+ *
+ * @returns {}
+ *
+ */
 function adminQuizSessionResultsCSV(
   authUserId: number,
   quizId: number,

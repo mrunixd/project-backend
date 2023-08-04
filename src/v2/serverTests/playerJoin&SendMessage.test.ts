@@ -7,8 +7,6 @@ import {
   requestPlayerJoin,
   requestPlayerSendMessage,
   requestAdminQuizSessionUpdate,
-  // requestAdminQuizSessionStatus,
-  // requestAdminQuizInfo,
   OK,
   INPUT_ERROR,
 } from '../helper';
@@ -18,7 +16,6 @@ let result2: any;
 let person1: any;
 let quiz1: any;
 let sessionId: any;
-// let info1: any;
 
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
@@ -26,7 +23,6 @@ beforeEach(() => {
   result2 = undefined;
   person1 = undefined;
   quiz1 = undefined;
-  // info1 = undefined;
 });
 
 const quizQuestion1Body = {
@@ -70,7 +66,6 @@ describe('////////TESTING v1/player/join&sendmessage////////', () => {
       `${quiz1.body.quizId}`,
       3
     );
-    // info1 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person1.body.token}`);
   });
   describe('TESTING v1/player/join success', () => {
     test('player joins empty game successfully', () => {
@@ -78,18 +73,7 @@ describe('////////TESTING v1/player/join&sendmessage////////', () => {
       expect(result1.body).toStrictEqual({ playerId: expect.any(Number) });
       expect(result1.status).toBe(OK);
     });
-    // test('checking succesful autostart', () => {
-    //   requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
-    //   requestPlayerJoin(sessionId.body.sessionId, 'Vincent the goat');
-    //   requestPlayerJoin(sessionId.body.sessionId, 'Aarnav');
-    //   result2 = requestAdminQuizSessionStatus(`${person1.body.token}`, `${quiz1.body.quizId}`, `${sessionId.body.sessionId}`);
-    //   expect(result2.body).toStrictEqual({
-    //     state: 'QUESTION_COUNTDOWN',
-    //     atQuestion: 1,
-    //     players: ["Aarnav", "Manan Jaiswal", "Vincent the goat"],
-    //     metadata: info1.body
-    //   });
-    // });
+
   });
   describe('TESTING v1/player/join errors', () => {
     test('CASE 400: player joins game where individual has same name', () => {

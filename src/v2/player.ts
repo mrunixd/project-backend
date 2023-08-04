@@ -2,10 +2,6 @@ import { ErrorObject, STATE, getSession, setSession, Message } from './dataStore
 import { SessionResultsReturn, createTimeout } from './quiz';
 import HTTPError from 'http-errors';
 
-// interface answerIds {
-//   answerIds: number[];
-// }
-
 interface Status {
   state: string;
   numQuestions: number;
@@ -225,6 +221,29 @@ function playerViewMessages(playerId: number): Messages | ErrorObject {
   return sessionMessages;
 }
 
+/**
+ * This function provides information about the selected player
+ *
+ * @param {number} authUserId
+ * @param {number} quizId
+ * @param {string} imgUrl
+ *
+ * @returns {
+ * "questionId": number,
+ * "question": string,
+ * "duration": number,
+ * "thumbnailUrl": string,
+ * "points": 5,
+ * "answers": [
+ *    {
+ *      "answerId": number,
+ *      "answer": "Prince Charles",
+ *      "colour": "red"
+ *    }
+ *  ]
+ * }
+ *
+ */
 function playerQuestionInfo(playerId: number, questionPosition: number) {
   const sessionData = getSession();
   const session = sessionData.sessions.find((session) =>
@@ -249,6 +268,16 @@ function playerQuestionInfo(playerId: number, questionPosition: number) {
   }
 }
 
+/**
+ * function that handles player answering quiz questions
+ *
+ * @param {number} playerId
+ * @param {number} questionPosition
+ * @param {number[]} answerIds
+ *
+ * @returns {}
+ *
+ */
 function playerQuestionAnswer(playerId: number, questionPosition: number, answerIds: number[]) {
   const sessionData = getSession();
   const session = sessionData.sessions.find((session) => session.players.find((player) => player.playerId === playerId));
@@ -309,6 +338,13 @@ function playerQuestionAnswer(playerId: number, questionPosition: number, answer
   return {};
 }
 
+/** function checks a given array of numbers for duplicates
+ * 
+ * @params {number[]} array
+ * 
+ * @returns {SetConstructor}
+ *
+ */
 function hasDuplicates(arr: number[]) {
   return new Set(arr).size !== arr.length;
 }
