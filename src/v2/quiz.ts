@@ -67,17 +67,21 @@ interface sessionStatusReturn {
   metadata: Quiz;
 }
 
-/// /
 interface UserRank {
   name: string;
   score: number;
 }
+interface QuestionResultReturn {
+  questionId: number;
+  questionCorrectBreakdown: QuestionBreakdown[];
+  averageAnswerTime: number;
+  percentCorrect: number;
+}
 
 export interface SessionResultsReturn {
   usersRankedByScore: UserRank[];
-  questionResults: QuestionResult[];
+  questionResults: QuestionResultReturn[];
 }
-/// /
 
 interface CSVSessionResult {
   url: string;
@@ -940,16 +944,6 @@ function adminQuizQuestionDelete(
     throw HTTPError(400, { error: 'Question ID does not refer to a valid question in this quiz' });
   }
 
-  // if (currentQuestion.thumbnailUrl !== undefined) {
-  //   // Delete Thumbnail File
-  //   const urlParts = currentQuestion.thumbnailUrl.split('/');
-  //   const fileName = urlParts[urlParts.length - 1];
-
-  //   const imagesDirectoryPath = path.join(__dirname, '../../images', fileName);
-
-  //   fs.unlinkSync(imagesDirectoryPath);
-  // }
-
   const indexQuestion = currentQuiz.questions.findIndex(
     (id) => id.questionId === questionId
   );
@@ -1333,9 +1327,13 @@ function adminQuizSessionResults(
   });
   userRank.sort((a, b) => b.score - a.score);
 
+  const questionResults = currentSession.questionResults.map((result) => {
+    const { questionId, questionCorrectBreakdown, averageAnswerTime, percentCorrect } = result;
+    return { questionId, questionCorrectBreakdown, averageAnswerTime, percentCorrect };
+  });
   return {
     usersRankedByScore: userRank,
-    questionResults: currentSession.questionResults
+    questionResults: questionResults
   };
 }
 
