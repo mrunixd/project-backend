@@ -42,7 +42,7 @@ import {
   adminQuizSessionList
 } from './quiz';
 
-import { playerJoin, playerStatus, playerResults, playerSendMessage, playerViewMessages, playerQuestionInfo } from './player';
+import { playerJoin, playerStatus, playerResults, playerSendMessage, playerViewMessages, playerQuestionInfo, playerQuestionAnswer } from './player';
 import { clear, sessionIdtoUserId, checkValidToken, fullTokenCheck } from './other';
 import HTTPError from 'http-errors';
 
@@ -924,6 +924,17 @@ app.get('/v1/player/:playerid/question/:questionposition', (req: Request, res: R
   const questionPos = parseInt(req.params.questionposition);
 
   const response = playerQuestionInfo(playerId, questionPos);
+
+  return res.json(response);
+});
+
+// ROUTE: playerQuestionAnswer
+app.put('/v1/player/:playerid/question/:questionposition/answer', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const questionPos = parseInt(req.params.questionposition);
+  const { answerIds } = req.body;
+
+  const response = playerQuestionAnswer(playerId, questionPos, answerIds);
 
   return res.json(response);
 });

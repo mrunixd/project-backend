@@ -218,3 +218,8 @@ export function requestPlayerQuestionInfo(playerId: number, questionPosition: nu
   const response = getRequest(`/v1/player/${playerId}/question/${questionPosition}`, {}, {});
   return response;
 }
+
+export function requestPlayerQuestionAnswer(playerId: number, questionPosition: number, answerIds: number[]) {
+  const response = putRequest(`/v1/player/${playerId}/question/${questionPosition}/answer`, { answerIds }, {});
+  return response;
+}

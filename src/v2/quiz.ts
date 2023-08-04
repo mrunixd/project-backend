@@ -1,4 +1,4 @@
-import { getData, setData, QuizIds, Quiz, Question, Answer, Session, SessionId, STATE, ACTION, QuestionResult, getSession, setSession } from './dataStore';
+import { getData, setData, QuizIds, Quiz, Question, Answer, Session, SessionId, STATE, ACTION, QuestionResult, QuestionBreakdown, getSession, setSession } from './dataStore';
 import HTTPError from 'http-errors';
 import request from 'sync-request';
 import fs from 'fs';
@@ -1047,6 +1047,30 @@ function adminQuizSessionStart(
     }
   }
 
+  // For every question in the new Session, initialise values
+  const questionResults: QuestionResult[] = [];
+  for (const question of currentQuiz.questions) {
+    const questionCorrectBreakdown: QuestionBreakdown[] = [];
+    for (const answer of question.answers) {
+      if (answer.correct) {
+        questionCorrectBreakdown.push({
+          answerId: answer.answerId,
+          playersCorrect: []
+        });
+      }
+    }
+
+    questionResults.push({
+      questionId: question.questionId,
+      questionCorrectBreakdown: questionCorrectBreakdown,
+      averageAnswerTime: 0,
+      percentCorrect: 0,
+      numPlayerAnswers: 0,
+      numPlayersCorrect: 0
+    });
+  }
+
+  // Push this info into the session
   sessionData.sessions.push({
     sessionId: sessionId,
     autoStartNum: autoStartNum,
@@ -1054,9 +1078,9 @@ function adminQuizSessionStart(
     atQuestion: 0,
     players: [],
     metadata: currentQuiz,
-    // usersRankedByScore: [],
-    questionResults: [],
-    messages: []
+    questionResults: questionResults,
+    messages: [],
+    currentQuestionOpenTime: 0
   });
   setSession(sessionData);
   return { sessionId: sessionId };
@@ -1116,9 +1140,11 @@ function createTimeout(sessionId: number) {
   const timers = sessionData.timers;
   // session.atQuestion++;
   const countdownTimeout = setTimeout(() => {
-    // session.state = performAction('FINISH_COUNTDOWN');
-
     session.state = 'QUESTION_OPEN';
+
+    const currentTime = Math.floor(Date.now() / 1000);
+    session.currentQuestionOpenTime = currentTime;
+
     setSession(sessionData);
     const timeoutIndex = timers.findIndex((timeout) => timeout.sessionId === sessionId);
     const durationTimeout = setTimeout(() => {
@@ -1449,5 +1475,6 @@ export {
   adminQuizThumbnailUpdate,
   adminQuizSessionResults,
   adminQuizSessionResultsCSV,
+  createTimeout,
   adminQuizSessionList
 };
