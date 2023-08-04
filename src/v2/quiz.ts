@@ -112,9 +112,6 @@ function adminQuizList(
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
-  if (!user) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  }
 
   if (user.quizIds) {
     return { quizzes: user.quizIds.map((quiz) => quiz) };
@@ -147,9 +144,7 @@ function adminQuizCreate(
   const acceptedCharacters = /^[a-zA-Z0-9 ]+$/;
 
   // Error checking block
-  if (!data.users.some((users) => users.authUserId === authUserId)) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  } else if (!acceptedCharacters.test(name)) {
+  if (!acceptedCharacters.test(name)) {
     throw HTTPError(400, { error: 'Name contains invalid characters' });
   } else if (name.length > MAXNAME || name.length < MINNAME) {
     throw HTTPError(400, { error: 'Name is less than 3 or more than 30 characters' });
@@ -209,9 +204,7 @@ function adminQuizRemove(
   const data = getData();
   const user = data.users.find((user) => user.authUserId === authUserId);
   // Error checking block
-  if (user === undefined) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  } else if (!data.quizzes.some((quizzes) => quizzes.quizId === quizId)) {
+  if (!data.quizzes.some((quizzes) => quizzes.quizId === quizId)) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
   } else if (!user.quizIds.some((id) => id.quizId === quizId)) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz that this user owns' });
@@ -253,9 +246,7 @@ function adminQuizInfo(authUserId: number, quizId: number): Quiz | ErrorObject {
   const selected = data.quizzes.find((quiz) => quiz.quizId === quizId);
 
   // Error checking block
-  if (user === undefined) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  } else if (selected === undefined) {
+  if (selected === undefined) {
     throw HTTPError(400, { error: 'Quiz Id does not refer to a valid quiz' });
   } else if (
     !user.quizIds.some((quiz) => quiz.quizId === quizId) &&
@@ -299,9 +290,7 @@ function adminQuizNameUpdate(
   const selected = data.quizzes.find((quiz) => quiz.quizId === quizId);
 
   // Error checking block
-  if (user === undefined) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  } else if (!acceptedCharacters.test(name)) {
+  if (!acceptedCharacters.test(name)) {
     throw HTTPError(400, { error: 'Name contains any characters that are not alphanumeric or are spaces' });
   } else if (name.length < MINNAME || name.length > MAXNAME) {
     throw HTTPError(400, {
@@ -354,9 +343,7 @@ function adminQuizDescriptionUpdate(
   const selected = data.quizzes.find((quiz) => quiz.quizId === quizId);
 
   // Error checking block
-  if (user === undefined) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  } else if (selected === undefined) {
+  if (selected === undefined) {
     throw HTTPError(400, { error: 'Quiz Id does not refer to a valid quiz' });
   } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
     throw HTTPError(400, { error: 'Quiz Id does not refer to a quiz that this user owns' });
@@ -385,9 +372,7 @@ function adminQuizTrash(
 ): EmptyQuizList | QuizList | ErrorObject {
   const data = getData();
   const user = data.users.find((user) => user.authUserId === authUserId);
-  if (user === undefined) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid' });
-  }
+
   return { quizzes: user.trash };
 }
 
@@ -406,9 +391,6 @@ function adminQuizRestore(
 ): Record<string, never> | ErrorObject {
   const data = getData();
   const user = data.users.find((user) => user.authUserId === authUserId);
-  if (user === undefined) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  }
   const quizzes = data.quizzes.find((quiz) => quiz.quizId === quizId);
   const restoredQuiz = user.trash.find((quiz) => quiz.quizId === quizId);
   const checkQuizzes = user.quizIds.find((quiz) => quiz.quizId === quizId);
@@ -444,9 +426,7 @@ function adminQuizTrashEmpty(
 ): Record<string, never> | ErrorObject {
   const data = getData();
   const user = data.users.find((user) => user.authUserId === userId);
-  if (user === undefined) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  }
+
   // error checking array
   for (const string of array) {
     const quizId = parseInt(string);
@@ -492,9 +472,7 @@ function adminQuizQuestion(
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
 
   // Error-checking block
-  if (user === undefined) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  } else if (currentQuiz === undefined) {
+  if (currentQuiz === undefined) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
   } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a quiz that this user owns' });
@@ -632,9 +610,7 @@ function adminQuizTransfer(
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
 
   // Error-checking block
-  if (currentUser === undefined) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  } else if (currentQuiz === undefined) {
+  if (currentQuiz === undefined) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
   } else if (!currentUser.quizIds.some((quiz) => quiz.quizId === quizId)) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a quiz that this user owns' });
@@ -686,9 +662,7 @@ function adminQuizQuestionMove(
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
 
   // Error checking block
-  if (user === undefined) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  } else if (currentQuiz === undefined) {
+  if (currentQuiz === undefined) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
   } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a quiz that this user owns' });
@@ -746,9 +720,7 @@ function adminQuizQuestionDuplicate(
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
 
   // Error checking block
-  if (user === undefined) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  } else if (currentQuiz === undefined) {
+  if (currentQuiz === undefined) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
   } else if (!user.quizIds.some((quiz) => quiz.quizId === quizId)) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a quiz that this user owns' });
@@ -807,11 +779,10 @@ function adminQuizQuestionUpdate(
   const user = data.users.find((user) => user.authUserId === authUserId);
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
 
-  if (user === undefined) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  } else if (currentQuiz === undefined) {
+  if (currentQuiz === undefined) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
   }
+
   const currentQuestion = currentQuiz.questions.find(
     (question) => question.questionId === questionId
   );
@@ -956,9 +927,7 @@ function adminQuizQuestionDelete(
   const user = data.users.find((user) => user.authUserId === authUserId);
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
 
-  if (user === undefined) {
-    throw HTTPError(400, { error: 'AuthUserId is not a valid user' });
-  } else if (currentQuiz === undefined) {
+  if (currentQuiz === undefined) {
     throw HTTPError(400, { error: 'Quiz ID does not refer to a valid quiz' });
   }
   const currentQuestion = currentQuiz.questions.find(
