@@ -88,7 +88,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
-    test('CASE: question string is less than 5 or more than 50 characters', () => {
+    test('CASE: too few answers', () => {
       quizQuestion1 = {
         question: 'Who?',
         duration: 4,
@@ -97,7 +97,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question//////////', () => {
           {
             answer: 'King Charles',
             correct: true,
-          },
+          }
         ],
         thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
