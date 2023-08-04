@@ -223,3 +223,8 @@ export function requestPlayerQuestionAnswer(playerId: number, questionPosition: 
   const response = putRequest(`/v1/player/${playerId}/question/${questionPosition}/answer`, { answerIds }, {});
   return response;
 }
+
+export function requestPlayerFinalResults(playerId: number) { 
+  const response = getRequest(`/v1/player/${playerId}/results`, {}, {});
+  return response;
+}
