@@ -325,7 +325,7 @@ function playerFinalResults(playerId: number): SessionResultsReturn | ErrorObjec
   const sessionData = getSession();
 
   const currentSession = sessionData.sessions.find((session) => session.players.some((player) => player.playerId === playerId));
-  
+
   if (!currentSession) {
     throw HTTPError(400, 'Player ID does not exist');
   } else if (currentSession.state === 'FINAL_RESULTS') {
@@ -356,6 +356,6 @@ export {
   playerSendMessage,
   playerQuestionInfo,
   playerQuestionAnswer,
-  playerViewMessages, 
+  playerViewMessages,
   playerFinalResults
 };

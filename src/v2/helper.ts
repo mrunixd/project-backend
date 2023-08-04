@@ -224,7 +224,7 @@ export function requestPlayerQuestionAnswer(playerId: number, questionPosition: 
   return response;
 }
 
-export function requestPlayerFinalResults(playerId: number) { 
+export function requestPlayerFinalResults(playerId: number) {
   const response = getRequest(`/v1/player/${playerId}/results`, {}, {});
   return response;
 }
