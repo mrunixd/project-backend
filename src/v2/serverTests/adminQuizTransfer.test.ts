@@ -12,25 +12,8 @@ import {
   INPUT_ERROR,
 } from '../helper';
 
-let result1: any;
-let result2: any;
-let person1: any;
-let person2: any;
-let quiz1: any;
-let quiz2: any;
-let quizQuestion1: any;
-let quizQuestion2: any;
-
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
-  result1 = undefined;
-  result2 = undefined;
-  person1 = undefined;
-  person2 = undefined;
-  quiz1 = undefined;
-  quiz2 = undefined;
-  quizQuestion1 = undefined;
-  quizQuestion2 = undefined;
 });
 
 const quizQuestion1Body = {
@@ -65,7 +48,10 @@ const quizQuestion2Body = {
   ],
   thumbnailUrl: 'https://media.sproutsocial.com/uploads/PI_Analytics_Instagram_Competitors_Report.png'
 };
-
+let person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
+let person2 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+let quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
+let quizQuestion1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
 describe('///////Testing /v2/admin/quiz/transfer////////', () => {
   beforeEach(() => {
     person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
@@ -76,10 +62,10 @@ describe('///////Testing /v2/admin/quiz/transfer////////', () => {
 
   describe('Testing /v2/admin/quiz/question/transfer success cases', () => {
     test('move quiz to 2nd person who already has a quiz', () => {
-      quiz2 = requestAdminQuizCreate(`${person2.body.token}`, 'second quiz', 'second quiz being tested');
-      result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${person1.body.token}`, 'aarnavsample@gmail.com');
+      const quiz2 = requestAdminQuizCreate(`${person2.body.token}`, 'second quiz', 'second quiz being tested');
+      const result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${person1.body.token}`, 'aarnavsample@gmail.com');
 
-      result2 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person2.body.token}`);
+      const result2 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person2.body.token}`);
       const result3 = requestAdminQuizInfo(`${quiz2.body.quizId}`, `${person2.body.token}`);
 
       expect(result1.body).toStrictEqual({});
@@ -132,13 +118,13 @@ describe('///////Testing /v2/admin/quiz/transfer////////', () => {
     });
 
     test('duplicate 1st question after transfer to 2nd person', () => {
-      quizQuestion2 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion2Body);
+      const quizQuestion2 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion2Body);
 
-      result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${person1.body.token}`, 'aarnavsample@gmail.com');
+      const result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${person1.body.token}`, 'aarnavsample@gmail.com');
 
       const expectedTime = Math.floor(Date.now() / 1000);
       const quizQuestion3 = requestAdminQuizQuestionDuplicate(`${quiz1.body.quizId}`, `${quizQuestion1.body.questionId}`, `${person2.body.token}`);
-      result2 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person2.body.token}`);
+      const result2 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person2.body.token}`);
       const result3 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person1.body.token}`);
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
@@ -225,43 +211,43 @@ describe('///////Testing /v2/admin/quiz/transfer////////', () => {
   });
   describe('Testing /v2/admin/quiz/transfer error cases', () => {
     test('CASE (401): Token is not a valid structure - special symbols', () => {
-      result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${'le1!!'}`, 'aarnavsample@gmail.com');
+      const result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${'le1!!'}`, 'aarnavsample@gmail.com');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
     });
 
     test('CASE (403): Provided token is valid structure, but is not for a currently logged in session', () => {
       const sessionId = parseInt(person1.body.token) + 1;
-      result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${sessionId}`, 'aarnavsample@gmail.com');
+      const result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${sessionId}`, 'aarnavsample@gmail.com');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(FORBIDDEN);
     });
 
     test('CASE (400): Quiz ID does not refer to a valid quiz', () => {
-      result1 = requestAdminQuizTransfer(`${quiz1.body.quizId + 1}`, `${person1.body.token}`, 'aarnavsample@gmail.com');
+      const result1 = requestAdminQuizTransfer(`${quiz1.body.quizId + 1}`, `${person1.body.token}`, 'aarnavsample@gmail.com');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
 
     test('CASE (400): Quiz ID does not refer to a quiz that this user owns', () => {
       requestAdminAuthRegister('manan.j2450@gmail.com', 'Abcd12345', 'Manan', 'Jaiswal');
-      result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${person2.body.token}`, 'manan.j2450@gmail.com');
+      const result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${person2.body.token}`, 'manan.j2450@gmail.com');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
     test('CASE (400): userEmail is not a real user', () => {
-      result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${person1.body.token}`, 'fakeEmail');
+      const result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${person1.body.token}`, 'fakeEmail');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
     test('CASE (400): userEmail is the current logged in user', () => {
-      result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${person1.body.token}`, 'vincentxian@gmail.com');
+      const result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${person1.body.token}`, 'vincentxian@gmail.com');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
     test('CASE (400): Quiz ID refers to a quiz that has a name that is already used by the target user', () => {
-      quiz2 = requestAdminQuizCreate(`${person2.body.token}`, 'first quiz', 'second quiz being tested');
-      result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${person1.body.token}`, 'aarnavsample@gmail.com');
+      requestAdminQuizCreate(`${person2.body.token}`, 'first quiz', 'second quiz being tested');
+      const result1 = requestAdminQuizTransfer(`${quiz1.body.quizId}`, `${person1.body.token}`, 'aarnavsample@gmail.com');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });

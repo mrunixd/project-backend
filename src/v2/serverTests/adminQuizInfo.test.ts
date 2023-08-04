@@ -9,22 +9,8 @@ import {
   INPUT_ERROR,
 } from '../helper';
 
-let result1: any;
-let person1: any;
-let person2: any;
-let quiz1: any;
-let quizQuestion1: any;
-let quizQuestion2: any;
-
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
-  result1 = undefined;
-  person1 = undefined;
-  person2 = undefined;
-  quiz1 = undefined;
-
-  quizQuestion1 = undefined;
-  quizQuestion2 = undefined;
 });
 
 const quizQuestion1Body = {
@@ -61,22 +47,33 @@ const quizQuestion2Body = {
   thumbnailUrl:
     'https://media.sproutsocial.com/uploads/PI_Analytics_Instagram_Competitors_Report.png',
 };
+let person1 = requestAdminAuthRegister(
+  'vincentxian@gmail.com',
+  'password1',
+  'vincent',
+  'xian'
+);
+let quiz1 = requestAdminQuizCreate(
+  `${person1.body.token}`,
+  'first quiz',
+  'first quiz being tested'
+);
 
 describe('///////Testing /v2/admin/quiz/ info////////', () => {
   describe('Testing /v2/admin/quiz/ info success cases', () => {
     test('Success info 1 person 1 quiz 0 questions', () => {
-      person1 = requestAdminAuthRegister(
+      const person1 = requestAdminAuthRegister(
         'vincentxian@gmail.com',
         'password1',
         'vincent',
         'xian'
       );
-      quiz1 = requestAdminQuizCreate(
+      const quiz1 = requestAdminQuizCreate(
         `${person1.body.token}`,
         'first quiz',
         'first quiz being tested'
       );
-      result1 = requestAdminQuizInfo(
+      const result1 = requestAdminQuizInfo(
         `${quiz1.body.quizId}`,
         `${person1.body.token}`
       );
@@ -95,30 +92,30 @@ describe('///////Testing /v2/admin/quiz/ info////////', () => {
     });
 
     test('Success info 1 person 1 quiz 2 questions', () => {
-      person1 = requestAdminAuthRegister(
+      const person1 = requestAdminAuthRegister(
         'vincentxian@gmail.com',
         'password1',
         'vincent',
         'xian'
       );
-      quiz1 = requestAdminQuizCreate(
+      const quiz1 = requestAdminQuizCreate(
         `${person1.body.token}`,
         'first quiz',
         'first quiz being tested'
       );
 
-      quizQuestion1 = requestAdminQuizQuestion(
+      const quizQuestion1 = requestAdminQuizQuestion(
         `${quiz1.body.quizId}`,
         `${person1.body.token}`,
         quizQuestion1Body
       );
-      quizQuestion2 = requestAdminQuizQuestion(
+      const quizQuestion2 = requestAdminQuizQuestion(
         `${quiz1.body.quizId}`,
         `${person1.body.token}`,
         quizQuestion2Body
       );
 
-      result1 = requestAdminQuizInfo(
+      const result1 = requestAdminQuizInfo(
         `${quiz1.body.quizId}`,
         `${person1.body.token}`
       );
@@ -194,7 +191,7 @@ describe('///////Testing /v2/admin/quiz/ info////////', () => {
       );
     });
     test('CASE: Quiz ID does not refer to a valid quiz', () => {
-      result1 = requestAdminQuizInfo(
+      const result1 = requestAdminQuizInfo(
         `${quiz1.body.quizId + 1}`,
         `${person1.body.token}`
       );
@@ -203,7 +200,7 @@ describe('///////Testing /v2/admin/quiz/ info////////', () => {
     });
 
     test('CASE: Quiz ID does not refer to a quiz that this user owns', () => {
-      person2 = requestAdminAuthRegister(
+      const person2 = requestAdminAuthRegister(
         'aarnavsample@gmail.com',
         'Abcd12345',
         'aarnav',
@@ -214,7 +211,7 @@ describe('///////Testing /v2/admin/quiz/ info////////', () => {
         'first quiz being tested'
       );
       requestAdminQuizDelete(`${person1.body.token}`, `${quiz2.body.quizId}`);
-      result1 = requestAdminQuizInfo(
+      const result1 = requestAdminQuizInfo(
         `${quiz1.body.quizId}`,
         `${person2.body.token}`
       );

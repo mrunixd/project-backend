@@ -1,4 +1,7 @@
-import { getData, setData, QuizIds, Quiz, Question, Answer, Session, SessionId, STATE, ACTION, QuestionResult, QuestionBreakdown, getSession, setSession } from './dataStore';
+import {
+  getData, setData, QuizIds, Quiz, Question, Answer, Session, SessionId, ACTION,
+  QuestionResult, QuestionBreakdown, getSession, setSession, ErrorObject
+} from './dataStore';
 import HTTPError from 'http-errors';
 import request from 'sync-request';
 import fs from 'fs';
@@ -23,20 +26,15 @@ const MAXANSWERLENGTH = 30;
 const MAXDURATION = 180;
 let imageUrlOnServer: string;
 
-interface ErrorObject {
-  error: string;
+interface SessionListReturn {
+  activeSessions: number[];
+  inactiveSessions: number[];
 }
-
-interface QuizId {
-  quizId: number;
-}
-
-interface EmptyQuizList {
-  quizzes: [];
-}
-
-interface QuizList {
-  quizzes: QuizIds[];
+interface sessionStatusReturn {
+  state: string;
+  atQuestion: number;
+  players: string[];
+  metadata: Quiz;
 }
 
 export interface answerInput {
@@ -56,17 +54,6 @@ export interface QuestionId {
   questionId: number;
 }
 
-export interface NewQuestionId {
-  newQuestionId: number;
-}
-
-interface sessionStatusReturn {
-  state: string;
-  atQuestion: number;
-  players: string[];
-  metadata: Quiz;
-}
-
 interface UserRank {
   name: string;
   score: number;
@@ -81,10 +68,6 @@ interface QuestionResultReturn {
 export interface SessionResultsReturn {
   usersRankedByScore: UserRank[];
   questionResults: QuestionResultReturn[];
-}
-
-interface CSVSessionResult {
-  url: string;
 }
 
 enum Colours {
@@ -110,11 +93,8 @@ enum Colours {
  *  ]
  * }
  */
-function adminQuizList(
-  authUserId: number
-): EmptyQuizList | QuizList | ErrorObject {
+function adminQuizList(authUserId: number): {quizzes: []} | {quizzes: QuizIds[]} | ErrorObject {
   const data = getData();
-
   const user = data.users.find((user) => user.authUserId === authUserId);
 
   return { quizzes: user.quizIds.map((quiz) => quiz) };
@@ -134,7 +114,7 @@ function adminQuizCreate(
   authUserId: number,
   name: string,
   description: string
-): QuizId | ErrorObject {
+): {quizId: number} | ErrorObject {
   const data = getData();
 
   // Save the selected user to be used for error checking & return values
@@ -359,12 +339,10 @@ function adminQuizDescriptionUpdate(
  *
  * @param {number} authUserId
  *
- * @returns {EmptyQuizList | QuizList}
+ * @returns {{quizzes: []} | {quizzes: QuizIds[]}}
  *
  */
-function adminQuizTrash(
-  authUserId: number
-): EmptyQuizList | QuizList | ErrorObject {
+function adminQuizTrash(authUserId: number): {quizzes: []} | {quizzes: QuizIds[]} | ErrorObject {
   const data = getData();
   const user = data.users.find((user) => user.authUserId === authUserId);
 
@@ -453,14 +431,14 @@ function adminQuizTrashEmpty(
  * @param {number} quizId
  * @param {questionInput} questionBody
  *
- * @returns {QuestionId}
+ * @returns {{questionId: number}}
  *
  */
 function adminQuizQuestion(
   authUserId: number,
   quizId: number,
   questionBody: questionInput
-): QuestionId | ErrorObject {
+): {questionId: number} | ErrorObject {
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
@@ -707,7 +685,7 @@ function adminQuizQuestionDuplicate(
   authUserId: number,
   quizId: number,
   questionId: number
-): NewQuestionId | ErrorObject {
+): {newQuestionId: number} | ErrorObject {
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
@@ -973,7 +951,7 @@ function adminQuizSessionStart(
 
   const user = data.users.find((user) => user.authUserId === authUserId);
   const currentQuiz = data.quizzes.find((quiz) => quiz.quizId === quizId);
-  const nonEndedQuizzes = sessionData.sessions.map((session) => session.state !== STATE.END);
+  const nonEndedQuizzes = sessionData.sessions.map((session) => session.state !== 'END');
 
   // Error-checking block
   if (currentQuiz === undefined) {
@@ -989,16 +967,7 @@ function adminQuizSessionStart(
   }
 
   // Generates a unique 5 digit number for the new sessionId
-  let uniqueNumberFlag = false;
-  let sessionId = (Math.floor(Math.random() * 90000) + 10000);
-  while (uniqueNumberFlag === false) {
-    // If the generated sessionId already exists, generate a new one
-    if (sessionData.sessions.some((session) => session.sessionId === sessionId)) {
-      sessionId = (Math.floor(Math.random() * 90000) + 10000);
-    } else {
-      uniqueNumberFlag = true;
-    }
-  }
+  const sessionId = (Math.floor(Math.random() * 90000) + 10000);
 
   // For every question in the new Session, initialise values
   const questionResults: QuestionResult[] = [];
@@ -1341,7 +1310,7 @@ function adminQuizSessionResultsCSV(
   authUserId: number,
   quizId: number,
   sessionId: number
-): CSVSessionResult | ErrorObject {
+): {url: string} | ErrorObject {
   const data = getData();
   const sessionData = getSession();
 
@@ -1392,10 +1361,7 @@ function adminQuizSessionResultsCSV(
   return { url: fileUrl };
 }
 
-function adminQuizSessionList(quizId: number): {
-  activeSessions: number[];
-  inactiveSessions: number[];
-} {
+function adminQuizSessionList(quizId: number): SessionListReturn {
   const sessionData = getSession();
   const inactiveSessionIds: number[] = [];
   const activeSessionIds: number[] = [];

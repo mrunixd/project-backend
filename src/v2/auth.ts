@@ -2,19 +2,10 @@ import validator from 'validator';
 import { getData, setData, ErrorObject } from './dataStore';
 import HTTPError from 'http-errors';
 import { hashPassword } from './other';
+import { GetDetailsReturn } from './dataStore';
 const MAXNAMELENGTH = 20;
 const MINNAMELENGTH = 2;
 const MINPASSWORD = 8;
-
-interface User {
-  user: {
-    userId: number;
-    name: string;
-    email: string;
-    numSuccessfulLogins: number;
-    numFailedPasswordsSinceLastLogin: number;
-  };
-}
 
 interface TokenReturn {
   token: string;
@@ -85,16 +76,7 @@ function adminAuthRegister(
   });
 
   // Generates a unique 5 digit number for the new sessionId
-  let uniqueNumberFlag = false;
-  let sessionId = (Math.floor(Math.random() * 90000) + 10000).toString();
-  while (uniqueNumberFlag === false) {
-    // If the generated sessionId already exists, generate a new one
-    if (data.tokens.some((token) => token.sessionId === sessionId)) {
-      sessionId = (Math.floor(Math.random() * 90000) + 10000).toString();
-    } else {
-      uniqueNumberFlag = true;
-    }
-  }
+  const sessionId = (Math.floor(Math.random() * 90000) + 10000).toString();
 
   data.tokens.push({
     sessionId: sessionId,
@@ -139,16 +121,7 @@ function adminAuthLogin(
   selectedUser.numFailedPasswordsSinceLastLogin = 0;
 
   // Generates a unique 5 digit number for the new sessionId
-  let uniqueNumberFlag = false;
-  let sessionId = (Math.floor(Math.random() * 90000) + 10000).toString();
-  while (uniqueNumberFlag === false) {
-    // If the generated sessionId already exists, generate a new one
-    if (data.tokens.some((token) => token.sessionId === sessionId)) {
-      sessionId = (Math.floor(Math.random() * 90000) + 10000).toString();
-    } else {
-      uniqueNumberFlag = true;
-    }
-  }
+  const sessionId = (Math.floor(Math.random() * 90000) + 10000).toString();
 
   data.tokens.push({
     sessionId: sessionId,
@@ -177,7 +150,7 @@ function adminAuthLogin(
  *  }
  * }
  */
-function adminUserDetails(authUserId: number): User {
+function adminUserDetails(authUserId: number): GetDetailsReturn {
   const data = getData();
   // Save required user and return relevant information
   const user = data.users.find((users) => users.authUserId === authUserId);

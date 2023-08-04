@@ -7,21 +7,15 @@ import {
   UNAUTHORISED,
 } from '../helper';
 
-let result1: any;
-let person1: any;
-let quiz1: any;
-let quiz2: any;
-let quiz3: any;
-
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
-  result1 = undefined;
-  person1 = undefined;
-  quiz1 = undefined;
-  quiz2 = undefined;
-  quiz3 = undefined;
 });
-
+let person1 = requestAdminAuthRegister(
+  'aarnavsample@gmail.com',
+  'Abcd12345',
+  'aarnav',
+  'sheth'
+);
 describe('////////TESTING v2/admin/quiz/list////////', () => {
   beforeEach(() => {
     person1 = requestAdminAuthRegister(
@@ -40,7 +34,7 @@ describe('////////TESTING v2/admin/quiz/list////////', () => {
         'first quiz being tested'
       );
 
-      result1 = requestAdminQuizList(`${person1.body.token}`);
+      const result1 = requestAdminQuizList(`${person1.body.token}`);
 
       expect(result1.body).toStrictEqual({
         quizzes: [
@@ -54,29 +48,29 @@ describe('////////TESTING v2/admin/quiz/list////////', () => {
     });
 
     test('Successful empty display', () => {
-      result1 = requestAdminQuizList(`${person1.body.token}`);
+      const result1 = requestAdminQuizList(`${person1.body.token}`);
       expect(result1.body).toStrictEqual({ quizzes: [] });
       expect(result1.status).toBe(OK);
     });
 
     test('Successful Multiple quiz display', () => {
-      quiz1 = requestAdminQuizCreate(
+      const quiz1 = requestAdminQuizCreate(
         `${person1.body.token}`,
         'first quiz',
         'first quiz being tested'
       );
-      quiz2 = requestAdminQuizCreate(
+      const quiz2 = requestAdminQuizCreate(
         `${person1.body.token}`,
         'second quiz',
         'second quiz being tested'
       );
-      quiz3 = requestAdminQuizCreate(
+      const quiz3 = requestAdminQuizCreate(
         `${person1.body.token}`,
         'third quiz',
         'third quiz being tested'
       );
 
-      result1 = requestAdminQuizList(`${person1.body.token}`);
+      const result1 = requestAdminQuizList(`${person1.body.token}`);
       expect(result1.body).toStrictEqual({
         quizzes: [
           {
@@ -99,7 +93,7 @@ describe('////////TESTING v2/admin/quiz/list////////', () => {
 
   describe('ERROR CASES', () => {
     test('CASE (401): Token is not a valid structure - special symbols', () => {
-      result1 = requestAdminQuizList('let!!');
+      const result1 = requestAdminQuizList('let!!');
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(UNAUTHORISED);
     });

@@ -12,12 +12,6 @@ import {
   INPUT_ERROR,
 } from '../helper';
 
-let result1: any;
-let person1: any;
-let player1: any;
-let quiz1: any;
-let session1: any;
-let question1: any;
 const quizQuestion1Body = {
   question: 'Who is the Monarch of England?',
   duration: 0.1,
@@ -37,13 +31,12 @@ const quizQuestion1Body = {
 
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
-  result1 = undefined;
-  person1 = undefined;
-  player1 = undefined;
-  quiz1 = undefined;
-  session1 = undefined;
-  question1 = undefined;
 });
+let person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
+let quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
+let question1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
+let session1 = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 10);
+let player1 = requestPlayerJoin(session1.body.sessionId, 'Vincent Xian');
 
 describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid}/results ///////', () => {
   beforeEach(() => {
@@ -60,7 +53,7 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid}/results ///
       sleepSync(100);
       requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'GO_TO_ANSWER');
       requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'GO_TO_FINAL_RESULTS');
-      result1 = requestPlayerResults(player1.body.playerId);
+      const result1 = requestPlayerResults(player1.body.playerId);
 
       expect(result1.body).toStrictEqual({
         usersRankedByScore: [{
@@ -82,13 +75,13 @@ describe('/////// TESTING v1/admin/quiz/{quizid}/session/{sessionid}/results ///
   });
   describe('/////// Testing v1/admin/player/{playerid}/results errors', () => {
     test('CASE (400): player ID does not refer to a player', () => {
-      result1 = requestPlayerResults(100);
+      const result1 = requestPlayerResults(100);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (400): Session is not in FINAL_RESULTS state', () => {
       requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'END');
-      result1 = requestPlayerResults(player1.body.playerId);
+      const result1 = requestPlayerResults(player1.body.playerId);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });

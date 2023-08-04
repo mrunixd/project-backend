@@ -11,21 +11,8 @@ import {
   INPUT_ERROR
 } from '../helper';
 
-let person1: any;
-let quiz1: any;
-let sessionId: any;
-let result1: any;
-let result2: any;
-let result3: any;
-
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
-  person1 = undefined;
-  quiz1 = undefined;
-  sessionId = undefined;
-  result1 = undefined;
-  result2 = undefined;
-  result3 = undefined;
 });
 
 const quizQuestion1Body = {
@@ -46,19 +33,24 @@ const quizQuestion1Body = {
         'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
 };
 
+let person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
+let quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
+let sessionId = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 3);
+const result1 = requestPlayerJoin(sessionId.body.sessionId, 'Zhi Zhao');
+
 describe('/////// TESTING /v1/player/:playerid/chat (Show Messages) ///////', () => {
   beforeEach(() => {
     person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
     quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
     requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
     sessionId = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 3);
-    result1 = requestPlayerJoin(sessionId.body.sessionId, 'Zhi Zhao');
+    const result1 = requestPlayerJoin(sessionId.body.sessionId, 'Zhi Zhao');
     requestPlayerSendMessage(result1.body.playerId, 'Hello World');
   });
 
   describe('CASE: adminViewChatMessages successful', () => {
     test('adminViewChatMessages runs successfully with one message', () => {
-      result2 = requestPlayerViewMessages(result1.body.playerId);
+      const result2 = requestPlayerViewMessages(result1.body.playerId);
 
       expect(result2.body).toStrictEqual({
         message: [{
@@ -74,10 +66,10 @@ describe('/////// TESTING /v1/player/:playerid/chat (Show Messages) ///////', ()
 
     test('playerViewMessages runs successfully with multiple messages', () => {
       requestAdminAuthRegister('zhizhao@gmail.com', 'password1', 'Zhi', 'Zhao');
-      result2 = requestPlayerJoin(sessionId.body.sessionId, 'Vincent Xian');
+      const result2 = requestPlayerJoin(sessionId.body.sessionId, 'Vincent Xian');
       requestPlayerSendMessage(result2.body.playerId, 'Goodbye World');
 
-      result3 = requestPlayerViewMessages(result2.body.playerId);
+      const result3 = requestPlayerViewMessages(result2.body.playerId);
 
       expect(result3.body).toStrictEqual({
         message: [
@@ -102,7 +94,7 @@ describe('/////// TESTING /v1/player/:playerid/chat (Show Messages) ///////', ()
 
   describe('/////// Testing /v1/player/:playerid/chat errors ///////', () => {
     test('CASE (400): PlayerId does not exist', () => {
-      result2 = requestPlayerViewMessages(1234);
+      const result2 = requestPlayerViewMessages(1234);
       expect(result2.body).toStrictEqual({ error: expect.any(String) });
       expect(result2.status).toBe(INPUT_ERROR);
     });

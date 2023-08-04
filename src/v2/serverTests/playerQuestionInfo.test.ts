@@ -10,19 +10,9 @@ import {
   OK,
   INPUT_ERROR,
 } from '../helper';
-let result1: any;
-let person1: any;
-let quiz1: any;
-let sessionId: any;
-let player1: any;
 
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
-  result1 = undefined;
-  person1 = undefined;
-  quiz1 = undefined;
-  sessionId = undefined;
-  player1 = undefined;
 });
 
 const quizQuestion1Body = {
@@ -60,6 +50,23 @@ const quizQuestion2Body = {
   thumbnailUrl:
     'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
 };
+let person1 = requestAdminAuthRegister(
+  'manan.j2450@gmail.com',
+  'password1',
+  'Manan ',
+  'Jaiswal'
+);
+let quiz1 = requestAdminQuizCreate(
+  `${person1.body.token}`,
+  'first quiz',
+  'first quiz being tested'
+);
+let sessionId = requestAdminQuizSessionStart(
+  `${person1.body.token}`,
+  `${quiz1.body.quizId}`,
+  3
+);
+let player1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan');
 
 describe('////////TESTING /v1/player/:playerid/question/:questionposition////////', () => {
   beforeEach(() => {
@@ -99,7 +106,7 @@ describe('////////TESTING /v1/player/:playerid/question/:questionposition///////
         `${sessionId.body.sessionId}`,
         'NEXT_QUESTION'
       );
-      result1 = requestPlayerQuestionInfo(player1.body.playerId, 1);
+      const result1 = requestPlayerQuestionInfo(player1.body.playerId, 1);
       expect(result1.body).toStrictEqual({
         questionId: expect.any(Number),
         question: 'Who is the Monarch of England?',
@@ -126,7 +133,7 @@ describe('////////TESTING /v1/player/:playerid/question/:questionposition///////
   });
   describe('Testing /v1/player/:playerid/question/:questionposition errors', () => {
     test('CASE 400: PlayerId does not exist', () => {
-      result1 = requestPlayerQuestionInfo(player1.body.playerId + 1, 1);
+      const result1 = requestPlayerQuestionInfo(player1.body.playerId + 1, 1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
@@ -137,7 +144,7 @@ describe('////////TESTING /v1/player/:playerid/question/:questionposition///////
         `${sessionId.body.sessionId}`,
         'NEXT_QUESTION'
       );
-      result1 = requestPlayerQuestionInfo(player1.body.playerId, 3);
+      const result1 = requestPlayerQuestionInfo(player1.body.playerId, 3);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
@@ -148,7 +155,7 @@ describe('////////TESTING /v1/player/:playerid/question/:questionposition///////
         `${sessionId.body.sessionId}`,
         'NEXT_QUESTION'
       );
-      result1 = requestPlayerQuestionInfo(player1.body.playerId, 2);
+      const result1 = requestPlayerQuestionInfo(player1.body.playerId, 2);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
@@ -159,7 +166,7 @@ describe('////////TESTING /v1/player/:playerid/question/:questionposition///////
         `${sessionId.body.sessionId}`,
         'END'
       );
-      result1 = requestPlayerQuestionInfo(player1.body.playerId, 1);
+      const result1 = requestPlayerQuestionInfo(player1.body.playerId, 1);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });

@@ -1,5 +1,15 @@
 import fs from 'fs';
 
+export interface GetDetailsReturn {
+  user: {
+    userId: number;
+    name: string;
+    email: string;
+    numSuccessfulLogins: number;
+    numFailedPasswordsSinceLastLogin: number;
+  };
+}
+
 export interface QuizIds {
   quizId: number;
   name: string;
@@ -28,9 +38,9 @@ export interface Question {
   questionId: number;
   question: string;
   duration: number;
+  thumbnailUrl: string;
   points: number;
   answers: Answer[];
-  thumbnailUrl: string;
 }
 
 export interface Quiz {
@@ -110,7 +120,7 @@ export interface SessionId {
 }
 
 interface TimeOut {
-  timeoutId: any;
+  timeoutId: ReturnType<typeof setTimeout>;
   sessionId: number;
 }
 

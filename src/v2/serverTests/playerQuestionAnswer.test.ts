@@ -13,28 +13,14 @@ import {
   INPUT_ERROR,
   sleepSync,
 } from '../helper';
-let result1: any;
-let person1: any;
-let quiz1: any;
-let sessionId: any;
-let player1: any;
-let player2: any;
-let question: any;
 
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
-  result1 = undefined;
-  person1 = undefined;
-  quiz1 = undefined;
-  sessionId = undefined;
-  player1 = undefined;
-  player2 = undefined;
-  question = undefined;
 });
 
 const quizQuestion1Body = {
   question: 'Who is the Monarch of England?',
-  duration: 4,
+  duration: 2,
   points: 5,
   answers: [
     {
@@ -48,6 +34,16 @@ const quizQuestion1Body = {
   ],
   thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
 };
+let person1 = requestAdminAuthRegister('manan.j2450@gmail.com', 'password1', 'Manan ', 'Jaiswal');
+let quiz1 = requestAdminQuizCreate(
+  `${person1.body.token}`,
+  'first quiz',
+  'first quiz being tested'
+);
+let sessionId = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 2);
+let player1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan');
+let player2 = requestPlayerJoin(sessionId.body.sessionId, 'Vincent');
+let question = requestPlayerQuestionInfo(player1.body.playerId, 1);
 
 describe('////////TESTING /v1/player/:playerid/question/:questionposition/answer////////', () => {
   beforeEach(() => {
@@ -68,7 +64,7 @@ describe('////////TESTING /v1/player/:playerid/question/:questionposition/answer
   describe('TESTING /v1/player/:playerid/question/:questionposition/answer success case', () => {
     test('testing 2nd player answers 1st question correctly', () => {
       requestPlayerQuestionAnswer(player1.body.playerId, 1, [question.body.answers[0].answerId]);
-      result1 = requestPlayerQuestionAnswer(player2.body.playerId, 1, [question.body.answers[1].answerId]);
+      const result1 = requestPlayerQuestionAnswer(player2.body.playerId, 1, [question.body.answers[1].answerId]);
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
@@ -107,38 +103,38 @@ describe('////////TESTING /v1/player/:playerid/question/:questionposition/answer
   });
   describe('TESTING /v1/player/:playerid/question/:questionposition/answer error case', () => {
     test('CASE (400): playerId doesnt exist', () => {
-      result1 = requestPlayerQuestionAnswer(player1.body.playerId + 1, 1, [question.body.answers[0].answerId]);
+      const result1 = requestPlayerQuestionAnswer(player1.body.playerId + 1, 1, [question.body.answers[0].answerId]);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (400): If question position is not valid for the session this player is in', () => {
-      result1 = requestPlayerQuestionAnswer(player1.body.playerId, 10, [question.body.answers[0].answerId]);
+      const result1 = requestPlayerQuestionAnswer(player1.body.playerId, 10, [question.body.answers[0].answerId]);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (400): Session is not in QUESTION_OPEN state', () => {
       requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${sessionId.body.sessionId}`, 'END');
-      result1 = requestPlayerQuestionAnswer(player1.body.playerId, 1, [question.body.answers[0].answerId]);
+      const result1 = requestPlayerQuestionAnswer(player1.body.playerId, 1, [question.body.answers[0].answerId]);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (400): If session is not yet up to this question', () => {
-      result1 = requestPlayerQuestionAnswer(player1.body.playerId, 2, [question.body.answers[0].answerId]);
+      const result1 = requestPlayerQuestionAnswer(player1.body.playerId, 2, [question.body.answers[0].answerId]);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (400): Answer IDs are not valid for this particular question', () => {
-      result1 = requestPlayerQuestionAnswer(player1.body.playerId, 1, [1000]);
+      const result1 = requestPlayerQuestionAnswer(player1.body.playerId, 1, [1000]);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('There are duplicate answer IDs provided', () => {
-      result1 = requestPlayerQuestionAnswer(player1.body.playerId, 1, [question.body.answers[0].answerId, question.body.answers[0].answerId]);
+      const result1 = requestPlayerQuestionAnswer(player1.body.playerId, 1, [question.body.answers[0].answerId, question.body.answers[0].answerId]);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });
     test('CASE (400): Less than 1 answer ID was submitted', () => {
-      result1 = requestPlayerQuestionAnswer(player1.body.playerId, 1, []);
+      const result1 = requestPlayerQuestionAnswer(player1.body.playerId, 1, []);
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toStrictEqual(INPUT_ERROR);
     });

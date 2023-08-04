@@ -10,20 +10,11 @@ import {
   INPUT_ERROR,
 } from '../helper';
 
-let result1: any;
-let result2: any;
-let person1: any;
-let person2: any;
-let quiz1: any;
-
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
-  result1 = undefined;
-  result2 = undefined;
-  person1 = undefined;
-  person2 = undefined;
-  quiz1 = undefined;
 });
+let person1 = requestAdminAuthRegister('aarnavsample@gmail.com', 'Abcd12345', 'aarnav', 'sheth');
+let quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
 
 describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
   beforeEach(() => {
@@ -32,7 +23,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
   });
   describe('/////// Testing v2/admin/quiz/thumbnail success', () => {
     test('CASE: Successful adminQuizThumbnailUpdate', () => {
-      result1 = requestAdminQuizThumbnailUpdate(
+      const result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId}`,
           `${person1.body.token}`,
           'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
@@ -41,7 +32,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
-      result2 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person1.body.token}`);
+      const result2 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person1.body.token}`);
 
       expect(result2.body).toStrictEqual({
         quizId: quiz1.body.quizId,
@@ -62,7 +53,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
         `${person1.body.token}`,
         'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
       );
-      result1 = requestAdminQuizThumbnailUpdate(
+      const result1 = requestAdminQuizThumbnailUpdate(
         `${quiz1.body.quizId}`,
         `${person1.body.token}`,
         'https://www.pngall.com/wp-content/uploads/2016/04/Potato-PNG-Clipart.png'
@@ -71,7 +62,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
       expect(result1.body).toStrictEqual({});
       expect(result1.status).toBe(OK);
 
-      result2 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person1.body.token}`);
+      const result2 = requestAdminQuizInfo(`${quiz1.body.quizId}`, `${person1.body.token}`);
 
       expect(result2.body).toStrictEqual({
         quizId: quiz1.body.quizId,
@@ -90,7 +81,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
 
   describe('/////// Testing v2/admin/quiz/name error', () => {
     test('CASE: quizId does not refer to a valid quiz', () => {
-      result1 = requestAdminQuizThumbnailUpdate(
+      const result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId + 1}`,
           `${person1.body.token}`,
           'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
@@ -101,14 +92,14 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
     });
 
     test('CASE: quizId does not refer to a quiz that this user owns', () => {
-      person2 = requestAdminAuthRegister(
+      const person2 = requestAdminAuthRegister(
         'zhizhao@gmail.com',
         'Abcd12345',
         'Zhi',
         'Zhao'
       );
 
-      result1 = requestAdminQuizThumbnailUpdate(
+      const result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId}`,
           `${person2.body.token}`,
           'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
@@ -119,7 +110,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
     });
 
     test('CASE: Token is not a valid structure - too short', () => {
-      result1 = requestAdminQuizThumbnailUpdate(
+      const result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId}`,
           `${1}`,
           'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
@@ -130,7 +121,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
     });
 
     test('CASE: Token is not a valid structure - non-numeric characters', () => {
-      result1 = requestAdminQuizThumbnailUpdate(
+      const result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId}`,
           'let!!',
           'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
@@ -141,7 +132,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
     });
 
     test('CASE: Token is not a valid structure - too long', () => {
-      result1 = requestAdminQuizThumbnailUpdate(
+      const result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId}`,
           `${12121322}`,
           'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
@@ -152,7 +143,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
     });
 
     test('CASE: Provided token is valid structure, but is not for a currently logged in session', () => {
-      result1 = requestAdminQuizThumbnailUpdate(
+      const result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId}`,
           `${12345}`,
           'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png'
@@ -163,7 +154,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
     });
 
     test('CASE: invalid url', () => {
-      result1 = requestAdminQuizThumbnailUpdate(
+      const result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId}`,
           `${person1.body.token}`,
           'https://www.wix.com/'
@@ -174,7 +165,7 @@ describe('/////// TESTING v2/admin/quiz/thumbnail ///////', () => {
     });
 
     test('CASE: valid url but not a jpeg or png', () => {
-      result1 = requestAdminQuizThumbnailUpdate(
+      const result1 = requestAdminQuizThumbnailUpdate(
           `${quiz1.body.quizId}`,
           `${person1.body.token}`,
           'https://i0.wp.com/www.printmag.com/wp-content/uploads/2021/02/4cbe8d_f1ed2800a49649848102c68fc5a66e53mv2.gif'

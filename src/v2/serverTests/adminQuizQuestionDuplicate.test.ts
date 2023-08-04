@@ -9,25 +9,8 @@ import {
   INPUT_ERROR,
 } from '../helper';
 
-let result1: any;
-let result2: any;
-let person1: any;
-let person2: any;
-let quiz1: any;
-let quiz2: any;
-let quizQuestion1: any;
-let quizQuestion2: any;
-
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
-  result1 = undefined;
-  result2 = undefined;
-  person1 = undefined;
-  person2 = undefined;
-  quiz1 = undefined;
-  quiz2 = undefined;
-  quizQuestion1 = undefined;
-  quizQuestion2 = undefined;
 });
 
 const quizQuestion1Body = {
@@ -64,7 +47,22 @@ const quizQuestion2Body = {
   thumbnailUrl:
     'https://media.sproutsocial.com/uploads/PI_Analytics_Instagram_Competitors_Report.png',
 };
-
+let person1 = requestAdminAuthRegister(
+  'vincentxian@gmail.com',
+  'password1',
+  'vincent',
+  'xian'
+);
+let quiz1 = requestAdminQuizCreate(
+  `${person1.body.token}`,
+  'first quiz',
+  'first quiz being tested'
+);
+let quizQuestion1 = requestAdminQuizQuestion(
+  `${quiz1.body.quizId}`,
+  `${person1.body.token}`,
+  quizQuestion1Body
+);
 describe('///////Testing /v2/admin/quiz/question/duplicate////////', () => {
   beforeEach(() => {
     person1 = requestAdminAuthRegister(
@@ -87,7 +85,7 @@ describe('///////Testing /v2/admin/quiz/question/duplicate////////', () => {
 
   describe('Testing /v2/admin/quiz/question/duplicate success cases', () => {
     test('Success duplicating 1st question with 1 quiz 2 question', () => {
-      quizQuestion2 = requestAdminQuizQuestion(
+      const quizQuestion2 = requestAdminQuizQuestion(
         `${quiz1.body.quizId}`,
         `${person1.body.token}`,
         quizQuestion2Body
@@ -99,7 +97,7 @@ describe('///////Testing /v2/admin/quiz/question/duplicate////////', () => {
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`
       );
-      result2 = requestAdminQuizInfo(
+      const result2 = requestAdminQuizInfo(
         `${quiz1.body.quizId}`,
         `${person1.body.token}`
       );
@@ -186,12 +184,12 @@ describe('///////Testing /v2/admin/quiz/question/duplicate////////', () => {
       });
     });
     test('Success duplicating 1st question of 2nd quiz with 1 question', () => {
-      quiz2 = requestAdminQuizCreate(
+      const quiz2 = requestAdminQuizCreate(
         `${person1.body.token}`,
         'second quiz',
         'second quiz being tested'
       );
-      quizQuestion2 = requestAdminQuizQuestion(
+      const quizQuestion2 = requestAdminQuizQuestion(
         `${quiz2.body.quizId}`,
         `${person1.body.token}`,
         quizQuestion2Body
@@ -202,7 +200,7 @@ describe('///////Testing /v2/admin/quiz/question/duplicate////////', () => {
         `${quizQuestion2.body.questionId}`,
         `${person1.body.token}`
       );
-      result2 = requestAdminQuizInfo(
+      const result2 = requestAdminQuizInfo(
         `${quiz2.body.quizId}`,
         `${person1.body.token}`
       );
@@ -270,7 +268,7 @@ describe('///////Testing /v2/admin/quiz/question/duplicate////////', () => {
 
   describe('Testing /v2/admin/quiz/question/duplicate error cases', () => {
     test('CASE (400): Quiz ID does not refer to a valid quiz', () => {
-      result1 = requestAdminQuizQuestionDuplicate(
+      const result1 = requestAdminQuizQuestionDuplicate(
         `${quiz1.body.quizId + 1}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`
@@ -280,14 +278,14 @@ describe('///////Testing /v2/admin/quiz/question/duplicate////////', () => {
     });
 
     test('CASE (400): Quiz ID does not refer to a quiz that this user owns', () => {
-      person2 = requestAdminAuthRegister(
+      const person2 = requestAdminAuthRegister(
         'aarnavsample@gmail.com',
         'Abcd12345',
         'aarnav',
         'sheth'
       );
 
-      result1 = requestAdminQuizQuestionDuplicate(
+      const result1 = requestAdminQuizQuestionDuplicate(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person2.body.token}`
@@ -297,18 +295,18 @@ describe('///////Testing /v2/admin/quiz/question/duplicate////////', () => {
     });
 
     test('CASE (400): Question Id does not refer to a valid question within this quiz', () => {
-      quiz2 = requestAdminQuizCreate(
+      const quiz2 = requestAdminQuizCreate(
         `${person1.body.token}`,
         'second quiz',
         'second quiz being tested'
       );
-      quizQuestion2 = requestAdminQuizQuestion(
+      const quizQuestion2 = requestAdminQuizQuestion(
         `${quiz2.body.quizId}`,
         `${person1.body.token}`,
         quizQuestion2Body
       );
 
-      result1 = requestAdminQuizQuestionDuplicate(
+      const result1 = requestAdminQuizQuestionDuplicate(
         `${quiz1.body.quizId}`,
         `${quizQuestion2.body.questionId}`,
         `${person1.body.token}`

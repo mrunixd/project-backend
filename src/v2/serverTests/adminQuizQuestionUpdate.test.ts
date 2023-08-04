@@ -9,21 +9,8 @@ import {
   INPUT_ERROR,
 } from '../helper';
 
-let result1: any;
-let result2: any;
-let person1: any;
-let person2: any;
-let quiz1: any;
-let quizQuestion1: any;
-
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
-  result1 = undefined;
-  result2 = undefined;
-  person1 = undefined;
-  person2 = undefined;
-  quiz1 = undefined;
-  quizQuestion1 = undefined;
 });
 
 const quizQuestion1Body = {
@@ -43,6 +30,23 @@ const quizQuestion1Body = {
   thumbnailUrl:
     'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
 };
+
+let person1 = requestAdminAuthRegister(
+  'aarnavsample@gmail.com',
+  'Abcd12345',
+  'aarnav',
+  'sheth'
+);
+let quiz1 = requestAdminQuizCreate(
+  `${person1.body.token}`,
+  'first quiz',
+  'first quiz being tested'
+);
+let quizQuestion1 = requestAdminQuizQuestion(
+  `${quiz1.body.quizId}`,
+  `${person1.body.token}`,
+  quizQuestion1Body
+);
 
 describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', () => {
   beforeEach(() => {
@@ -83,13 +87,13 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
         thumbnailUrl:
           'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestionUpdate(
+      const result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`,
         quizQuestion3Body
       );
-      result2 = requestAdminQuizInfo(
+      const result2 = requestAdminQuizInfo(
         `${quiz1.body.quizId}`,
         `${person1.body.token}`
       );
@@ -135,7 +139,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
 
   describe('Testing /v2/admin/quiz/{quizid}/question error cases', () => {
     test('CASE: quiz does not exist', () => {
-      result1 = requestAdminQuizQuestionUpdate(
+      const result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId + 1}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`,
@@ -146,13 +150,13 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
     });
 
     test('CASE: quiz does not exist for user', () => {
-      person2 = requestAdminAuthRegister(
+      const person2 = requestAdminAuthRegister(
         'vincent@gmail.com',
         'password1',
         'vincent',
         'xian'
       );
-      result1 = requestAdminQuizQuestionUpdate(
+      const result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person2.body.token}`,
@@ -163,7 +167,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
     });
 
     test('CASE: quiz question does not exist for quiz', () => {
-      result1 = requestAdminQuizQuestionUpdate(
+      const result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId + 1}`,
         `${person1.body.token}`,
@@ -191,7 +195,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
         thumbnailUrl:
           'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestionUpdate(
+      const result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`,
@@ -215,7 +219,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
         thumbnailUrl:
           'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestionUpdate(
+      const result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`,
@@ -243,7 +247,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
         thumbnailUrl:
           'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestionUpdate(
+      const result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`,
@@ -271,7 +275,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
         thumbnailUrl:
           'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestionUpdate(
+      const result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`,
@@ -299,7 +303,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
         thumbnailUrl:
           'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestionUpdate(
+      const result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`,
@@ -328,7 +332,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
         thumbnailUrl:
           'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestionUpdate(
+      const result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`,
@@ -355,7 +359,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
         ],
         thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestionUpdate(
+      const result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`,
@@ -382,7 +386,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
         thumbnailUrl:
           'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
       };
-      result1 = requestAdminQuizQuestionUpdate(
+      const result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`,
@@ -408,7 +412,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
         ],
         thumbnailUrl: '',
       };
-      result1 = requestAdminQuizQuestionUpdate(
+      const result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`,
@@ -434,7 +438,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
         ],
         thumbnailUrl: 'https://NOT_AREAL_URL.png'
       };
-      result1 = requestAdminQuizQuestionUpdate(
+      const result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`,
@@ -461,7 +465,7 @@ describe('////////Testing v2/admin/quiz/{quizid}/question/update //////////', ()
         ],
         thumbnailUrl: 'https://www.wix.com/'
       };
-      result1 = requestAdminQuizQuestionUpdate(
+      const result1 = requestAdminQuizQuestionUpdate(
         `${quiz1.body.quizId}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`,

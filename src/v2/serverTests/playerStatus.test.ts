@@ -10,20 +10,8 @@ import {
   INPUT_ERROR,
 } from '../helper';
 
-let result1: any;
-let result2: any;
-let result3: any;
-let person1: any;
-let quiz1: any;
-let sessionId: any;
-
 beforeEach(() => {
   deleteRequest('/v1/clear', {});
-  result1 = undefined;
-  result2 = undefined;
-  person1 = undefined;
-  result3 = undefined;
-  quiz1 = undefined;
 });
 
 const quizQuestion1Body = {
@@ -43,6 +31,27 @@ const quizQuestion1Body = {
   thumbnailUrl:
     'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
 };
+let person1 = requestAdminAuthRegister(
+  'manan.j2450@gmail.com',
+  'password1',
+  'Manan ',
+  'Jaiswal'
+);
+let quiz1 = requestAdminQuizCreate(
+  `${person1.body.token}`,
+  'first quiz',
+  'first quiz being tested'
+);
+requestAdminQuizQuestion(
+  `${quiz1.body.quizId}`,
+  `${person1.body.token}`,
+  quizQuestion1Body
+);
+let sessionId = requestAdminQuizSessionStart(
+  `${person1.body.token}`,
+  `${quiz1.body.quizId}`,
+  3
+);
 
 describe('////////TESTING v1/player/:playerid////////', () => {
   beforeEach(() => {
@@ -70,8 +79,8 @@ describe('////////TESTING v1/player/:playerid////////', () => {
   });
   describe('Testing v1/player/:playerid success cases', () => {
     test('Testing player status of one player', () => {
-      result1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
-      result2 = requestPlayerStatus(result1.body.playerId);
+      const result1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
+      const result2 = requestPlayerStatus(result1.body.playerId);
       expect(result2.body).toStrictEqual({
         state: 'LOBBY',
         numQuestions: expect.any(Number),
@@ -80,9 +89,9 @@ describe('////////TESTING v1/player/:playerid////////', () => {
       expect(result2.status).toBe(OK);
     });
     test('Testing player status of two player session', () => {
-      result1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
-      result2 = requestPlayerJoin(sessionId.body.sessionId, 'Aarnav Sheth');
-      result3 = requestPlayerStatus(result1.body.playerId);
+      let result1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
+      const result2 = requestPlayerJoin(sessionId.body.sessionId, 'Aarnav Sheth');
+      const result3 = requestPlayerStatus(result1.body.playerId);
       result1 = requestPlayerStatus(result2.body.playerId);
       expect(result1.body).toStrictEqual({
         state: 'LOBBY',
@@ -100,8 +109,8 @@ describe('////////TESTING v1/player/:playerid////////', () => {
   });
   describe('Testing v1/player/:playerid error cases', () => {
     test('Testing no player found', () => {
-      result1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
-      result2 = requestPlayerStatus(result1.body.playerId + 1);
+      const result1 = requestPlayerJoin(sessionId.body.sessionId, 'Manan Jaiswal');
+      const result2 = requestPlayerStatus(result1.body.playerId + 1);
       expect(result2.body).toStrictEqual({ error: expect.any(String) });
       expect(result2.status).toBe(INPUT_ERROR);
     });
