@@ -324,7 +324,7 @@ function hasDuplicates(arr: number[]) {
 function playerFinalResults(playerId: number): SessionResultsReturn | ErrorObject {
   const sessionData = getSession();
 
-  const currentSession = sessionData.sessions.find((session) => session.players.find(player => playerId === playerId));
+  const currentSession = sessionData.sessions.find((session) => session.players.some((player) => player.playerId === playerId));
   
   if (!currentSession) {
     throw HTTPError(400, 'Player ID does not exist');
@@ -342,7 +342,7 @@ function playerFinalResults(playerId: number): SessionResultsReturn | ErrorObjec
     const { questionId, questionCorrectBreakdown, averageAnswerTime, percentCorrect } = result;
     return { questionId, questionCorrectBreakdown, averageAnswerTime, percentCorrect };
   });
-  
+
   return {
     usersRankedByScore: userRank,
     questionResults: questionResults
