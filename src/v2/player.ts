@@ -339,9 +339,9 @@ function playerQuestionAnswer(playerId: number, questionPosition: number, answer
 }
 
 /** function checks a given array of numbers for duplicates
- * 
+ *
  * @params {number[]} array
- * 
+ *
  * @returns {SetConstructor}
  *
  */

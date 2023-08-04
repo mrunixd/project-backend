@@ -73,7 +73,6 @@ describe('////////TESTING v1/player/join&sendmessage////////', () => {
       expect(result1.body).toStrictEqual({ playerId: expect.any(Number) });
       expect(result1.status).toBe(OK);
     });
-
   });
   describe('TESTING v1/player/join errors', () => {
     test('CASE 400: player joins game where individual has same name', () => {

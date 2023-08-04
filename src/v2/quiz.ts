@@ -517,7 +517,6 @@ function adminQuizQuestion(
   }
 
   if (questionBody.thumbnailUrl !== undefined) {
-
     const res = request('GET', `${questionBody.thumbnailUrl}`);
     const body = res.getBody();
 
