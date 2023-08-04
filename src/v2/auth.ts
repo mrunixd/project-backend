@@ -2,19 +2,10 @@ import validator from 'validator';
 import { getData, setData, ErrorObject } from './dataStore';
 import HTTPError from 'http-errors';
 import { hashPassword } from './other';
+import { GetDetailsReturn } from './dataStore';
 const MAXNAMELENGTH = 20;
 const MINNAMELENGTH = 2;
 const MINPASSWORD = 8;
-
-interface User {
-  user: {
-    userId: number;
-    name: string;
-    email: string;
-    numSuccessfulLogins: number;
-    numFailedPasswordsSinceLastLogin: number;
-  };
-}
 
 interface TokenReturn {
   token: string;
@@ -177,7 +168,7 @@ function adminAuthLogin(
  *  }
  * }
  */
-function adminUserDetails(authUserId: number): User {
+function adminUserDetails(authUserId: number): GetDetailsReturn {
   const data = getData();
   // Save required user and return relevant information
   const user = data.users.find((users) => users.authUserId === authUserId);

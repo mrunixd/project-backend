@@ -1,4 +1,4 @@
-import { getData, setData, QuizIds, Quiz, Question, Answer, Session, SessionId, STATE, ACTION, QuestionResult, QuestionBreakdown, getSession, setSession } from './dataStore';
+import { getData, setData, QuizIds, Quiz, Question, Answer, Session, SessionId, STATE, ACTION, QuestionResult, QuestionBreakdown, getSession, setSession, ErrorObject, SessionListReturn, sessionStatusReturn } from './dataStore';
 import HTTPError from 'http-errors';
 import request from 'sync-request';
 import fs from 'fs';
@@ -23,22 +23,6 @@ const MAXANSWERLENGTH = 30;
 const MAXDURATION = 180;
 let imageUrlOnServer: string;
 
-interface ErrorObject {
-  error: string;
-}
-
-interface QuizId {
-  quizId: number;
-}
-
-interface EmptyQuizList {
-  quizzes: [];
-}
-
-interface QuizList {
-  quizzes: QuizIds[];
-}
-
 export interface answerInput {
   answer: string;
   correct: boolean;
@@ -56,17 +40,6 @@ export interface QuestionId {
   questionId: number;
 }
 
-export interface NewQuestionId {
-  newQuestionId: number;
-}
-
-interface sessionStatusReturn {
-  state: string;
-  atQuestion: number;
-  players: string[];
-  metadata: Quiz;
-}
-
 interface UserRank {
   name: string;
   score: number;
@@ -81,10 +54,6 @@ interface QuestionResultReturn {
 export interface SessionResultsReturn {
   usersRankedByScore: UserRank[];
   questionResults: QuestionResultReturn[];
-}
-
-interface CSVSessionResult {
-  url: string;
 }
 
 enum Colours {
@@ -110,11 +79,8 @@ enum Colours {
  *  ]
  * }
  */
-function adminQuizList(
-  authUserId: number
-): EmptyQuizList | QuizList | ErrorObject {
+function adminQuizList(authUserId: number): {quizzes: []} | {quizzes: QuizIds[]} | ErrorObject {
   const data = getData();
-
   const user = data.users.find((user) => user.authUserId === authUserId);
 
   if (user.quizIds) {
@@ -140,7 +106,7 @@ function adminQuizCreate(
   authUserId: number,
   name: string,
   description: string
-): QuizId | ErrorObject {
+): {quizId: number} | ErrorObject {
   const data = getData();
 
   // Save the selected user to be used for error checking & return values
@@ -368,12 +334,10 @@ function adminQuizDescriptionUpdate(
  *
  * @param {number} authUserId
  *
- * @returns {EmptyQuizList | QuizList}
+ * @returns {{quizzes: []} | {quizzes: QuizIds[]}}
  *
  */
-function adminQuizTrash(
-  authUserId: number
-): EmptyQuizList | QuizList | ErrorObject {
+function adminQuizTrash(authUserId: number): {quizzes: []} | {quizzes: QuizIds[]} | ErrorObject {
   const data = getData();
   const user = data.users.find((user) => user.authUserId === authUserId);
 
@@ -462,14 +426,14 @@ function adminQuizTrashEmpty(
  * @param {number} quizId
  * @param {questionInput} questionBody
  *
- * @returns {QuestionId}
+ * @returns {{questionId: number}}
  *
  */
 function adminQuizQuestion(
   authUserId: number,
   quizId: number,
   questionBody: questionInput
-): QuestionId | ErrorObject {
+): {questionId: number} | ErrorObject {
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
@@ -717,7 +681,7 @@ function adminQuizQuestionDuplicate(
   authUserId: number,
   quizId: number,
   questionId: number
-): NewQuestionId | ErrorObject {
+): {newQuestionId: number} | ErrorObject {
   const data = getData();
 
   const user = data.users.find((user) => user.authUserId === authUserId);
@@ -1337,11 +1301,7 @@ function adminQuizSessionResults(
   };
 }
 
-function adminQuizSessionResultsCSV(
-  authUserId: number,
-  quizId: number,
-  sessionId: number
-): CSVSessionResult | ErrorObject {
+function adminQuizSessionResultsCSV(authUserId: number, quizId: number, sessionId: number): {url: string} | ErrorObject {
   const data = getData();
   const sessionData = getSession();
 
@@ -1392,10 +1352,7 @@ function adminQuizSessionResultsCSV(
   return { url: fileUrl };
 }
 
-function adminQuizSessionList(quizId: number): {
-  activeSessions: number[];
-  inactiveSessions: number[];
-} {
+function adminQuizSessionList(quizId: number): SessionListReturn {
   const sessionData = getSession();
   const inactiveSessionIds: number[] = [];
   const activeSessionIds: number[] = [];

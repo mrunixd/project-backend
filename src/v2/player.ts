@@ -1,19 +1,12 @@
-import { ErrorObject, STATE, getSession, setSession, Message } from './dataStore';
+import { ErrorObject, STATE, getSession, setSession, Message, Question } from './dataStore';
 import { SessionResultsReturn, createTimeout } from './quiz';
 import HTTPError from 'http-errors';
 
-// interface answerIds {
-//   answerIds: number[];
-// }
 
-interface Status {
+export interface Status {
   state: string;
   numQuestions: number;
   atQuestion: number;
-}
-
-interface Messages {
-  message: Message[]
 }
 
 /**
@@ -22,7 +15,7 @@ interface Messages {
  * @param {number} playerId
  * @param {string} name
  *
- * @returns {number} playerId
+ * @returns {{playerId: number}}
  *
  */
 function playerJoin(sessionId: number, name: string): {playerId: number} | ErrorObject {
@@ -210,7 +203,7 @@ function playerSendMessage(playerId: number, message: string): Record<string, ne
  * @returns {Message[]}
  *
  */
-function playerViewMessages(playerId: number): Messages | ErrorObject {
+function playerViewMessages(playerId: number): Message[] | ErrorObject {
   const sessionData = getSession();
   const session = sessionData.sessions.find(session => session.players.some(player => player.playerId === playerId));
 
@@ -227,7 +220,7 @@ function playerViewMessages(playerId: number): Messages | ErrorObject {
   return sessionMessages;
 }
 
-function playerQuestionInfo(playerId: number, questionPosition: number) {
+function playerQuestionInfo(playerId: number, questionPosition: number): Question {
   const sessionData = getSession();
   const session = sessionData.sessions.find((session) =>
     session.players.find((player) => player.playerId === playerId)
@@ -245,7 +238,7 @@ function playerQuestionInfo(playerId: number, questionPosition: number) {
   }
 }
 
-function playerQuestionAnswer(playerId: number, questionPosition: number, answerIds: number[]) {
+function playerQuestionAnswer(playerId: number, questionPosition: number, answerIds: number[]): Record<string, never> | ErrorObject {
   const sessionData = getSession();
   const session = sessionData.sessions.find((session) => session.players.find((player) => player.playerId === playerId));
   if (session === undefined) {
