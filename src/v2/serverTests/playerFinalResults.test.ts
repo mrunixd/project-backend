@@ -1,4 +1,5 @@
 import {
+    deleteRequest,
     requestAdminAuthRegister,
     requestAdminQuizCreate,
     requestAdminQuizQuestion,
@@ -19,7 +20,7 @@ import {
   let question3: any;
   let player1: any;
   let player2: any;
-  let sessionId: any;
+  let session1: any;
   let result1: any;
   
   beforeEach(() => {
@@ -31,7 +32,7 @@ import {
     question3 = undefined;
     player1 = undefined;
     player2 = undefined;
-    sessionId = undefined;
+    session1 = undefined;
     result1 = undefined;
   });
   
@@ -86,15 +87,13 @@ import {
     thumbnailUrl: 'https://media.sproutsocial.com/uploads/Homepage_Header-Listening.png',
   };
   
-  
-  
   describe('/////// TESTING /v1/player/{playerid}/results ///////', () => {
     beforeEach(() => {
       person1 = requestAdminAuthRegister('vincentxian@gmail.com', 'password1', 'vincent', 'xian');
       quiz1 = requestAdminQuizCreate(`${person1.body.token}`, 'first quiz', 'first quiz being tested');
       question1 = requestAdminQuizQuestion(`${quiz1.body.quizId}`, `${person1.body.token}`, quizQuestion1Body);
-      sessionId = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 3);
-      player1 = requestPlayerJoin(sessionId.body.sessionId, 'Zhi Zhao');
+      session1 = requestAdminQuizSessionStart(`${person1.body.token}`, `${quiz1.body.quizId}`, 3);
+      player1 = requestPlayerJoin(session1.body.sessionId, 'Zhi Zhao');
     });
   
     describe('/////// Testing /v1/player/{playerid}/results success ///////', () => {
@@ -105,14 +104,33 @@ import {
         requestAdminQuizSessionUpdate(`${person1.body.token}`, `${quiz1.body.quizId}`, `${session1.body.sessionId}`, 'GO_TO_FINAL_RESULTS');
         result1 = requestPlayerFinalResults(player1.body.playerId);
     
-        expect(result1.body).toStrictEqual({
-          usersRankedByScore: [{
-            name: 'Zhi Zhao',
-            score: 0
-          }],
-          questionResults: []
+        expect(result1.body).toStrictEqual(
+        {
+            usersRankedByScore: 
+            [
+                {
+                name: 'Zhi Zhao',
+                score: 0
+                }
+            ],
+            questionResults: 
+            [
+                {
+                    questionId: 0,
+                    questionCorrectBreakdown: 
+                    [
+                        {
+                            answerId: 1,
+                            playersCorrect: []
+                        }
+                    ]
+                }
+            ],
+
+            averageAnswerTime: 0,
+            percentCorrect: 0
         });
-        expect(result1.body).toBe(OK);
+        expect(result1.status).toBe(OK);
       });
   
     //   test('CASE: 3 questions, 2 players', () => {
@@ -181,14 +199,14 @@ import {
         result1 = requestPlayerFinalResults(player1.body.playerId + 1);
     
         expect(result1.body).toStrictEqual({ error: expect.any(String) });
-        expect(result1.body).toBe(INPUT_ERROR);
+        expect(result1.status).toBe(INPUT_ERROR);
       });
   
       test('CASE (400): Session is not in FINAL_RESULTS state', () => {
         result1 = requestPlayerFinalResults(player1.body.playerId + 1);
     
         expect(result1.body).toStrictEqual({ error: expect.any(String) });
-        expect(result1.body).toBe(INPUT_ERROR);
+        expect(result1.status).toBe(INPUT_ERROR);
       });
     });
   });
