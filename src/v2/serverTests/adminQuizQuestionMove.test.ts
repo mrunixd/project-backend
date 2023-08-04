@@ -201,7 +201,7 @@ describe('///////Testing /v2/admin/quiz/question/move////////', () => {
     });
     test('CASE (400): Quiz ID does not refer to a valid quiz', () => {
       result1 = requestAdminQuizQuestionMove(
-        `${quiz1.body.quizId + 1}`,
+        `${quiz1.body.quizId + 6}`,
         `${quizQuestion1.body.questionId}`,
         `${person1.body.token}`,
         1

@@ -3,6 +3,7 @@ import {
   requestAdminQuizCreate,
   requestAdminQuizInfo,
   requestAdminQuizQuestion,
+  requestAdminQuizDelete,
   deleteRequest,
   OK,
   INPUT_ERROR,
@@ -208,10 +209,16 @@ describe('///////Testing /v2/admin/quiz/ info////////', () => {
         'aarnav',
         'sheth'
       );
+      const quiz2 = requestAdminQuizCreate(`${person1.body.token}`,
+      'first quiz',
+      'first quiz being tested'
+      );
+      requestAdminQuizDelete(`${person1.body.token}`, `${quiz2.body.quizId}`)
       result1 = requestAdminQuizInfo(
         `${quiz1.body.quizId}`,
         `${person2.body.token}`
       );
+      
       expect(result1.body).toStrictEqual({ error: expect.any(String) });
       expect(result1.status).toBe(INPUT_ERROR);
     });
