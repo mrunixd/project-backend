@@ -182,6 +182,16 @@ export function requestPlayerSendMessage(playerId: number, message: string) {
   return response;
 }
 
+export function requestPlayerResults(playerId: number) {
+  const response = getRequest(`/v1/player/${playerId}/results`, {}, {});
+  return response;
+}
+
+export function requestPlayerViewMessages(playerId: number) {
+  const response = getRequest(`/v1/player/${playerId}/chat`, {}, {});
+  return response;
+}
+
 export function requestAdminQuizThumbnailUpdate(quizId: string, token: string, imgUrl: string) {
   const response = putRequest(`/v1/admin/quiz/${quizId}/thumbnail`, { imgUrl }, { token });
   return response;
@@ -192,11 +202,6 @@ export function sleepSync(ms: number) {
   while (new Date().getTime() - startTime < ms) {
     // zzzZZ
   }
-}
-
-export function requestPlayerResults(playerId: number) {
-  const response = getRequest(`/v1/player/${playerId}/results`, {}, {});
-  return response;
 }
 
 export function requestAdminQuizSessionResultsCSV(token: string, quizId: string, sessionId: string) {

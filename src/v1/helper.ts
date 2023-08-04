@@ -1,5 +1,6 @@
 import request from 'sync-request';
 import config from './config.json';
+import { IncomingHttpHeaders } from 'http';
 
 export const OK = 200;
 export const INPUT_ERROR = 400;
@@ -9,24 +10,24 @@ export const port = config.port;
 export const url = config.url;
 export const SERVER_URL = `${url}:${port}`;
 
-export function postRequest(route: string, json: any) {
-  const res = request('POST', `${SERVER_URL}${route}`, { json: json });
+export function postRequest(route: string, json: any, headers: IncomingHttpHeaders = {}) {
+  const res = request('POST', `${SERVER_URL}${route}`, { json: json, headers: headers });
   return {
     status: res.statusCode,
     body: JSON.parse(res.body.toString())
   };
 }
 
-export function deleteRequest(route: string, qs: any) {
-  const res = request('DELETE', `${SERVER_URL}${route}`, { qs: qs });
+export function deleteRequest(route: string, qs: any, headers: IncomingHttpHeaders = {}) {
+  const res = request('DELETE', `${SERVER_URL}${route}`, { qs: qs, headers: headers });
   return {
     status: res.statusCode,
     body: JSON.parse(res.body.toString())
   };
 }
 
-export function putRequest(route: string, json: any) {
-  const res = request('PUT', `${SERVER_URL}${route}`, { json: json });
+export function putRequest(route: string, json: any, headers: IncomingHttpHeaders = {}) {
+  const res = request('PUT', `${SERVER_URL}${route}`, { json: json, headers: headers });
 
   return {
     status: res.statusCode,
@@ -34,14 +35,13 @@ export function putRequest(route: string, json: any) {
   };
 }
 
-export function getRequest(route: string, qs: any) {
-  const res = request('GET', `${SERVER_URL}${route}`, { qs: qs });
+export function getRequest(route: string, qs: any, headers: IncomingHttpHeaders = {}) {
+  const res = request('GET', `${SERVER_URL}${route}`, { qs: qs, headers: headers });
   return {
     status: res.statusCode,
     body: JSON.parse(res.body.toString())
   };
 }
-
 export function requestAdminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string) {
   const response = postRequest('/v1/admin/auth/register', { email, password, nameFirst, nameLast });
   return response;
@@ -53,96 +53,163 @@ export function requestAdminAuthLogin(email: string, password: string) {
 }
 
 export function requestAdminUserDetails(token: string) {
-  const response = getRequest(`/v1/admin/user/details?token=${token}`, {});
+  const response = getRequest('/v2/admin/user/details', {}, { token });
   return response;
 }
 
 export function requestAdminAuthLogout(token: string) {
-  const response = postRequest('/v1/admin/auth/logout', { token });
+  const response = postRequest('/v2/admin/auth/logout', {}, { token });
   return response;
 }
 
 export function requestAdminAuthUpdateDetails(token: string, email: string, nameFirst: string, nameLast: string) {
-  const response = putRequest('/v1/admin/user/details', { token, email, nameFirst, nameLast });
+  const response = putRequest('/v2/admin/user/details', { email, nameFirst, nameLast }, { token });
   return response;
 }
 
 export function requestAdminAuthUpdatePassword(token: string, oldPassword: string, newPassword: string) {
-  const response = putRequest('/v1/admin/user/password', { token, oldPassword, newPassword });
+  const response = putRequest('/v2/admin/user/password', { oldPassword, newPassword }, { token });
   return response;
 }
 
 export function requestAdminQuizCreate(token: string, name: string, description: string) {
-  const response = postRequest('/v1/admin/quiz', { token, name, description });
+  const response = postRequest('/v2/admin/quiz', { name, description }, { token });
   return response;
 }
 
 export function requestAdminQuizList(token: string) {
-  const response = getRequest(`/v1/admin/quiz/list?token=${token}`, {});
+  const response = getRequest('/v2/admin/quiz/list', {}, { token });
   return response;
 }
 
 export function requestAdminQuizDelete(quizId: string, token: string) {
-  const response = deleteRequest(`/v1/admin/quiz/${quizId}?token=${token}`, {});
+  const response = deleteRequest(`/v2/admin/quiz/${quizId}`, {}, { token });
   return response;
 }
 
 export function requestAdminQuizInfo(quizId: string, token: string) {
-  const response = getRequest(`/v1/admin/quiz/${quizId}?token=${token}`, {});
+  const response = getRequest(`/v2/admin/quiz/${quizId}`, {}, { token });
   return response;
 }
 
 export function requestAdminQuizNameUpdate(quizId: string, token: string, name: string) {
-  const response = putRequest(`/v1/admin/quiz/${quizId}/name`, { token, name });
+  const response = putRequest(`/v2/admin/quiz/${quizId}/name`, { name }, { token });
   return response;
 }
 
 export function requestAdminQuizDescriptionUpdate(quizId: string, token: string, description: string) {
-  const response = putRequest(`/v1/admin/quiz/${quizId}/description`, { token, description });
-  return response;
-}
-
-export function requestAdminQuizQuestionCreate(quizId: string, token: string, questionBody: any) {
-  const response = postRequest(`/v1/admin/quiz/${quizId}/question`, { token, questionBody });
+  const response = putRequest(`/v2/admin/quiz/${quizId}/description`, { description }, { token });
   return response;
 }
 
 export function requestAdminQuizTrashList(token: string) {
-  const response = getRequest(`/v1/admin/quiz/trash?token=${token}`, {});
+  const response = getRequest('/v2/admin/quiz/trash', {}, { token });
   return response;
 }
 
 export function requestAdminQuizRestore(quizId: string, token: string) {
-  const response = postRequest(`/v1/admin/quiz/${quizId}/restore`, { token });
+  const response = postRequest(`/v2/admin/quiz/${quizId}/restore`, {}, { token });
   return response;
 }
 
-// export function requestAdminQuizTrashEmpty(token: string, quizIds: string[]) {
-//   const response = deleteRequest(`/v1/admin/quiz/trash/empty`, { token, quizIds });
-//   return response;
-// }
+export function requestAdminQuizTrashEmpty(token: string, quizIds: string) {
+  const response = deleteRequest('/v2/admin/quiz/trash/empty', { quizIds }, { token });
+  return response;
+}
 
 export function requestAdminQuizTransfer(quizId: string, token: string, userEmail: string) {
-  const response = postRequest(`/v1/admin/quiz/${quizId}/transfer`, { token, userEmail });
+  const response = postRequest(`/v2/admin/quiz/${quizId}/transfer`, { userEmail }, { token });
+  return response;
+}
+
+export function requestAdminQuizQuestionCreate(quizId: string, token: string, questionBody: any) {
+  const response = postRequest(`/v2/admin/quiz/${quizId}/question`, { questionBody }, { token });
   return response;
 }
 
 export function requestAdminQuizQuestionUpdate(quizId: string, questionId: string, token: string, questionBody: any) {
-  const response = putRequest(`/v1/admin/quiz/${quizId}/question/${questionId}`, { token, questionBody });
+  const response = putRequest(`/v2/admin/quiz/${quizId}/question/${questionId}`, { questionBody }, { token });
   return response;
 }
 
 export function requestAdminQuizQuestionMove(quizId: string, questionId: string, token: string, newPosition: number) {
-  const response = putRequest(`/v1/admin/quiz/${quizId}/question/${questionId}/move`, { token, newPosition });
+  const response = putRequest(`/v2/admin/quiz/${quizId}/question/${questionId}/move`, { newPosition }, { token });
   return response;
 }
 
 export function requestAdminQuizQuestionDuplicate(quizId: string, questionId: string, token: string) {
-  const response = postRequest(`/v1/admin/quiz/${quizId}/question/${questionId}/duplicate`, { token });
+  const response = postRequest(`/v2/admin/quiz/${quizId}/question/${questionId}/duplicate`, {}, { token });
   return response;
 }
 
 export function requestAdminQuizQuestionDelete(quizId: string, questionId: string, token: string) {
-  const response = deleteRequest(`/v1/admin/quiz/${quizId}/question/${questionId}?token=${token}`, {});
+  const response = deleteRequest(`/v2/admin/quiz/${quizId}/question/${questionId}`, {}, { token });
+  return response;
+}
+
+export function requestAdminQuizSessionStart(token: string, quizId: string, autoStartNum: number) {
+  const response = postRequest(`/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
+  return response;
+}
+
+export function requestAdminQuizSessionUpdate(token: string, quizId: string, sessionId: string, action: string) {
+  const response = putRequest(`/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
+  return response;
+}
+
+export function requestAdminQuizSessionStatus(token: string, quizId: string, sessionId: string) {
+  const response = getRequest(`/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
+  return response;
+}
+
+export function requestAdminQuizSessionResults(token: string, quizId: string, sessionId: string) {
+  const response = getRequest(`/v1/admin/quiz/${quizId}/session/${sessionId}/results`, {}, { token });
+  return response;
+}
+
+export function requestPlayerJoin(sessionId: number, name: string) {
+  const response = postRequest('/v1/player/join', { sessionId, name });
+  return response;
+}
+
+export function requestPlayerStatus(playerId: number) {
+  const response = getRequest(`/v1/player/${playerId}`, {}, {});
+  return response;
+}
+
+export function requestPlayerSendMessage(playerId: number, message: string) {
+  const response = postRequest(`/v1/player/${playerId}/chat`, { message });
+  return response;
+}
+
+export function requestAdminQuizThumbnailUpdate(quizId: string, token: string, imgUrl: string) {
+  const response = putRequest(`/v1/admin/quiz/${quizId}/thumbnail`, { imgUrl }, { token });
+  return response;
+}
+
+export function sleepSync(ms: number) {
+  const startTime = new Date().getTime();
+  while (new Date().getTime() - startTime < ms) {
+    // zzzZZ
+  }
+}
+
+export function requestPlayerResults(playerId: number) {
+  const response = getRequest(`/v1/player/${playerId}/results`, {}, {});
+  return response;
+}
+
+export function requestAdminQuizSessionResultsCSV(token: string, quizId: string, sessionId: string) {
+  const response = getRequest(`/v1/admin/quiz/${quizId}/session/${sessionId}/results/csv`, {}, { token });
+  return response;
+}
+
+export function requestAdminQuizSessionList(token: string, quizId: string) {
+  const response = getRequest(`/v1/admin/quiz/${quizId}/sessions`, {}, { token });
+  return response;
+}
+
+export function requestPlayerQuestionInfo(playerId: number, questionPosition: number) {
+  const response = getRequest(`/v1/player/${playerId}/question/${questionPosition}`, {}, {});
   return response;
 }
