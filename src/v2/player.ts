@@ -348,6 +348,43 @@ function playerQuestionAnswer(playerId: number, questionPosition: number, answer
 function hasDuplicates(arr: number[]) {
   return new Set(arr).size !== arr.length;
 }
+
+/**
+ * This function retrieves the final results for a player
+ *
+ * @param {number} playerId
+ *
+ * @returns {SessionResultsReturn}
+ *
+ */
+function playerFinalResults(playerId: number): SessionResultsReturn | ErrorObject {
+  const sessionData = getSession();
+
+  const currentSession = sessionData.sessions.find((session) => session.players.some((player) => player.playerId === playerId));
+
+  if (!currentSession) {
+    throw HTTPError(400, 'Player ID does not exist');
+  } else if (currentSession.state === 'FINAL_RESULTS') {
+    throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
+  }
+
+  const userRank = currentSession.players.map((player) => {
+    const { name, score } = player;
+    return { name, score };
+  });
+  userRank.sort((a, b) => b.score - a.score);
+
+  const questionResults = currentSession.questionResults.map((result) => {
+    const { questionId, questionCorrectBreakdown, averageAnswerTime, percentCorrect } = result;
+    return { questionId, questionCorrectBreakdown, averageAnswerTime, percentCorrect };
+  });
+
+  return {
+    usersRankedByScore: userRank,
+    questionResults: questionResults
+  };
+}
+
 export {
   playerJoin,
   playerStatus,
@@ -355,5 +392,6 @@ export {
   playerSendMessage,
   playerQuestionInfo,
   playerQuestionAnswer,
-  playerViewMessages
+  playerViewMessages,
+  playerFinalResults
 };
